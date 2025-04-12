@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producer-Consumer Synchronization Visualization</title>
+    <style>
+        :root {
+            --primary: #4a6bff;
+            --secondary: #ff6b4a;
+            --background: #1a1a2e;
+            --surface: #16213e;
+            --text: #e2e2e2;
+            --success: #4aff6b;
+            --error: #ff4a6b;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            color: var(--text);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.secondary {
+            background-color: var(--secondary);
+        }
+        
+        .visualization {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 2rem;
+            gap: 2rem;
+        }
+        
+        .process-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        
+        .process {
+            flex: 1;
+            background-color: var(--surface);
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .process-title {
+            position: absolute;
+            top: -12px;
+            background-color: var(--surface);
+            padding: 0.25rem 1rem;
+            border-radius: 16px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .producer {
+            border: 2px solid var(--primary);
+        }
+        
+        .producer .process-title {
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .consumer {
+            border: 2px solid var(--secondary);
+        }
+        
+        .consumer .process-title {
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+        
+        .process-state {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        .item {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .buffer-container {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--surface);
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+            min-height: 100px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .buffer-title {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--surface);
+            padding: 0.25rem 1rem;
+            border-radius: 16px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .buffer-slots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        
+        .buffer-slot {
+            width: 50px;
+            height: 50px;
+            border: 2px dashed #666;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .buffer-item {
+            width: 40px;
+            height: 40px;
+            border-radius: -50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+        
+        .semaphore-indicators {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+        }
+        
+        .semaphore {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: var(--surface);
+            border-radius: 8px;
+            min-width: 100px;
+        }
+        
+        .semaphore-title {
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .semaphore-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .logs-container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: var(--surface);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 2rem;
+            height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logs-title {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.25rem;
+            font-family: monospace;
+            color: #ccc;
+            line-height: 1.5;
+            font-size: 0.9rem;
+            display: flex;
+        }
+        
+        .log-timestamp {
+            margin-right: 1rem;
+            color: #888;
+            min-width: 70px;
+        }
+        
+        .log-producer {
+            color: var(--primary);
+        }
+        
+        .log-consumer {
+            color: var(--secondary);
+        }
+        
+        .log-mutex {
+            color: var(--success);
+        }
+        
+        .settings {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .setting {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .setting label {
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+        }
+        
+        .setting input {
+            width: 60px;
+            padding: 0.25rem;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: var(--surface);
+            color: var(--text);
+            text-align: center;
+        }
+        
+        /* Animations */
+        @keyframes produce {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes consume {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        
+        @keyframes highlight {
+            0% { box-shadow: 0 0 0 2px rgba(74, 107, 255, 0); }
+            50% { box-shadow: 0 0 0 4px rgba(74, 107, 255, 0.5); }
+            100% { box-shadow: 0 0 0 2px rgba(74, 107, 255, 0); }
+        }
+        
+        .highlight-producer {
+            animation: highlight 1s infinite;
+            border-color: var(--primary);
+        }
+        
+        .highlight-consumer {
+            animation: highlight 1s infinite;
+            border-color: var(--secondary);
+        }
+        
+        .moving-item {
+            position: absolute;
+            z-index: 10;
+            transition: all 0.8s ease;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #666;
+            margin-right: 8px;
+        }
+        
+        .status-active {
+            background-color: var(--success);
+        }
+        
+        .status-waiting {
+            background-color: var(--error);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Producer-Consumer Process Synchronization</h1>
+        
+        <div class="settings">
+            <div class="setting">
+                <label for="buffer-size">Buffer Size</label>
+                <input type="number" id="buffer-size" min="1" max="10" value="5">
+            </div>
+            <div class="setting">
+                <label for="producer-speed">Producer Speed (ms)</label>
+                <input type="number" id="producer-speed" min="500" max="5000" step="500" value="2000">
+            </div>
+            <div class="setting">
+                <label for="consumer-speed">Consumer Speed (ms)</label>
+                <input type="number" id="consumer-speed" min="500" max="5000" step="500" value="3000">
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn">Start Simulation</button>
+            <button id="pause-btn" class="secondary" disabled>Pause</button>
+            <button id="reset-btn" class="secondary">Reset</button>
+        </div>
+        
+        <div class="visualization">
+            <div class="process-container">
+                <div class="process producer">
+                    <div class="process-title">Producer</div>
+                    <div class="status-container" style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <div class="status-indicator" id="producer-status"></div>
+                        <div class="process-state" id="producer-state">Idle</div>
+                    </div>
+                    <div id="producer-item-container"></div>
+                </div>
+                
+                <div class="process consumer">
+                    <div class="process-title">Consumer</div>
+                    <div class="status-container" style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <div class="status-indicator" id="consumer-status"></div>
+                        <div class="process-state" id="consumer-state">Idle</div>
+                    </div>
+                    <div id="consumer-item-container"></div>
+                </div>
+            </div>
+            
+            <div class="buffer-container">
+                <div class="buffer-title">Bounded Buffer</div>
+                <div class="buffer-slots" id="buffer-slots">
+                    <!-- Buffer slots will be generated dynamically -->
+                </div>
+                
+                <div class="semaphore-indicators">
+                    <div class="semaphore">
+                        <div class="semaphore-title">Mutex</div>
+                        <div class="semaphore-value" id="mutex-value">1</div>
+                    </div>
+                    <div class="semaphore">
+                        <div class="semaphore-title">Empty Slots</div>
+                        <div class="semaphore-value" id="empty-value">5</div>
+                    </div>
+                    <div class="semaphore">
+                        <div class="semaphore-title">Full Slots</div>
+                        <div class="semaphore-value" id="full-value">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="logs-container">
+            <div class="logs-title">Process Logs</div>
+            <div id="logs"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let isRunning = false;
+        let itemCounter = 1;
+        let buffer = [];
+        let mutex = 1;
+        let empty;
+        let full = 0;
+        let producerTimer;
+        let consumerTimer;
+        let bufferSize = 5;
+        let producerSpeed = 2000;
+        let consumerSpeed = 3000;
+        
+        // DOM Elements
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const bufferSlotsContainer = document.getElementById('buffer-slots');
+        const mutexValue = document.getElementById('mutex-value');
+        const emptyValue = document.getElementById('empty-value');
+        const fullValue = document.getElementById('full-value');
+        const producerState = document.getElementById('producer-state');
+        const consumerState = document.getElementById('consumer-state');
+        const logsContainer = document.getElementById('logs');
+        const producerStatus = document.getElementById('producer-status');
+        const consumerStatus = document.getElementById('consumer-status');
+        const producerItemContainer = document.getElementById('producer-item-container');
+        const consumerItemContainer = document.getElementById('consumer-item-container');
+        
+        // Settings inputs
+        const bufferSizeInput = document.getElementById('buffer-size');
+        const producerSpeedInput = document.getElementById('producer-speed');
+        const consumerSpeedInput = document.getElementById('consumer-speed');
+        
+        // Initialize the simulation
+        function initialize() {
+            // Get settings from inputs
+            bufferSize = parseInt(bufferSizeInput.value);
+            producerSpeed = parseInt(producerSpeedInput.value);
+            consumerSpeed = parseInt(consumerSpeedInput.value);
+            
+            // Reset global variables
+            buffer = [];
+            mutex = 1;
+            empty = bufferSize;
+            full = 0;
+            itemCounter = 1;
+            
+            // Update semaphore displays
+            updateSemaphoreDisplay();
+            
+            // Clear logs
+            logsContainer.innerHTML = '';
+            log('System', 'Simulation initialized');
+            
+            // Generate buffer slots
+            generateBufferSlots();
+            
+            // Reset process states
+            producerState.textContent = 'Idle';
+            consumerState.textContent = 'Idle';
+            producerStatus.classList.remove('status-active', 'status-waiting');
+            consumerStatus.classList.remove('status-active', 'status-waiting');
+            
+            // Clear item containers
+            producerItemContainer.innerHTML = '';
+            consumerItemContainer.innerHTML = '';
+        }
+        
+        // Generate buffer slots based on buffer size
+        function generateBufferSlots() {
+            bufferSlotsContainer.innerHTML = '';
+            for (let i = 0; i < bufferSize; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'buffer-slot';
+                slot.id = `slot-${i}`;
+                bufferSlotsContainer.appendChild(slot);
+            }
+        }
+        
+        // Update semaphore displays
+        function updateSemaphoreDisplay() {
+            mutexValue.textContent = mutex;
+            emptyValue.textContent = empty;
+            fullValue.textContent = full;
+        }
+        
+        // Log an event
+        function log(source, message) {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            
+            const timestamp = document.createElement('span');
+            timestamp.className = 'log-timestamp';
+            const now = new Date();
+            timestamp.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}.${now.getMilliseconds().toString().padStart(3, '0')}`;
+            
+            const content = document.createElement('span');
+            
+            if (source === 'Producer') {
+                content.className = 'log-producer';
+            } else if (source === 'Consumer') {
+                content.className = 'log-consumer';
+            } else if (source === 'Mutex') {
+                content.className = 'log-mutex';
+            }
+            
+            content.textContent = `[${source}] ${message}`;
+            
+            logEntry.appendChild(timestamp);
+            logEntry.appendChild(content);
+            
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+        
+        // Producer process
+        async function producerProcess() {
+            if (!isRunning) return;
+            
+            log('Producer', 'Attempting to produce an item...');
+            producerState.textContent = 'Checking if buffer has space';
+            
+            // Wait for empty slot (P(empty))
+            if (empty === 0) {
+                log('Producer', 'Buffer is full, waiting for consumer to consume items');
+                producerState.textContent = 'Waiting - Buffer Full';
+                producerStatus.classList.remove('status-active');
+                producerStatus.classList.add('status-waiting');
+                
+                // Schedule next attempt
+                clearTimeout(producerTimer);
+                producerTimer = setTimeout(producerProcess, producerSpeed);
+                return;
+            }
+            
+            empty--;
+            updateSemaphoreDisplay();
+            log('Producer', `Decremented empty semaphore to ${empty}`);
+            
+            // Wait for mutex (P(mutex))
+            if (mutex === 0) {
+                log('Producer', 'Waiting for mutex');
+                producerState.textContent = 'Waiting for mutex';
+                producerStatus.classList.remove('status-active');
+                producerStatus.classList.add('status-waiting');
+                
+                // Give back the empty slot we just took
+                empty++;
+                updateSemaphoreDisplay();
+                
+                // Schedule next attempt
+                clearTimeout(producerTimer);
+                producerTimer = setTimeout(producerProcess, producerSpeed);
+                return;
+            }
+            
+            mutex--;
+            updateSemaphoreDisplay();
+            log('Mutex', 'Producer acquired mutex');
+            
+            // Critical section - produce item
+            producerState.textContent = 'Producing item';
+            producerStatus.classList.add('status-active');
+            producerStatus.classList.remove('status-waiting');
+            
+            // Create item in producer
+            const itemValue = itemCounter++;
+            const producerItem = createItemElement(itemValue);
+            producerItemContainer.innerHTML = '';
+            producerItemContainer.appendChild(producerItem);
+            
+            // Animate production
+            producerItem.style.animation = 'produce 0.5s ease-out';
+            
+            await delay(500);
+            
+            // Add to buffer
+            const nextEmptySlot = buffer.length;
+            buffer.push(itemValue);
+            
+            log('Producer', `Produced item ${itemValue}`);
+            producerState.textContent = `Produced item ${itemValue}`;
+            
+            // Create clone for animation
+            const itemClone = producerItem.cloneNode(true);
+            itemClone.classList.add('moving-item');
+            document.body.appendChild(itemClone);
+            
+            // Get positions for animation
+            const producerItemRect = producerItem.getBoundingClientRect();
+            const targetSlot = document.getElementById(`slot-${nextEmptySlot}`);
+            const targetRect = targetSlot.getBoundingClientRect();
+            
+            // Position clone at start
+            itemClone.style.top = `${producerItemRect.top}px`;
+            itemClone.style.left = `${producerItemRect.left}px`;
+            
+            await delay(10); // Small delay for the initial position to take effect
+            
+            // Animate to target
+            itemClone.style.top = `${targetRect.top}px`;
+            itemClone.style.left = `${targetRect.left}px`;
+            
+            await delay(800); // Wait for animation
+            
+            // Add item to slot
+            const bufferItem = createItemElement(itemValue);
+            targetSlot.appendChild(bufferItem);
+            
+            // Remove clone
+            document.body.removeChild(itemClone);
+            
+            // Release mutex (V(mutex))
+            mutex++;
+            updateSemaphoreDisplay();
+            log('Mutex', 'Producer released mutex');
+            
+            // Signal full slot (V(full))
+            full++;
+            updateSemaphoreDisplay();
+            log('Producer', `Incremented full semaphore to ${full}`);
+            
+            // Clean up and schedule next production
+            producerItemContainer.innerHTML = '';
+            producerState.textContent = 'Idle';
+            producerStatus.classList.remove('status-active');
+            
+            // Schedule next production
+            if (isRunning) {
+                clearTimeout(producerTimer);
+                producerTimer = setTimeout(producerProcess, producerSpeed);
+            }
+        }
+        
+        // Consumer process
+        async function consumerProcess() {
+            if (!isRunning) return;
+            
+            log('Consumer', 'Attempting to consume an item...');
+            consumerState.textContent = 'Checking if buffer has items';
+            
+            // Wait for full slot (P(full))
+            if (full === 0) {
+                log('Consumer', 'Buffer is empty, waiting for producer to produce items');
+                consumerState.textContent = 'Waiting - Buffer Empty';
+                consumerStatus.classList.remove('status-active');
+                consumerStatus.classList.add('status-waiting');
+                
+                // Schedule next attempt
+                clearTimeout(consumerTimer);
+                consumerTimer = setTimeout(consumerProcess, consumerSpeed);
+                return;
+            }
+            
+            full--;
+            updateSemaphoreDisplay();
+            log('Consumer', `Decremented full semaphore to ${full}`);
+            
+            // Wait for mutex (P(mutex))
+            if (mutex === 0) {
+                log('Consumer', 'Waiting for mutex');
+                consumerState.textContent = 'Waiting for mutex';
+                consumerStatus.classList.remove('status-active');
+                consumerStatus.classList.add('status-waiting');
+                
+                // Give back the full slot we just took
+                full++;
+                updateSemaphoreDisplay();
+                
+                // Schedule next attempt
+                clearTimeout(consumerTimer);
+                consumerTimer = setTimeout(consumerProcess, consumerSpeed);
+                return;
+            }
+            
+            mutex--;
+            updateSemaphoreDisplay();
+            log('Mutex', 'Consumer acquired mutex');
+            
+            // Critical section - consume item
+            consumerState.textContent = 'Consuming item';
+            consumerStatus.classList.add('status-active');
+            consumerStatus.classList.remove('status-waiting');
+            
+            // Get first item from buffer (FIFO)
+            const itemValue = buffer.shift();
+            const sourceSlot = document.getElementById(`slot-0`);
+            const sourceItem = sourceSlot.querySelector('.buffer-item');
+            
+            // Shift all items in the UI to maintain FIFO order
+            for (let i = 0; i < buffer.length; i++) {
+                const nextSlot = document.getElementById(`slot-${i}`);
+                const futureSlot = document.getElementById(`slot-${i+1}`);
+                if (futureSlot.querySelector('.buffer-item')) {
+                    nextSlot.appendChild(futureSlot.querySelector('.buffer-item'));
+                }
+            }
+            
+            // Create clone for animation
+            const itemClone = sourceItem.cloneNode(true);
+            itemClone.classList.add('moving-item');
+            document.body.appendChild(itemClone);
+            
+            // Get positions for animation
+            const sourceRect = sourceItem.getBoundingClientRect();
+            itemClone.style.top = `${sourceRect.top}px`;
+            itemClone.style.left = `${sourceRect.left}px`;
+            
+            // Create placeholder in consumer
+            const consumerItem = createItemElement(itemValue);
+            consumerItemContainer.innerHTML = '';
+            
+            // Remove original item from source
+            sourceSlot.removeChild(sourceItem);
+            
+            // Get consumer position
+            consumerItemContainer.appendChild(consumerItem);
+            const consumerRect = consumerItem.getBoundingClientRect();
+            consumerItemContainer.innerHTML = '';
+            
+            await delay(10); // Small delay for the removal to take effect
+            
+            // Animate to consumer
+            itemClone.style.top = `${consumerRect.top}px`;
+            itemClone.style.left = `${consumerRect.left}px`;
+            
+            await delay(800); // Wait for animation
+            
+            // Show item in consumer
+            consumerItemContainer.appendChild(consumerItem);
+            
+            // Remove clone
+            document.body.removeChild(itemClone);
+            
+            log('Consumer', `Consumed item ${itemValue}`);
+            consumerState.textContent = `Consumed item ${itemValue}`;
+            
+            // Release mutex (V(mutex))
+            mutex++;
+            updateSemaphoreDisplay();
+            log('Mutex', 'Consumer released mutex');
+            
+            // Signal empty slot (V(empty))
+            empty++;
+            updateSemaphoreDisplay();
+            log('Consumer', `Incremented empty semaphore to ${empty}`);
+            
+            // Animate consumption
+            consumerItem.style.animation = 'consume 0.5s ease-in forwards';
+            
+            await delay(500);
+            
+            // Clean up and schedule next consumption
+            consumerItemContainer.innerHTML = '';
+            consumerState.textContent = 'Idle';
+            consumerStatus.classList.remove('status-active');
+            
+            // Schedule next consumption
+            if (isRunning) {
+                clearTimeout(consumerTimer);
+                consumerTimer = setTimeout(consumerProcess, consumerSpeed);
+            }
+        }
+        
+        // Create an item element with a value
+        function createItemElement(value) {
+            const item = document.createElement('div');
+            item.className = 'buffer-item';
+            item.textContent = value;
+            return item;
+        }
+        
+        // Utility function for delay
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Event handlers
+        startBtn.addEventListener('click', () => {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                bufferSizeInput.disabled = true;
+                producerSpeedInput.disabled = true;
+                consumerSpeedInput.disabled = true;
+                
+                log('System', 'Simulation started');
+                
+                // Start producer and consumer processes
+                producerProcess();
+                consumerProcess();
+            }
+        });
+        
+        pauseBtn.addEventListener('click', () => {
+            isRunning = false;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            
+            // Clear timers
+            clearTimeout(producerTimer);
+            clearTimeout(consumerTimer);
+            
+            log('System', 'Simulation paused');
+        });
+        
+        resetBtn.addEventListener('click', () => {
+            isRunning = false;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            bufferSizeInput.disabled = false;
+            producerSpeedInput.disabled = false;
+            consumerSpeedInput.disabled = false;
+            
+            // Clear timers
+            clearTimeout(producerTimer);
+            clearTimeout(consumerTimer);
+            
+            // Initialize
+            initialize();
+        });
+        
+        // Initialize on load
+        window.addEventListener('load', initialize);
+        
+        // Handle settings changes
+        bufferSizeInput.addEventListener('change', initialize);
+        producerSpeedInput.addEventListener('change', () => {
+            producerSpeed = parseInt(producerSpeedInput.value);
+        });
+        consumerSpeedInput.addEventListener('change', () => {
+            consumerSpeed = parseInt(consumerSpeedInput.value);
+        });
+    </script>
+</body>
+</html>

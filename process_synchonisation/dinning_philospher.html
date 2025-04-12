@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dining Philosophers Visualization - Blue Theme</title>
+    <style>
+        :root {
+            --bg-color: #101b2d;
+            --text-color: #e0e8f5;
+            --primary: #61a5ff;
+            --secondary: #3a6bbd;
+            --accent: #61e0ff;
+            --table-color: #1d2d42;
+            --philosopher-color: #2c4366;
+            --fork-color: #b8d4f0;
+            --log-bg: #162136;
+            --eating-animation: #4fc3f7;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            color: var(--accent);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+        }
+        
+        .simulation {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            margin-bottom: 20px;
+        }
+        
+        .table {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background-color: var(--table-color);
+            top: 100px;
+            left: 100px;
+            box-shadow: 0 0 30px rgba(97, 165, 255, 0.3);
+        }
+        
+        .philosopher {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--philosopher-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(184, 212, 240, 0.3);
+            transition: all 0.5s;
+        }
+        
+        .philosopher.thinking {
+            background-color: #3a6bbd;
+        }
+        
+        .philosopher.hungry {
+            background-color: #61a5ff;
+        }
+        
+        .philosopher.eating {
+            background-color: #4fc3f7;
+            animation: eating 1s infinite alternate;
+        }
+        
+        .fork {
+            position: absolute;
+            width: 8px;
+            height: 40px;
+            background-color: var(--fork-color);
+            border-radius: 2px;
+            transform-origin: 50% 100%;
+            transition: transform 0.3s;
+        }
+        
+        /* Food visualization */
+        .food {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #f5d442;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .eating .food {
+            opacity: 1;
+            transform: scale(0.7);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            background-color: var(--secondary);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        button:hover {
+            background-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        button.active {
+            background-color: var(--accent);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .speed-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .speed-slider {
+            -webkit-appearance: none;
+            width: 200px;
+            height: 8px;
+            background: var(--secondary);
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+        
+        .log-container {
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: var(--log-bg);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid var(--primary);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .status-indicators {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .thinking-dot {
+            background-color: #3a6bbd;
+        }
+        
+        .hungry-dot {
+            background-color: #61a5ff;
+        }
+        
+        .eating-dot {
+            background-color: #4fc3f7;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes eating {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+        
+        @keyframes thinking {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(10deg); }
+        }
+        
+        .thinking {
+            animation: thinking 2s infinite alternate;
+        }
+        
+        .hungry {
+            animation: pulse 0.7s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+        
+        /* Fork animation */
+        .fork.left-picked {
+            transform: translate(-15px, -15px) rotate(45deg) !important;
+        }
+        
+        .fork.right-picked {
+            transform: translate(15px, -15px) rotate(-45deg) !important;
+        }
+        
+        @media (max-width: 600px) {
+            .simulation {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .table {
+                width: 200px;
+                height: 200px;
+                top: 50px;
+                left: 50px;
+            }
+            
+            .philosopher {
+                width: 40px;
+                height: 40px;
+                font-size: 12px;
+            }
+            
+            .fork {
+                width: 6px;
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Dining Philosophers Problem</h1>
+    <p class="subtitle">Visual Representation of Process Synchronization</p>
+    
+    <div class="container">
+        <div class="status-indicators">
+            <div class="status-indicator">
+                <div class="status-dot thinking-dot"></div>
+                <span>Thinking</span>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot hungry-dot"></div>
+                <span>Hungry</span>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot eating-dot"></div>
+                <span>Eating</span>
+            </div>
+        </div>
+        
+        <div class="simulation">
+            <div class="table"></div>
+            <div id="philosophers"></div>
+            <div id="forks"></div>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn">Start Simulation</button>
+            <button id="pauseBtn" disabled>Pause</button>
+            <button id="resetBtn">Reset</button>
+            <button id="autoAnimateBtn">Auto Animation</button>
+        </div>
+        
+        <div class="speed-controls">
+            <span>Speed:</span>
+            <input type="range" min="1" max="5" value="3" class="speed-slider" id="speedSlider">
+            <span id="speedValue">Normal</span>
+        </div>
+        
+        <div class="log-container" id="logContainer"></div>
+    </div>
+    
+    <script>
+        // Constants and variables
+        const NUM_PHILOSOPHERS = 5;
+        const THINKING = 'thinking';
+        const HUNGRY = 'hungry';
+        const EATING = 'eating';
+        
+        const speedLabels = {
+            1: 'Very Slow',
+            2: 'Slow',
+            3: 'Normal',
+            4: 'Fast',
+            5: 'Very Fast'
+        };
+        
+        const speedFactors = {
+            1: 2.5,
+            2: 1.75,
+            3: 1,
+            4: 0.6,
+            5: 0.3
+        };
+        
+        let philosophers = [];
+        let forks = [];
+        let animationRunning = false;
+        let autoAnimationActive = false;
+        let timeoutIds = [];
+        let currentSpeedFactor = 1;
+        
+        // DOM elements
+        const philosophersContainer = document.getElementById('philosophers');
+        const forksContainer = document.getElementById('forks');
+        const logContainer = document.getElementById('logContainer');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const autoAnimateBtn = document.getElementById('autoAnimateBtn');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValueElem = document.getElementById('speedValue');
+        
+        // Initialize the simulation
+        function initializeSimulation() {
+            clearAllTimeouts();
+            philosophers = [];
+            forks = [];
+            animationRunning = false;
+            autoAnimationActive = false;
+            
+            // Remove existing elements
+            philosophersContainer.innerHTML = '';
+            forksContainer.innerHTML = '';
+            
+            // Initialize forks
+            for (let i = 0; i < NUM_PHILOSOPHERS; i++) {
+                const fork = {
+                    id: i,
+                    inUse: false,
+                    element: document.createElement('div')
+                };
+                
+                fork.element.className = 'fork';
+                fork.element.id = `fork-${i}`;
+                
+                const angle = (i * 72) + 36; // 72 degrees per philosopher, offset by 36
+                const radius = 150; // Table radius
+                const centerX = 250; // Center X of simulation area
+                const centerY = 250; // Center Y of simulation area
+                
+                const xPos = centerX + radius * Math.cos(angle * Math.PI / 180);
+                const yPos = centerY + radius * Math.sin(angle * Math.PI / 180);
+                
+                fork.element.style.left = `${xPos}px`;
+                fork.element.style.top = `${yPos}px`;
+                fork.element.style.transform = `rotate(${angle + 90}deg)`;
+                
+                forksContainer.appendChild(fork.element);
+                forks.push(fork);
+            }
+            
+            // Initialize philosophers
+            for (let i = 0; i < NUM_PHILOSOPHERS; i++) {
+                const philosopher = {
+                    id: i,
+                    state: THINKING,
+                    leftFork: i,
+                    rightFork: (i + 1) % NUM_PHILOSOPHERS,
+                    element: document.createElement('div'),
+                    thinkingTime: getRandomTime(3000, 7000),
+                    eatingTime: getRandomTime(2000, 5000)
+                };
+                
+                philosopher.element.className = 'philosopher thinking';
+                philosopher.element.id = `philosopher-${i}`;
+                philosopher.element.textContent = i + 1;
+                
+                // Add food element
+                const food = document.createElement('div');
+                food.className = 'food';
+                philosopher.element.appendChild(food);
+                
+                const angle = i * 72; // 72 degrees per philosopher
+                const radius = 180; // Distance from center
+                const centerX = 250; // Center X of simulation area
+                const centerY = 250; // Center Y of simulation area
+                
+                const xPos = centerX + radius * Math.cos(angle * Math.PI / 180) - 30;
+                const yPos = centerY + radius * Math.sin(angle * Math.PI / 180) - 30;
+                
+                philosopher.element.style.left = `${xPos}px`;
+                philosopher.element.style.top = `${yPos}px`;
+                
+                philosophersContainer.appendChild(philosopher.element);
+                philosophers.push(philosopher);
+            }
+            
+            addLogEntry('System initialized. All philosophers are thinking.');
+            updateButtonStates();
+        }
+        
+        // Get random time adjusted by speed factor
+        function getRandomTime(min, max) {
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+        
+        // Adjust time based on current speed factor
+        function adjustTimeBySpeed(time) {
+            return time * currentSpeedFactor;
+        }
+        
+        // Philosopher behavior
+        function startPhilosopherCycle(philosopherId) {
+            if (!animationRunning) return;
+            
+            const philosopher = philosophers[philosopherId];
+            
+            // Thinking state
+            setPhilosopherState(philosopherId, THINKING);
+            addLogEntry(`Philosopher ${philosopherId + 1} is thinking`);
+            
+            const thinkingTime = adjustTimeBySpeed(philosopher.thinkingTime);
+            timeoutIds.push(setTimeout(() => {
+                if (!animationRunning) return;
+                
+                // Hungry state
+                setPhilosopherState(philosopherId, HUNGRY);
+                addLogEntry(`Philosopher ${philosopherId + 1} is hungry and wants to eat`);
+                
+                tryToEat(philosopherId);
+            }, thinkingTime));
+        }
+        
+        // Try to pick up forks and eat
+        function tryToEat(philosopherId) {
+            if (!animationRunning) return;
+            
+            const philosopher = philosophers[philosopherId];
+            const leftFork = forks[philosopher.leftFork];
+            const rightFork = forks[philosopher.rightFork];
+            
+            // Check if both forks are available
+            if (!leftFork.inUse && !rightFork.inUse) {
+                // Pick up forks
+                leftFork.inUse = true;
+                rightFork.inUse = true;
+                
+                // Animate forks
+                leftFork.element.classList.add('left-picked');
+                rightFork.element.classList.add('right-picked');
+                
+                addLogEntry(`Philosopher ${philosopherId + 1} picks up forks ${leftFork.id + 1} and ${rightFork.id + 1}`);
+                
+                // Start eating
+                setPhilosopherState(philosopherId, EATING);
+                addLogEntry(`Philosopher ${philosopherId + 1} is eating`);
+                
+                // Finish eating after some time
+                const eatingTime = adjustTimeBySpeed(philosopher.eatingTime);
+                timeoutIds.push(setTimeout(() => {
+                    if (!animationRunning) return;
+                    
+                    // Put down forks
+                    leftFork.inUse = false;
+                    rightFork.inUse = false;
+                    leftFork.element.classList.remove('left-picked');
+                    rightFork.element.classList.remove('right-picked');
+                    
+                    addLogEntry(`Philosopher ${philosopherId + 1} finishes eating and puts down forks`);
+                    
+                    // Start the cycle again
+                    startPhilosopherCycle(philosopherId);
+                }, eatingTime));
+            } else {
+                // If forks are not available, wait and try again
+                timeoutIds.push(setTimeout(() => {
+                    if (!animationRunning) return;
+                    tryToEat(philosopherId);
+                }, adjustTimeBySpeed(1000)));
+            }
+        }
+        
+        // Set philosopher state and update UI
+        function setPhilosopherState(philosopherId, state) {
+            const philosopher = philosophers[philosopherId];
+            philosopher.state = state;
+            
+            philosopher.element.className = `philosopher ${state}`;
+        }
+        
+        // Add log entry
+        function addLogEntry(message) {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Limit log entries
+            while (logContainer.children.length > 50) {
+                logContainer.removeChild(logContainer.firstChild);
+            }
+        }
+        
+        // Start the simulation
+        function startSimulation() {
+            if (animationRunning) return;
+            
+            animationRunning = true;
+            addLogEntry('Simulation started');
+            
+            // Start with slight delays to avoid synchronization
+            philosophers.forEach((philosopher, index) => {
+                timeoutIds.push(setTimeout(() => {
+                    startPhilosopherCycle(index);
+                }, index * 300));
+            });
+            
+            updateButtonStates();
+        }
+        
+        // Pause the simulation
+        function pauseSimulation() {
+            animationRunning = false;
+            clearAllTimeouts();
+            addLogEntry('Simulation paused');
+            updateButtonStates();
+        }
+        
+        // Clear all timeouts
+        function clearAllTimeouts() {
+            timeoutIds.forEach(id => clearTimeout(id));
+            timeoutIds = [];
+        }
+        
+        // Update button states
+        function updateButtonStates() {
+            startBtn.disabled = animationRunning;
+            pauseBtn.disabled = !animationRunning;
+            autoAnimateBtn.className = autoAnimationActive ? 'active' : '';
+        }
+        
+        // Toggle auto animation
+        function toggleAutoAnimation() {
+            autoAnimationActive = !autoAnimationActive;
+            
+            if (autoAnimationActive) {
+                addLogEntry('Auto animation enabled - will prevent deadlocks');
+                autoAnimateBtn.classList.add('active');
+                
+                // Monitor and resolve potential deadlocks
+                timeoutIds.push(setInterval(() => {
+                    if (!animationRunning) return;
+                    
+                    // Check for deadlock (all philosophers hungry)
+                    const hungryCount = philosophers.filter(p => p.state === HUNGRY).length;
+                    if (hungryCount >= 4) {
+                        // Force one philosopher to release their claim
+                        const randomPhilosopherId = Math.floor(Math.random() * NUM_PHILOSOPHERS);
+                        const philosopher = philosophers[randomPhilosopherId];
+                        
+                        if (philosopher.state === HUNGRY) {
+                            setPhilosopherState(randomPhilosopherId, THINKING);
+                            addLogEntry(`Auto-animation prevented deadlock: Philosopher ${randomPhilosopherId + 1} decides to think more`);
+                            
+                            // Restart this philosopher's cycle
+                            timeoutIds.push(setTimeout(() => {
+                                startPhilosopherCycle(randomPhilosopherId);
+                            }, adjustTimeBySpeed(1000)));
+                        }
+                    }
+                }, adjustTimeBySpeed(2000)));
+            } else {
+                addLogEntry('Auto animation disabled');
+                autoAnimateBtn.classList.remove('active');
+            }
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startSimulation);
+        pauseBtn.addEventListener('click', pauseSimulation);
+        resetBtn.addEventListener('click', () => {
+            pauseSimulation();
+            initializeSimulation();
+        });
+        autoAnimateBtn.addEventListener('click', toggleAutoAnimation);
+        
+        speedSlider.addEventListener('input', () => {
+            const speedValue = parseInt(speedSlider.value);
+            speedValueElem.textContent = speedLabels[speedValue];
+            currentSpeedFactor = speedFactors[speedValue];
+        });
+        
+        // Initialize
+        initializeSimulation();
+    </script>
+</body>
+</html>

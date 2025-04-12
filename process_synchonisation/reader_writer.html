@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reader-Writer Synchronization Visualization</title>
+    <style>
+        :root {
+            --primary: #9d4edd;
+            --reader: #2ecc71;
+            --writer: #e74c3c;
+            --background: #1a1a2e;
+            --dark: #16213e;
+            --light: #242854;
+            --border: #30375d;
+            --text: #e6e6fa;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-reader {
+            background-color: var(--reader);
+            color: var(--dark);
+        }
+        
+        .btn-writer {
+            background-color: var(--writer);
+            color: white;
+        }
+        
+        .btn-reset {
+            background-color: var(--dark);
+            color: white;
+        }
+        
+        .btn-auto {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .speed-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        
+        .visualization {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+        
+        .resource-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .resource {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background-color: var(--light);
+            border: 8px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.5s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            color: var(--text);
+        }
+        
+        .resource.reading {
+            border-color: var(--reader);
+            box-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+        }
+        
+        .resource.writing {
+            border-color: var(--writer);
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+        }
+        
+        .status {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--light);
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            min-width: 200px;
+            color: var(--text);
+        }
+        
+        .counters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+        
+        .counter {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            min-width: 120px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .counter-readers {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--reader);
+        }
+        
+        .counter-writers {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--writer);
+        }
+        
+        .queue-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .queue-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .queue {
+            background-color: var(--dark);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .queue-item {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeIn 0.5s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .reader-item {
+            background-color: rgba(46, 204, 113, 0.2);
+            border-left: 4px solid var(--reader);
+        }
+        
+        .writer-item {
+            background-color: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid var(--writer);
+        }
+        
+        .active-item {
+            outline: 2px solid var(--warning);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+        }
+        
+        .log-container {
+            margin-top: 2rem;
+        }
+        
+        .log {
+            background-color: var(--dark);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column-reverse;
+            color: var(--text);
+        }
+        
+        .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .log-reader {
+            color: var(--reader);
+        }
+        
+        .log-writer {
+            color: var(--writer);
+        }
+        
+        .log-system {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        /* Auto Animation Switch */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--dark);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .auto-status {
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+        
+        @media (max-width: 768px) {
+            .visualization {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Reader-Writer Synchronization Visualization</h1>
+        <p>Visualizing process synchronization with multiple readers and writers accessing a shared resource</p>
+    </header>
+    
+    <div class="container">
+        <div class="controls">
+            <button class="btn-reader" id="add-reader">Add Reader</button>
+            <button class="btn-writer" id="add-writer">Add Writer</button>
+            <button class="btn-auto" id="toggle-auto">Auto Animation</button>
+            <button class="btn-reset" id="reset">Reset</button>
+        </div>
+        
+        <div class="switch-container">
+            <label class="switch">
+                <input type="checkbox" id="auto-switch">
+                <span class="slider"></span>
+            </label>
+            <span class="auto-status" id="auto-status">Auto Animation: Off</span>
+        </div>
+        
+        <div class="speed-controls">
+            <label for="speed">Simulation Speed:</label>
+            <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
+            <span id="speed-value">1x</span>
+        </div>
+        
+        <div class="counters">
+            <div class="counter counter-readers">
+                <div>Active Readers</div>
+                <div id="reader-count">0</div>
+            </div>
+            <div class="counter counter-writers">
+                <div>Active Writers</div>
+                <div id="writer-count">0</div>
+            </div>
+        </div>
+        
+        <div class="visualization">
+            <div class="resource-container">
+                <div class="resource" id="resource">
+                    <span id="resource-text">Shared Resource</span>
+                </div>
+                <div class="status" id="status">Idle</div>
+            </div>
+            
+            <div class="queue-container">
+                <div>
+                    <div class="queue-title">Process Queue</div>
+                    <div class="queue" id="queue">
+                        <!-- Queue items will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="log-container">
+            <div class="queue-title">Event Log</div>
+            <div class="log" id="log">
+                <div class="log-entry log-system">[System] Visualization started</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration
+        const config = {
+            readerDuration: { min: 2000, max: 4000 },
+            writerDuration: { min: 3000, max: 5000 },
+            queueDelay: 500,
+            maxProcesses: 15,
+            autoAddInterval: { min: 1000, max: 3000 }  // Auto add interval
+        };
+        
+        // State
+        const state = {
+            activeReaders: 0,
+            activeWriter: null,
+            queue: [],
+            nextId: 1,
+            speedFactor: 1,
+            autoMode: false,
+            autoIntervalId: null
+        };
+        
+        // DOM Elements
+        const elements = {
+            resource: document.getElementById('resource'),
+            resourceText: document.getElementById('resource-text'),
+            status: document.getElementById('status'),
+            queue: document.getElementById('queue'),
+            log: document.getElementById('log'),
+            readerCount: document.getElementById('reader-count'),
+            writerCount: document.getElementById('writer-count'),
+            speedValue: document.getElementById('speed-value'),
+            autoSwitch: document.getElementById('auto-switch'),
+            autoStatus: document.getElementById('auto-status')
+        };
+        
+        // Buttons
+        document.getElementById('add-reader').addEventListener('click', () => addProcess('reader'));
+        document.getElementById('add-writer').addEventListener('click', () => addProcess('writer'));
+        document.getElementById('reset').addEventListener('click', resetSimulation);
+        document.getElementById('toggle-auto').addEventListener('click', toggleAutoMode);
+        elements.autoSwitch.addEventListener('change', toggleAutoMode);
+        
+        // Speed control
+        document.getElementById('speed').addEventListener('input', (e) => {
+            state.speedFactor = parseFloat(e.target.value);
+            elements.speedValue.textContent = `${state.speedFactor}x`;
+            
+            // If auto mode is on, restart with new speed
+            if (state.autoMode) {
+                stopAutoMode();
+                startAutoMode();
+            }
+        });
+        
+        // Helper Functions
+        function addLog(message, type = 'system') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            elements.log.prepend(entry);
+        }
+        
+        function updateCounts() {
+            elements.readerCount.textContent = state.activeReaders;
+            elements.writerCount.textContent = state.activeWriter ? '1' : '0';
+        }
+        
+        function updateStatus() {
+            if (state.activeWriter) {
+                elements.status.textContent = `Writing (Process ${state.activeWriter})`;
+                elements.resource.className = 'resource writing';
+            } else if (state.activeReaders > 0) {
+                elements.status.textContent = `Reading (${state.activeReaders} readers)`;
+                elements.resource.className = 'resource reading';
+            } else {
+                elements.status.textContent = 'Idle';
+                elements.resource.className = 'resource';
+            }
+        }
+        
+        function scaleDuration(duration) {
+            return duration / state.speedFactor;
+        }
+        
+        // Auto Mode Functions
+        function toggleAutoMode() {
+            state.autoMode = !state.autoMode;
+            elements.autoSwitch.checked = state.autoMode;
+            elements.autoStatus.textContent = `Auto Animation: ${state.autoMode ? 'On' : 'Off'}`;
+            
+            if (state.autoMode) {
+                startAutoMode();
+                addLog('Auto animation mode started', 'system');
+            } else {
+                stopAutoMode();
+                addLog('Auto animation mode stopped', 'system');
+            }
+        }
+        
+        function startAutoMode() {
+            if (state.autoIntervalId) {
+                clearInterval(state.autoIntervalId);
+            }
+            
+            state.autoIntervalId = setInterval(() => {
+                const totalProcesses = state.queue.length + state.activeReaders + (state.activeWriter ? 1 : 0);
+                
+                if (totalProcesses < config.maxProcesses) {
+                    // Randomly choose reader or writer with 70% chance for reader
+                    const processType = Math.random() < 0.7 ? 'reader' : 'writer';
+                    addProcess(processType);
+                }
+            }, scaleDuration(Math.floor(Math.random() * (config.autoAddInterval.max - config.autoAddInterval.min) + config.autoAddInterval.min)));
+        }
+        
+        function stopAutoMode() {
+            if (state.autoIntervalId) {
+                clearInterval(state.autoIntervalId);
+                state.autoIntervalId = null;
+            }
+        }
+        
+        // Process Management
+        function addProcess(type) {
+            if (state.queue.length + state.activeReaders + (state.activeWriter ? 1 : 0) >= config.maxProcesses) {
+                addLog('Maximum process limit reached', 'system');
+                return;
+            }
+            
+            const id = state.nextId++;
+            const processItem = {
+                id,
+                type,
+                status: 'waiting'
+            };
+            
+            state.queue.push(processItem);
+            
+            const queueItem = document.createElement('div');
+            queueItem.className = `queue-item ${type}-item`;
+            queueItem.dataset.id = id;
+            queueItem.innerHTML = `
+                <span>${type === 'reader' ? 'Reader' : 'Writer'} #${id}</span>
+                <span class="status">Waiting</span>
+            `;
+            elements.queue.appendChild(queueItem);
+            
+            addLog(`${type === 'reader' ? 'Reader' : 'Writer'} #${id} added to queue`, type);
+            
+            processQueue();
+        }
+        
+        function processQueue() {
+            if (state.queue.length === 0) return;
+            
+            // Check if we can process next item
+            if (state.activeWriter) {
+                // Writer is active, can't process more
+                return;
+            }
+            
+            const nextItem = state.queue[0];
+            
+            if (nextItem.type === 'reader') {
+                // Readers can be processed in parallel if no writer is active or waiting
+                const hasWaitingWriter = state.queue.some(item => item.type === 'writer');
+                
+                if (!hasWaitingWriter || state.activeReaders > 0) {
+                    // Process reader
+                    state.queue.shift();
+                    processReader(nextItem);
+                    
+                    // Continue processing queue for other readers
+                    setTimeout(() => processQueue(), scaleDuration(config.queueDelay));
+                }
+            } else if (nextItem.type === 'writer') {
+                // Writers need exclusive access
+                if (state.activeReaders === 0) {
+                    // Process writer
+                    state.queue.shift();
+                    processWriter(nextItem);
+                }
+                // If readers are active, writer waits
+            }
+        }
+        
+        function processReader(reader) {
+            const duration = Math.floor(Math.random() * (config.readerDuration.max - config.readerDuration.min) + config.readerDuration.min);
+            
+            // Update UI
+            const readerElement = document.querySelector(`.queue-item[data-id="${reader.id}"]`);
+            if (readerElement) {
+                readerElement.classList.add('active-item');
+                readerElement.querySelector('.status').textContent = 'Reading';
+            }
+            
+            // Update state
+            state.activeReaders++;
+            updateCounts();
+            updateStatus();
+            
+            addLog(`Reader #${reader.id} started reading`, 'reader');
+            
+            // Finish after duration
+            setTimeout(() => {
+                state.activeReaders--;
+                updateCounts();
+                updateStatus();
+                
+                addLog(`Reader #${reader.id} finished reading`, 'reader');
+                
+                if (readerElement) {
+                    readerElement.remove();
+                }
+                
+                // Process next items if this was the last reader
+                if (state.activeReaders === 0) {
+                    processQueue();
+                }
+            }, scaleDuration(duration));
+        }
+        
+        function processWriter(writer) {
+            const duration = Math.floor(Math.random() * (config.writerDuration.max - config.writerDuration.min) + config.writerDuration.min);
+            
+            // Update UI
+            const writerElement = document.querySelector(`.queue-item[data-id="${writer.id}"]`);
+            if (writerElement) {
+                writerElement.classList.add('active-item');
+                writerElement.querySelector('.status').textContent = 'Writing';
+            }
+            
+            // Update state
+            state.activeWriter = writer.id;
+            elements.resourceText.textContent = `Writer #${writer.id} is updating...`;
+            updateCounts();
+            updateStatus();
+            
+            addLog(`Writer #${writer.id} started writing`, 'writer');
+            
+            // Finish after duration
+            setTimeout(() => {
+                state.activeWriter = null;
+                elements.resourceText.textContent = 'Shared Resource';
+                updateCounts();
+                updateStatus();
+                
+                addLog(`Writer #${writer.id} finished writing`, 'writer');
+                
+                if (writerElement) {
+                    writerElement.remove();
+                }
+                
+                // Process next items
+                processQueue();
+            }, scaleDuration(duration));
+        }
+        
+        function resetSimulation() {
+            // Clear state
+            state.activeReaders = 0;
+            state.activeWriter = null;
+            state.queue = [];
+            
+            // Reset UI
+            elements.queue.innerHTML = '';
+            elements.resource.className = 'resource';
+            elements.resourceText.textContent = 'Shared Resource';
+            elements.status.textContent = 'Idle';
+            updateCounts();
+            
+            // Stop auto mode if active
+            if (state.autoMode) {
+                toggleAutoMode();
+            }
+            
+            addLog('Simulation reset', 'system');
+        }
+        
+        // Initialize
+        addLog('Ready to add readers and writers', 'system');
+    </script>
+</body>
+</html>

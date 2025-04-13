@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Replacement Algorithms</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <style>
+    .navbar{
+      border-bottom: 1px solid white;
+    }
+    .card {
+      height: 100%;
+      transition: all 0.3s ease;
+      border: 1px solid white;
+      border-left: 3px solid #23EC46;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      transform: none !important;
+    }
+    .card-title {
+      color: #f0f0f0;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      margin: auto; /* Center vertically when collapsed */
+      transition: all 0.3s ease;
+    }
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100px; 
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .card-description{
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .card-text {
+      color: #f0f0f0;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-text:hover {
+      color: #23EC46;
+    }
+    .card:hover {
+      background-color: #333333 !important; 
+    }
+    .card.active {
+      transform: scale(1.05);
+    }
+    .btn-custom {
+      background-color: #222222;
+      margin-right: 10px; 
+    }
+    .btn-custom:hover {
+      background-color: #333333;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+    }
+    .card-description {
+      display: none; 
+    }
+    .card.active .card-title {
+        margin: 0 0 1rem 0; 
+    }
+    .card.active .card-description {
+      display: block; 
+      opacity: 1;
+      max-height: 500px;
+    }
+    .dropdown-menu {
+      background-color: #222222;
+      border: 1px solid white;
+    }
+    .dropdown-item {
+      color: #f0f0f0;
+    }
+  </style>
+</head>
+<body style="background-color: #1E1E1E; color: #23EC46; font-family: Space Mono, monospace; font-weight: 400; font-style: normal;" >
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #222222;">
+    <a class="navbar-brand" href="../index.html">OS PROJECT</a> <!-- Changed the name here -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="../index.html">Home</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Algorithms
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="../process_scheduling/process.html">Process Scheduling</a>
+            <a class="dropdown-item" href="../process_sync/home.html">Process Synchronization</a>
+            <a class="dropdown-item" href="../Bankers/bankers.html">Bankers Algorithm</a>
+            <a class="dropdown-item" href="../mft_mvt/Fit.html">Fit Algorithms</a>
+            <a class="dropdown-item" href="../Page_Replacement Algo/page replacement_home.html">Page Replacement Algorithm</a>
+            <a class="dropdown-item" href="../Disk/disk.html">Disk Scheduling</a>
+            <a class="dropdown-item" href="../file allocation/file.html">File Allocation</a>
+            <a class="dropdown-item" href="../mft_mvt/MVFT.html">MFT and MVT</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about.html">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">References</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <div class="jumbotron" style="background-color: #222222; border: 1px solid white">
+      <h1 class="display-4 text-center" style="font-weight: 550;">Page Replacement Algorithms</h1>
+      <p class="lead text-center" style="color: white;">A Page Replacement Algorithm is a technique employed by operating systems to manage memory by selecting which pages to replace in the main memory when it becomes full. The primary goal is to minimize page faults and optimize system performance.</p>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card" style="background-color: #222222;" onclick="toggleDescription(this)">
+          <div class="card-body">
+            <h5 class="card-title" style="color: #f0f0f0;">FIFO</h5>
+            <p class="card-text card-description">The FIFO (First-In-First-Out) page replacement algorithm replaces the oldest page in the main memory when a page fault occurs.</p>
+            <p class="card-text card-description">It is simple to implement but may not always perform optimally compared to other algorithms.</p>
+            <p class="card-text card-description">FIFO does not consider the future usage of pages, which can lead to inefficient memory usage.</p>
+            <p class="card-text card-description">It is commonly used in scenarios where simplicity is more important than performance.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card" style="background-color: #222222;" onclick="toggleDescription(this)">
+          <div class="card-body">
+            <h5 class="card-title" style="color: #f0f0f0;">OPTIMAL</h5>
+            <p class="card-text card-description">The Optimal algorithm replaces the page that will not be used for the longest period of time in the future.</p>
+            <p class="card-text card-description">It is theoretically the most efficient page replacement algorithm as it minimizes the number of page faults.</p>
+            <p class="card-text card-description">However, implementing the optimal algorithm requires knowledge of future memory accesses, which is usually not feasible.</p>
+            <p class="card-text card-description">Optimal is often used as a benchmark to compare the performance of other algorithms.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card" style="background-color: #222222;" onclick="toggleDescription(this)">
+          <div class="card-body">
+            <h5 class="card-title" style="color: #f0f0f0;">LRU</h5>
+            <p class="card-text card-description">The LRU (Least Recently Used) page replacement algorithm replaces the page that has been least recently accessed.</p>
+            <p class="card-text card-description">It is based on the idea that pages that have been accessed recently are more likely to be accessed again soon.</p>
+            <p class="card-text card-description">LRU is more complex to implement than FIFO but generally performs better by considering recent page access patterns.</p>
+            <p class="card-text card-description">However, LRU requires maintaining a list of recently used pages, which can be resource-intensive.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-md-4">
+        <div class="card" style="background-color: #222222;" onclick="toggleDescription(this)">
+          <div class="card-body">
+            <h5 class="card-title" style="color: #f0f0f0;">MRU</h5>
+            <p class="card-text card-description">The MRU (Most Recently Used) page replacement algorithm replaces the page that has been most recently accessed.</p>
+            <p class="card-text card-description">Contrary to LRU, MRU assumes that the most recently accessed page is more likely to be accessed again in the near future.</p>
+            <p class="card-text card-description">MRU is simpler to implement than LRU but may not always perform optimally, especially in scenarios where access patterns change frequently.</p>
+            <p class="card-text card-description">It is suitable for situations where the most recent access is more indicative of future accesses than the least recent access.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card" style="background-color: #222222;" onclick="toggleDescription(this)">
+          <div class="card-body">
+            <h5 class="card-title" style="color: #f0f0f0;">RANDOM</h5>
+            <p class="card-text card-description">The random page replacement algorithm selects a page for replacement randomly when a page fault occurs and the main memory is full.</p>
+            <p class="card-text card-description">It does not consider any access patterns or page usage history, making it the simplest page replacement algorithm to implement.</p>
+            <p class="card-text card-description">Random replacement may lead to unpredictable performance and is generally used for comparison purposes rather than in practical implementations.</p>
+            <p class="card-text card-description">While it may not perform well in most scenarios, it can occasionally outperform other algorithms in certain edge cases.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-5">
+      <div class="col-md-12 button-container">
+        <a href="page_replacement_visualizer.html" class="btn btn-primary btn-lg mr-4 btn-custom">PAGE REPLACEMENT VISUALIZER</a>
+        <a href="page_replacement_comparison.html" class="btn btn-primary btn-lg btn-custom">PAGE COMPARISON VISUALIZER</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+  <script>
+    function toggleDescription(card) {
+      card.classList.toggle('active');
+    }
+  </script>
+</body>
+</html>

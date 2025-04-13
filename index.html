@@ -5,17 +5,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <title>OS-Sim</title>
 </head>
 
 <body>
+  <nav class="navbar">
+    <div class="nav-brand">OS-Sim</div>
+    <div class="nav-links">
+      <div class="dropdown">
+        <button class="dropbtn">
+          <i class="fas fa-bars"></i> Topics
+        </button>
+        <div class="dropdown-content">
+          <a href="Scheduling_Algorithms/main.html">Scheduling Algorithms</a>
+          <a href="processSynchronization/processSynchronization.html">Process Synchronization</a>
+          <a href="thread_synchronization/thread_sync.html">Threading and Synchronization</a>
+          <a href="bankers_algorithm/banker.html">Banker's Algorithm</a>
+          <a href="deadlock_detetction/deadlock_detection.html">LRU Approximation</a>
+          <a href="MVT_MFT/landing.html">MVT/MFT</a>
+          <a href="File_Organisation/fileorg.html">File Organization</a>
+          <a href="memory_fit/memory_fit_home.html">Memory Allocation</a>
+          <a href="pageReplacement/page_replacement.html">Page Replacement</a>
+          <a href="Disk_Scheduling/intro.html">Disk Scheduling</a>
+          <a href="FileAlloc/fileAllocation.html">File Allocation</a>
+          <a href="hashingAlgos/security.html">Hashing Algorithms</a>
+          <a href="Paging/paging.html">Paging Technique</a>
+          <a href="Inter_Process_Communication/index.html">Inter-Process Communication</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+      <a href="#" class="nav-item"><i class="fas fa-question-circle"></i> Help</a>
+      <a href="#" class="nav-item"><i class="fas fa-info-circle"></i> About Us</a>
+    </div>
+  </nav>
+  
+  <hr class="navbar-divider">
+
+
   <div class="container">
     <h1>OSSim - OS Simulator</h1>
     <p>Welcome to our Operating Systems Lab mini project. Here, we explore various concepts and practical aspects of
       operating systems.</p>
     <p>Feel free to navigate through the project and explore the different sections.</p>
   </div>
-  <nav>
+  <div class="buttons">
     <div class="btn-container">
       <a class="btn" href="Scheduling_Algorithms/main.html">Scheduling Algorithms</a>
       <a class="btn" href="processSynchronization/processSynchronization.html">Process Synchronization</a>
@@ -33,7 +67,7 @@
       <a class="btn" href="Paging/paging.html">Paging Technique</a>
       <a class="btn" href="Inter_Process_Communication/index.html">Inter-Process Communication and Shared Memory</a>
     </div>
-  </nav>
+  </div>
   <section id="page-top"
     style="background-image: url(&quot;assets/img/bg-pattern.png&quot;);background-color: #2e3130;height: 1072.76px;">
     <div class="container" style="color: rgb(255,255,255);">
@@ -58,6 +92,17 @@
       </div>
     </div>
   </section>
+  <script>
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 10) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  </script>
+  
 </body>
 </html>
 

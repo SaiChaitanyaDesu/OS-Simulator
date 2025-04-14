@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>File Allocation Simulator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="file_allocation.css">
+  
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">
+      <i class="fas fa-hdd"></i>
+    </div>
+    <h1>File Allocation Simulator</h1>
+  </header>
+
+  <div class="panels">
+    <div class="control-panel">
+      <div class="panel-header">
+        <i class="fas fa-sliders"></i>
+        <span>Control Panel</span>
+      </div>
+
+      <div class="form-group">
+        <label for="totalBlocks"><i class="fas fa-cube"></i> Total Blocks</label>
+        <div class="input-icon">
+          <i class="fas fa-cube"></i>
+          <input type="number" id="totalBlocks" value="20" min="1" />
+        </div>
+      </div>
+
+      <button onclick="initializeDisk()" class="btn-primary">
+        <i class="fas fa-power-off"></i> Initialize Disk
+      </button>
+
+      <div class="section-divider">
+        <div class="section-title">
+          <i class="fas fa-file-alt"></i> Other Files Allocation
+        </div>
+        
+        <div class="form-group">
+          <label for="otherFileBlocks"><i class="fas fa-list-ol"></i> Blocks for Other Files</label>
+          <div class="input-icon">
+            <i class="fas fa-list-ol"></i>
+            <input type="text" id="otherFileBlocks" placeholder="e.g. 2,5,6" />
+          </div>
+        </div>
+        
+        <button onclick="allocateOtherFiles()" class="btn-purple">
+          <i class="fas fa-file-medical"></i> Allocate Other Files
+        </button>
+      </div>
+
+      <div class="section-divider">
+        <div class="section-title">
+          <i class="fas fa-file-alt"></i> Main File Allocation
+        </div>
+        
+        <div class="allocation-type-switcher">
+          <div class="allocation-type-option active" data-value="sequential" onclick="switchAllocationType(this)">
+            <i class="fas fa-arrow-right"></i> Sequential
+          </div>
+          <div class="allocation-type-option" data-value="indexed" onclick="switchAllocationType(this)">
+            <i class="fas fa-sitemap"></i> Indexed
+          </div>
+          <div class="allocation-type-option" data-value="linked" onclick="switchAllocationType(this)">
+            <i class="fas fa-link"></i> Linked
+          </div>
+        </div>
+        <select id="allocationType" class="visually-hidden" onchange="onAllocationChange()">
+          <option value="sequential">Sequential</option>
+          <option value="indexed">Indexed</option>
+          <option value="linked">Linked</option>
+        </select>
+
+        <div id="sequentialPanel">
+          <div class="row">
+            <div class="form-group">
+              <label for="startPosition"><i class="fas fa-map-marker-alt"></i> Start Position</label>
+              <div class="input-icon">
+                <i class="fas fa-map-marker-alt"></i>
+                <input type="number" id="startPosition" value="0" min="0" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="initialLength"><i class="fas fa-ruler-horizontal"></i> Initial Length</label>
+              <div class="input-icon">
+                <i class="fas fa-ruler-horizontal"></i>
+                <input type="number" id="initialLength" value="4" min="1" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="indexedPanel" style="display: none;">
+          <div class="form-group">
+            <label for="indexBlock"><i class="fas fa-th-large"></i> Index Block</label>
+            <div class="input-icon">
+              <i class="fas fa-th-large"></i>
+              <input type="number" id="indexBlock" value="0" min="0" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="dataBlocks"><i class="fas fa-list-ol"></i> Data Blocks</label>
+            <div class="input-icon">
+              <i class="fas fa-list-ol"></i>
+              <input type="text" id="dataBlocks" placeholder="e.g. 2,5,6" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="growthSize"><i class="fas fa-expand-arrows-alt"></i> Growth Size</label>
+          <div class="input-icon">
+            <i class="fas fa-expand-arrows-alt"></i>
+            <input type="number" id="growthSize" value="2" min="1" />
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button onclick="allocateInitial()" class="btn-success">
+            <i class="fas fa-plus-circle"></i> Initial Allocation
+          </button>
+          <button onclick="growFile()" class="btn-warning">
+            <i class="fas fa-expand"></i> Grow File
+          </button>
+          <button onclick="reset()" class="btn-danger">
+            <i class="fas fa-trash-alt"></i> Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="visualization-panel">
+      <div class="panel-header">
+        <i class="fas fa-chart-bar"></i>
+        <span>Disk Visualization</span>
+      </div>
+      
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: var(--light-gray);"></div>
+          <span>Free</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: var(--success);"></div>
+          <span>Main File</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: var(--other-file);"></div>
+          <span>Other Files</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: var(--primary);"></div>
+          <span>Index Block</span>
+        </div>
+      </div>
+
+      <div class="message message-info" id="message">
+        <i class="fas fa-info-circle"></i>
+        <span>Welcome! Start by initializing the disk.</span>
+      </div>
+      
+      <div class="disk-grid" id="diskGrid"></div>
+    </div>
+  </div>
+</div>
+<script src="file_allocation.js"></script>
+</body>
+</html>

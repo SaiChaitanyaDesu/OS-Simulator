@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disk Scheduling Algorithms</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0a0a0a;
+      color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .home-button-container {
+      display: flex;
+  justify-content: flex-end;
+  padding: 10px 20px;
+  background-color: transparent
+    }
+
+    .home-button {
+      background-color: white;
+  color: black;
+  font-weight: bold;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 255, 153, 0.3);
+    }
+
+    .go-to-simulator {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+
+    header {
+      background-color: #00ff99;
+      color: #000;
+      padding: 20px 0;
+      text-align: center;
+
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 30px 20px;
+    }
+
+    h2 {
+      color: #00ff99;
+      border-bottom: 2px solid #00ff99;
+      padding-bottom: 5px;
+    }
+
+    .algorithm {
+      margin-bottom: 40px;
+    }
+
+    .example {
+      background-color: #1e1e1e;
+      padding: 15px;
+      border-left: 5px solid #00ff99;
+      margin-top: 10px;
+      font-family: monospace;
+    }
+
+    footer {
+      background-color: #111;
+      text-align: center;
+      color: #888;
+      padding: 20px;
+      font-size: 0.9em;
+      border-top: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Introduction to Disk Scheduling Algorithms</h1>
+</header>
+
+<div class="home-button-container">
+  <button onclick="window.location.href='Disk_scheduling.html';" class="home-button">
+    Home
+  </button>
+</div>
+<!-- Place this directly inside your <body> tag, preferably right after <header> -->
+    <div style="
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+  ">
+    <button onclick="window.location.href='Disk_scheduling.html';"
+      style="
+        background-color: white;
+        color: black;
+        font-weight: bold;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0, 255, 153, 0.3);
+      ">
+      Go to Simulator
+    </button>
+  </div>
+
+  
+
+  
+  
+  <section id="harddisk">
+    <h2>What is a Hard Disk?</h2>
+    <p>A <strong>Hard Disk Drive (HDD)</strong> is a non-volatile storage device used to store operating systems, files, software, and other data permanently. It retains information even when the computer is powered off.</p>
+  
+    <h3>How It Works:</h3>
+    <p>Inside the hard disk, there are spinning disks called <em>platters</em>. These are coated with a magnetic material. A <strong>read/write head</strong> moves across the platters to read or write data as the platters spin.</p>
+  
+    <ul>
+      <li><strong>Platter:</strong> Circular magnetic disk that holds the data.</li>
+      <li><strong>Spindle:</strong> Rotates the platter at high speed (e.g., 7200 RPM).</li>
+      <li><strong>Read/Write Head:</strong> Reads or writes data on the platter surface.</li>
+      <li><strong>Actuator Arm:</strong> Moves the head to the correct data track.</li>
+      <li><strong>Controller:</strong> Coordinates all actions and communicates with the system.</li>
+    </ul>
+  
+    <h3>Key Features:</h3>
+    <ul>
+      <li><strong>Capacity:</strong> Typically ranges from hundreds of GBs to several TBs.</li>
+      <li><strong>Speed:</strong> Determined by rotation speed (RPM) and access time.</li>
+      <li><strong>Durability:</strong> Prone to wear over time due to moving parts.</li>
+    </ul>
+  
+    <div style="text-align:center; margin-top: 20px;">
+      <img src="Harddisk.jpg" alt="Hard Disk Diagram" width="400" style="border: 2px solid #00ff99; border-radius: 8px;" />
+      <p style="font-size: 0.9em; color: #aaa;">Inside a hard disk: Platters, actuator arm, and read/write head</p>
+    </div>
+  </section>
+  
+
+  <div class="container">
+    <p><strong>Disk Scheduling</strong> is a method used by operating systems to determine the order in which disk I/O requests are handled. Because seek operations (moving the read/write head) are time-consuming, efficient scheduling can significantly improve system performance.</p>
+  
+    <p>The goal is to reduce <strong>seek time</strong>, which is the time taken to move the disk arm to the desired cylinder.</p>
+  
+    <h2>1. First-Come-First-Serve (FCFS)</h2>
+    <div class="algorithm">
+      <p>Requests are processed in the order they arrive in the queue, regardless of their location on the disk.</p>
+      <img src="fcfs.jpg" alt="FCFS Diagram" style="max-width: 100%; margin: 10px 0; border: 2px solid #00ff99; border-radius: 5px;" />
+      <div class="example">
+        <strong>Example:</strong><br>
+        Requests: 82, 170, 43, 140, 24, 16, 190<br>
+        Head starts at: 50<br>
+        Seek operations: |82-50| + |170-82| + |43-170| + |140-43| + |24-140| + |16-24| + |190-16| = <strong>642</strong>
+      </div>
+      <p><strong>Advantages:</strong></p>
+      <ul>
+        <li>Simple and easy to implement</li>
+        <li>Fair to all processes</li>
+      </ul>
+      <p><strong>Disadvantages:</strong></p>
+      <ul>
+        <li>Does not consider seek time → may lead to long waits</li>
+        <li>Poor performance with random access patterns</li>
+      </ul>
+    </div>
+  
+    <h2>2. Shortest Seek Time First (SSTF)</h2>
+    <div class="algorithm">
+      <p>Selects the request closest to the current head position, minimizing immediate seek time.</p>
+      <img src="sstf.jpg" alt="SSTF Diagram" style="max-width: 100%; margin: 10px 0; border: 2px solid #00ff99; border-radius: 5px;" />
+      <div class="example">
+        <strong>Example:</strong><br>
+        Head: 50 → closest is 43 → 24 → 16 → 82 → 140 → 170 → 190<br>
+        Seek Time = |50-43| + |43-24| + |24-16| + |16-82| + |82-140| + |140-170| + |170-190| = <strong>208</strong>
+      </div>
+      <p><strong>Advantages:</strong></p>
+      <ul>
+        <li>Better performance than FCFS</li>
+        <li>Lower average seek time</li>
+      </ul>
+      <p><strong>Disadvantages:</strong></p>
+      <ul>
+        <li>May cause starvation for far requests</li>
+        <li>Not always predictable</li>
+      </ul>
+    </div>
+  
+    <h2>3. SCAN (Elevator Algorithm)</h2>
+    <div class="algorithm">
+      <p>Disk arm moves in one direction fulfilling requests until the end, then reverses direction (like an elevator).</p>
+      <img src="scan.jpg" alt="SCAN Diagram" style="max-width: 100%; margin: 10px 0; border: 2px solid #00ff99; border-radius: 5px;" />
+      <div class="example">
+        <strong>Example:</strong><br>
+        Head: 50 → up direction → 82 → 140 → 170 → 190 → (end 199) → reverse → 43 → 24 → 16<br>
+        Seek Time = |50-190| + |190-16| = <strong>314</strong>
+      </div>
+      <p><strong>Advantages:</strong></p>
+      <ul>
+        <li>Prevents starvation</li>
+        <li>More predictable than SSTF</li>
+      </ul>
+      <p><strong>Disadvantages:</strong></p>
+      <ul>
+        <li>Longer wait for requests just behind the head</li>
+        <li>Idle time when switching direction</li>
+      </ul>
+    </div>
+  
+    <h2>4. C-SCAN (Circular SCAN)</h2>
+    <div class="algorithm">
+      <p>The arm moves in one direction (e.g., upward), and once it reaches the end, it jumps back to the beginning without servicing any requests on the return trip.</p>
+      <img src="cscan.jpg" alt="C-SCAN Diagram" style="max-width: 100%; margin: 10px 0; border: 2px solid #00ff99; border-radius: 5px;" />
+      <div class="example">
+        <strong>Example:</strong><br>
+        Head: 50 → 82 → 140 → 170 → 190 → (end 199) → jump to 0 → 16 → 24 → 43<br>
+        Seek Time = |50-190| + |190-0| + |0-43| = <strong>333</strong>
+      </div>
+      <p><strong>Advantages:</strong></p>
+      <ul>
+        <li>Uniform wait time</li>
+        <li>No starvation</li>
+      </ul>
+      <p><strong>Disadvantages:</strong></p>
+      <ul>
+        <li>Unnecessary traversal to disk end</li>
+        <li>Wastes seek time during jump</li>
+      </ul>
+    </div>
+  
+    <h2>5. LOOK</h2>
+    <div class="algorithm">
+      <p>Same as SCAN, but the head only goes as far as the final request in each direction before reversing, not to the disk edge.</p>
+      <img src="look.jpg" alt="LOOK Diagram" style="max-width: 100%; margin: 10px 0; border: 2px solid #00ff99; border-radius: 5px;" />
+      <div class="example">
+        <strong>Example:</strong><br>
+        Head: 50 → 82 → 140 → 170 → 190 → reverse → 43 → 24 → 16<br>
+        Seek Time = |50-190| + |190-16| = <strong>314</strong>
+      </div>
+      <p><strong>Advantages:</strong></p>
+      <ul>
+        <li>Reduces unnecessary movement (no full end traversal)</li>
+        <li>Efficient and fair</li>
+      </ul>
+      <p><strong>Disadvantages:</strong></p>
+      <ul>
+        <li>More complex than FCFS or SSTF</li>
+        <li>Still biased toward requests in current direction</li>
+      </ul>
+    </div>
+  
+    <h2>6. C-LOOK</h2>
+    <div class="algorithm">
+      <p>Similar to C-SCAN, but instead of going to the end of the disk, it only jumps to the lowest request when the current direction is complete.</p>
+      <img src="clook.jpg" alt="C-LOOK Diagram" style="max-width: 100%; margin: 10px 0; border: 2px solid #00ff99; border-radius: 5px;" />
+      <div class="example">
+        <strong>Example:</strong><br>
+        Head: 50 → 82 → 140 → 170 → 190 → jump → 16 → 24 → 43<br>
+        Seek Time = |50-190| + |190-16| + |16-43| = <strong>341</strong>
+      </div>
+      <p><strong>Advantages:</strong></p>
+      <ul>
+        <li>Efficient and reduces unnecessary movement</li>
+        <li>Fair scheduling with minimal overhead</li>
+      </ul>
+      <p><strong>Disadvantages:</strong></p>
+      <ul>
+        <li>Jump may confuse performance prediction</li>
+        <li>Requires request sorting</li>
+      </ul>
+    </div>
+  
+    <h2>Conclusion</h2>
+    <p>Disk scheduling algorithms are essential for optimizing performance and responsiveness of disk I/O systems. While:</p>
+    <ul>
+      <li><strong>FCFS</strong> is easy and fair but inefficient,</li>
+      <li><strong>SSTF</strong> improves performance but risks starvation,</li>
+      <li><strong>SCAN</strong> and <strong>LOOK</strong> provide a good balance between performance and fairness,</li>
+      <li><strong>C-SCAN</strong> and <strong>C-LOOK</strong> offer uniform wait times and are ideal for systems with heavy loads.</li>
+    </ul>
+    <p>Choosing the right algorithm depends on the specific use case, such as real-time requirements, disk load, and fairness policies.</p>
+  </div>
+  
+
+<footer>
+  &copy; 2025 Disk Scheduling Educational Tool. Learn more and simulate at your own pace.
+</footer>
+
+</body>
+</html>

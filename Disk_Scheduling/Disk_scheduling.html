@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Disk Scheduling Simulation</title>
+
+  <style>
+    body {
+   font-family: Arial, sans-serif;
+   margin: 0;
+   padding: 20px;
+   background-color: #000; 
+   color: #f0f0f0; 
+ }
+ 
+ h1 {
+   text-align: center;
+   color: #00ff99;
+ }
+ 
+ .container {
+   max-width: 800px;
+   margin: 0 auto;
+   background: #1e1e1e; 
+   padding: 20px;
+   border-radius: 8px;
+   box-shadow: 0 0 15px rgba(0, 255, 153, 0.3);
+ }
+ 
+ select,
+ input {
+   margin: 10px 0;
+   padding: 10px;
+   width: 100%;
+   background-color: #333;
+   color: #fff;
+   border: 1px solid #555;
+   border-radius: 4px;
+ }
+ 
+ button {
+   margin: 10px 0;
+   padding: 10px;
+   width: 100%;
+   background-color: #00ff99;
+   color: #000;
+   font-weight: bold;
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+ }
+ 
+ button:hover {
+   background-color: #00cc77;
+ }
+ 
+ #result {
+   margin-top: 20px;
+   white-space: pre-wrap;
+   color: #00ff99;
+ }
+ 
+ #backButton {
+   position: fixed;              
+   right: 10px;
+   width: 90px;
+  
+   background-color: transparent;
+   color: #00ff99;
+   border: 1px solid #00ff99;
+   border-radius: 10%;
+   font-size: 16px;
+   line-height: 28px;
+   text-align: center;
+ 
+   cursor: pointer;
+   z-index: 1000;
+   transition: background-color 0.3s, color 0.3s;
+ }
+ 
+ #backButton:hover {
+   background-color: #00ff99;
+   color: #000;
+ }
+ 
+ 
+ #visualization {
+  position: relative;
+  height: 150px;
+  background: #111;
+  border: 2px solid #00ff99;
+  border-radius: 10px;
+  margin-top: 30px;
+  overflow-x: auto;
+}
+
+#visualization::-webkit-scrollbar {
+  height: 6px;
+}
+#visualization::-webkit-scrollbar-thumb {
+  background: #00ff99;
+}
+
+
+.disk-bar {
+  position: relative;
+  height: 4px;
+  background: #555;
+  margin: 70px auto 0 auto;
+  left: 2%;
+}
+
+.point {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  background: #0f0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.label {
+  position: absolute;
+  top: 25px;
+  font-size: 12px;
+  color: #0f0;
+  transform: translateX(-50%);
+}
+
+.head {
+  position: absolute;
+  top: 40px;
+  width: 20px;
+  height: 20px;
+  background: red;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  transition: left 0.4s ease;
+  z-index: 5;
+}
+
+#logOutput{
+    color: #0f0;
+}
+
+/* Graph Styles */
+#graphContainer {
+  position: relative;
+  height: 300px;
+  background: #111;
+  border: 2px solid #00ff99;
+  border-radius: 10px;
+  margin-top: 30px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+#graphTitle {
+  color: #00ff99;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.graph-line {
+  stroke: #00ff99;
+  stroke-width: 2;
+  fill: none;
+}
+
+.graph-point {
+  fill: yellow;
+  stroke: #000;
+}
+
+.current-point {
+  fill: red;
+  stroke: #fff;
+  stroke-width: 1;
+}
+
+.graph-axis {
+  stroke: #555;
+  stroke-width: 2;
+}
+
+.graph-grid {
+  stroke: #333;
+  stroke-width: 1;
+  stroke-dasharray: 2,2;
+}
+
+.graph-label {
+  fill: #00ff99;
+  font-size: 12px;
+}
+
+.tick-label {
+  fill: #aaa;
+  font-size: 10px;
+}
+ 
+ </style>
+
+</head>
+<body>
+  <button onclick="goBack()" id="backButton">Back</button>
+
+  <div class="container">
+    <h1>Disk Scheduling Simulator</h1>
+
+    <label for="Max-Size">Maximum Disk Size:</label>
+    <input type="number" id="max" placeholder="Example: 199">
+
+
+    <label for="algorithm">Select Algorithm:</label>
+    <select id="algorithm">
+      <option value="FCFS">FCFS</option>
+      <option value="SSTF">SSTF</option>
+      <option value="SCAN">SCAN</option>
+      <option value="LOOK">LOOK</option>
+      <option value="C-SCAN">C-SCAN</option>
+      <option value="C-LOOK">C-LOOK</option>
+    </select>
+
+
+
+    <div id="directionSelect" style="display: none;">
+      <label for="direction">Select Direction:</label>
+      <select id="direction">
+        <option value="right">Right</option>
+        <option value="left">Left</option>
+      </select>
+    </div>
+
+    <label for="requests">Enter Requests (comma-separated):</label>
+    <input type="text" id="requests" placeholder="Example: 98,183,37,122,14,124,65,67">
+
+    <label for="head">Initial Head Position:</label>
+    <input type="number" id="head" placeholder="Example: 53">
+
+    <button onclick="simulate()">Simulate</button>
+
+    <label>Speed (ms):</label>
+    <input type="range" id="speed" min="5" max="60" step="5" value="5">
+
+    <div id="result"></div>
+
+    <div id="visualization">
+      <div id="innercontainer"></div>
+    </div>
+
+    <div id="logOutput"><h3>Head Log:</h3><br>
+      <div id="out">    </div>
+    </div>
+
+    <!-- Add this after your current visualization div -->
+<div id="graphContainer">
+  <h3 id="graphTitle">Head Movement Graph</h3>
+  <svg id="graph" width="100%" height="250px"></svg>
+</div>
+  </div>
+
+  <script>
+
+    document.getElementById('algorithm').addEventListener('change', function () {
+      const directionDiv = document.getElementById('directionSelect');
+      if (['SCAN', 'LOOK', 'C-SCAN', 'C-LOOK'].includes(this.value)) {
+        directionDiv.style.display = 'block';
+      } else {
+        directionDiv.style.display = 'none';
+      }
+    });
+
+    function simulate() {
+      const algo = document.getElementById('algorithm').value;
+      const requests = document.getElementById('requests').value.split(',').map(Number);
+      const head = parseInt(document.getElementById('head').value);
+      const direction = document.getElementById('direction').value;
+
+      if (requests.some(isNaN) || isNaN(head)) {
+        document.getElementById('result').innerText = 'Invalid input. Please enter valid numbers.';
+        return;
+      }
+
+      // Validate disk range
+      if (requests.some(r => r < 0 || r > max) || head < 0 || head > max) {
+        document.getElementById('result').innerText = 'Invalid input. Disk positions must be between 0 and 199.';
+        return;
+      }
+
+      const kk = document.getElementById("out");
+      kk.innerHTML = " ";
+      document.getElementById('result').innerHTML = "";
+
+      let output = '';
+      let x = 0;
+
+      switch (algo) {
+        case 'FCFS':
+          output = fcfs(requests, head);
+          break;
+        case 'SSTF':
+          output = sstf(requests, head);
+          break;
+        case 'SCAN':
+          output = scan(requests, head, true, direction);
+          x = 1;
+          break;
+        case 'LOOK':
+          output = scan(requests, head, false, direction);
+          x = 1;
+          break;
+        case 'C-SCAN':
+          output = cscan(requests, head, true, direction);
+          x = 1;
+          break;
+        case 'C-LOOK':
+          output = cscan(requests, head, false, direction);
+          x = 1;
+          break;
+      }
+
+      if (x)
+        document.getElementById('result').innerHTML += "<br>" + output;
+      else
+        document.getElementById('result').innerHTML = output;
+
+      drawGraph(output, requests, head);
+    }
+
+    function fcfs(requests, head) {
+      let distance = 0;
+      let current = head;
+      let sequence = [];
+
+      for (let r of requests) {
+        distance += Math.abs(current - r);
+        sequence.push(r);
+        current = r;
+      }
+
+      return `Order: ${[head, ...sequence].join(' -> ')}\nTotal Seek Time: ${distance}`;
+    }
+
+    function sstf(requests, head) {
+      let distance = 0;
+      let current = head;
+      let sequence = [];
+      let reqs = [...requests];
+
+      while (reqs.length) {
+        reqs.sort((a, b) => Math.abs(current - a) - Math.abs(current - b));
+        let closest = reqs.shift();
+        distance += Math.abs(current - closest);
+        sequence.push(closest);
+        current = closest;
+      }
+
+      return `Order: ${[head, ...sequence].join(' -> ')}\nTotal Seek Time: ${distance}`;
+    }
+
+    function scan(requests, head, isSCAN, direction) {
+  let sequence = [];
+  let distance = 0;
+  let uniqueRequests = [...new Set(requests)]; // Remove duplicates
+  let reqs = uniqueRequests.slice().sort((a, b) => a - b);
+  let current = head;
+  let dir = direction === 'right' ? 1 : -1;
+  const max = parseInt(document.getElementById("max").value) || 199; 
+  let left = reqs.filter(r => r < head);
+  let right = reqs.filter(r => r > head); // Changed from >= to > to avoid duplicating head position
+  
+  // Handle the case where head is at a request position
+  let headIsRequest = reqs.includes(head);
+  
+  // For SCAN, always include the disk boundary
+  const diskEnd = dir === 1 ? max : 0;
+
+  if (dir === 1) {
+    // Right direction: head -> right requests -> disk end -> left requests in reverse
+    if (isSCAN) {
+      // Include diskEnd (max) only if there are right requests or we're at head
+      sequence = [...right];
+      if (right.length > 0 || headIsRequest) {
+        sequence.push(diskEnd);
+      }
+      // Add left requests in reverse only if they exist
+      if (left.length > 0) {
+        sequence = [...sequence, ...left.reverse()];
+      }
+    } else { // LOOK algorithm
+      sequence = [...right];
+      // Add left requests in reverse only if they exist
+      if (left.length > 0) {
+        sequence = [...sequence, ...left.reverse()];
+      }
+    }
+  } else {
+    // Left direction: head -> left requests in reverse -> disk start -> right requests
+    if (isSCAN) {
+      // Include diskEnd (0) only if there are left requests or we're at head
+      sequence = [...left.reverse()];
+      if (left.length > 0 || headIsRequest) {
+        sequence.push(diskEnd);
+      }
+      // Add right requests only if they exist
+      if (right.length > 0) {
+        sequence = [...sequence, ...right];
+      }
+    } else { // LOOK algorithm
+      sequence = [...left.reverse()];
+      // Add right requests only if they exist
+      if (right.length > 0) {
+        sequence = [...sequence, ...right];
+      }
+    }
+  }
+
+  // Calculate distance
+  let sPath = [head, ...sequence];
+  for (let i = 1; i < sPath.length; i++) {
+    distance += Math.abs(sPath[i] - sPath[i-1]);
+  }
+
+  const log = document.getElementById("result");
+  if (isSCAN) {
+    log.innerHTML += `<br>Current-direction: Head moves ${direction} to disk end (${diskEnd}), then reverses.`;
+  } else {
+    log.innerHTML += `<br>Current-direction: Head moves ${direction} to last request, then reverses.`;
+  }
+
+  return `Order: ${[head, ...sequence].join(' -> ')}\nTotal Seek Time: ${distance}`;
+}
+    function cscan(requests, head, isCSCAN, direction) {
+      let distance = 0;
+      let uniqueRequests = [...new Set(requests)]; // Remove duplicates
+      let reqs = uniqueRequests.slice().sort((a, b) => a - b);
+      let current = head;
+      let dir = direction === 'right' ? 1 : -1;
+
+      let left = reqs.filter(r => r < head);
+      let right = reqs.filter(r => r > head); // Changed from >= to > to avoid duplicating head position
+
+      
+      
+      const max=parseInt(document.getElementById("max").value) || 199;
+      
+      let headIsRequest = reqs.includes(head);
+      let sequence = [];
+
+      if (dir === 1) {
+        
+        if (isCSCAN) {
+          sequence = headIsRequest ? 
+            [head, ...right, max, 0, ...left] :
+            [...right, max, 0, ...left];
+        } else {
+          
+          sequence = headIsRequest ?
+            [head, ...right, ...left] :
+            [...right, ...left];
+        }
+      } else {
+       
+        if (isCSCAN) {
+          sequence = headIsRequest ? 
+            [head, ...left.reverse(), 0, max, ...right.reverse()] :
+            [...left.reverse(), 0, max, ...right.reverse()];
+        } else {
+
+          sequence = headIsRequest ?
+            [head, ...left.reverse(), ...right.reverse()] :
+            [...left.reverse(), ...right.reverse()];
+        }
+      }
+
+      
+      let sPath = [head, ...sequence];
+      for (let i = 1; i < sPath.length; i++) {
+
+        if (isCSCAN && ((dir === 1 && sPath[i-1] === max && sPath[i] === 0) || 
+                      (dir === -1 && sPath[i-1] === 0 && sPath[i] === max))) {
+          
+          distance += max;
+        } else {
+          distance += Math.abs(sPath[i] - sPath[i-1]);
+        }
+      }
+
+      const log = document.getElementById("result");
+      if (isCSCAN) {
+        log.innerHTML += `<br>Current-direction: Head moves ${direction}, reaches disk end, then wraps to start.`;
+      } else {
+        log.innerHTML += `<br>Current-direction: Head moves ${direction} to last request, then wraps to opposite end requests.`;
+      }
+
+      return `Order: ${[head, ...sequence].join(' -> ')}\nTotal Seek Time: ${distance}`;
+    }
+
+    function drawGraph(output, requests, head) {
+      const container = document.getElementById("visualization");
+      container.innerHTML = "";
+
+      const Maximum=parseInt(document.getElementById("max").value);
+
+      const speed = parseInt(document.getElementById("speed").value);
+      const animationDelay = 1000 - (speed * 15); // Invert the scale for intuitive control
+      
+      const match = output.match(/Order: (.+)\n/);
+      if (!match) return;
+
+      const sequence = match[1].split(" -> ").map(Number);
+      
+     
+      let path;
+      if (sequence[0] === head) {
+        path = sequence;
+      } else {
+        path = [head, ...sequence];  // Add head if not present
+      }
+
+      const all = [...path];
+      const max = Math.max(...all, Maximum); // Include max disk value
+      const min = Math.min(...all, 0);   // Include min disk value
+      const range = max - min || 1;
+      const barWidth = 100 + range * 5;
+
+      const bar = document.createElement("div");
+      bar.className = "disk-bar";
+      bar.style.width = `${barWidth}px`;
+      container.appendChild(bar);
+
+      const headDiv = document.createElement("div");
+      headDiv.className = "head";
+      bar.appendChild(headDiv);
+
+      const initialLeft = ((head - min) / range) * barWidth;
+      headDiv.style.left = `${initialLeft}px`;
+
+      setTimeout(() => {
+        container.scrollLeft = initialLeft - container.clientWidth / 2 + 50;
+      }, 100);
+
+
+
+      // Add disk boundary markers
+      const startLeft = ((0 - min) / range) * barWidth;
+      const endLeft = ((max - min) / range) * barWidth;
+      
+      // Add start marker (0)
+      const startMarker = document.createElement("div");
+      startMarker.className = "point";
+      startMarker.style.left = `${startLeft}px`;
+      startMarker.style.background = "#555";
+      startMarker.style.width = "4px";
+      startMarker.style.height = "20px";
+      startMarker.style.borderRadius = "0";
+      
+      const startLabel = document.createElement("div");
+      startLabel.className = "label";
+      startLabel.style.left = `${startLeft}px`;
+      startLabel.style.color = "#aaa";
+      startLabel.textContent = "0";
+      
+      bar.appendChild(startMarker);
+      bar.appendChild(startLabel);
+      
+      // Add end marker (199)
+      const endMarker = document.createElement("div");
+      endMarker.className = "point";
+      endMarker.style.left = `${endLeft}px`;
+      endMarker.style.background = "#555";
+      endMarker.style.width = "4px";
+      endMarker.style.height = "20px";
+      endMarker.style.borderRadius = "0";
+      
+      const endLabel = document.createElement("div");
+      endLabel.className = "label";
+      endLabel.style.left = `${endLeft}px`;
+      endLabel.style.color = "#aaa";
+      endLabel.textContent = Maximum.toString();
+      
+      bar.appendChild(endMarker);
+      bar.appendChild(endLabel);
+
+
+
+      // Draw points for requests (that aren't disk boundaries)
+      const uniqueRequests = [...new Set(requests)];
+      uniqueRequests.forEach(cyl => {
+        const left = ((cyl - min) / range) * barWidth;
+
+        const point = document.createElement("div");
+        point.className = "point";
+        point.style.left = `${left}px`;
+
+        const label = document.createElement("div");
+        label.className = "label";
+        label.style.left = `${left}px`;
+        label.textContent = cyl;
+
+        bar.appendChild(point);
+        bar.appendChild(label);
+      });
+
+      // Add head point
+      const headPoint = document.createElement("div");
+      headPoint.className = "point";
+      headPoint.style.left = `${initialLeft}px`;
+      headPoint.style.background = "yellow";
+
+      const headLabel = document.createElement("div");
+      headLabel.className = "label";
+      headLabel.style.left = `${initialLeft}px`;
+      headLabel.textContent = `(${head})`;
+
+      bar.appendChild(headPoint);
+      bar.appendChild(headLabel);
+
+      drawLineGraph(path, max, min);
+
+      // Animate head movement
+      let i = 0;
+      const log = document.getElementById("out");
+      log.innerHTML = `Initial head position: ${head} <br>`;
+      
+      function animate() {
+        if (i >= path.length) return;
+        const cyl = path[i];
+        const left = ((cyl - min) / range) * barWidth;
+
+        headDiv.style.left = `${left}px`;
+        container.scrollLeft = left - container.clientWidth / 2 + 50;
+
+        const currentPoint = document.getElementById("currentPosition");
+if (currentPoint) {
+  // Get the graph's dimensions
+  const svg = document.getElementById("graph");
+  const width = svg.clientWidth;
+  const height = svg.clientHeight;
+  const padding = 60;
+  
+  // Calculate position
+  const xScale = (width - padding * 2) / (path.length - 1);
+  const yScale = (height - padding * 2) / (max - min || 1);
+  
+  const x = padding + i * xScale;
+  const y = height - padding - (path[i] - min) * yScale;
+  
+  currentPoint.setAttribute("cx", x);
+  currentPoint.setAttribute("cy", y);
+}
+
+        if (i > 0) {
+          log.innerHTML += `Head moved to ${cyl} <br>`;
+        }
+
+        i++;
+        setTimeout(animate, animationDelay);
+      }
+
+      animate();
+
+
+    }
+
+    function goBack() {
+      window.location.href = "intro.html";
+    }
+
+    // Draw the line graph showing head movement over time
+function drawLineGraph(path, diskMax, diskMin) {
+  const svg = document.getElementById("graph");
+  svg.innerHTML = ""; // Clear previous graph
+  
+  const width = svg.clientWidth;
+  const height = svg.clientHeight;
+  const padding = 60; // Padding from edges
+  
+  // Set up scales
+  const xScale = (width - padding * 2) / (path.length - 1);
+  const yScale = (height - padding * 2) / (diskMax - diskMin || 1);
+  
+  // Draw axes
+  // Y-axis
+  const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  yAxis.setAttribute("x1", padding);
+  yAxis.setAttribute("y1", padding);
+  yAxis.setAttribute("x2", padding);
+  yAxis.setAttribute("y2", height - padding);
+  yAxis.setAttribute("class", "graph-axis");
+  svg.appendChild(yAxis);
+  
+  // X-axis
+  const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  xAxis.setAttribute("x1", padding);
+  xAxis.setAttribute("y1", height - padding);
+  xAxis.setAttribute("x2", width - padding);
+  xAxis.setAttribute("y2", height - padding);
+  xAxis.setAttribute("class", "graph-axis");
+  svg.appendChild(xAxis);
+  
+  // Y-axis label
+  const yLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  yLabel.setAttribute("x", 15);
+  yLabel.setAttribute("y", height / 2);
+  yLabel.setAttribute("class", "graph-label");
+  yLabel.setAttribute("text-anchor", "middle");
+  yLabel.setAttribute("transform", `rotate(-90, 15, ${height / 2})`);
+  yLabel.textContent = "Cylinder Position";
+  svg.appendChild(yLabel);
+  
+  // X-axis label
+  const xLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  xLabel.setAttribute("x", width / 2);
+  xLabel.setAttribute("y", height - 10);
+  xLabel.setAttribute("class", "graph-label");
+  xLabel.setAttribute("text-anchor", "middle");
+  xLabel.textContent = "Sequence Step";
+  svg.appendChild(xLabel);
+  
+  // Add Y-axis ticks and labels
+  const yTickCount = 5;
+  const yTickStep = (diskMax - diskMin) / (yTickCount - 1);
+  
+  for (let i = 0; i < yTickCount; i++) {
+    const tickValue = Math.round(diskMin + (yTickStep * i));
+    const yPos = height - padding - (tickValue - diskMin) * yScale;
+    
+    // Tick
+    const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    tick.setAttribute("x1", padding - 5);
+    tick.setAttribute("y1", yPos);
+    tick.setAttribute("x2", padding);
+    tick.setAttribute("y2", yPos);
+    tick.setAttribute("stroke", "#555");
+    svg.appendChild(tick);
+    
+    // Label
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("x", padding - 10);
+    label.setAttribute("y", yPos + 4);
+    label.setAttribute("class", "tick-label");
+    label.setAttribute("text-anchor", "end");
+    label.textContent = tickValue;
+    svg.appendChild(label);
+    
+    // Grid line
+    const gridLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    gridLine.setAttribute("x1", padding);
+    gridLine.setAttribute("y1", yPos);
+    gridLine.setAttribute("x2", width - padding);
+    gridLine.setAttribute("y2", yPos);
+    gridLine.setAttribute("class", "graph-grid");
+    svg.appendChild(gridLine);
+  }
+  
+  // Add X-axis ticks and labels
+  const xTickStep = Math.max(1, Math.floor(path.length / 10)); // Not too many ticks
+  
+  for (let i = 0; i < path.length; i += xTickStep) {
+    const xPos = padding + i * xScale;
+    
+    // Tick
+    const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    tick.setAttribute("x1", xPos);
+    tick.setAttribute("y1", height - padding);
+    tick.setAttribute("x2", xPos);
+    tick.setAttribute("y2", height - padding + 5);
+    tick.setAttribute("stroke", "#555");
+    svg.appendChild(tick);
+    
+    // Label
+    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    label.setAttribute("x", xPos);
+    label.setAttribute("y", height - padding + 15);
+    label.setAttribute("class", "tick-label");
+    label.setAttribute("text-anchor", "middle");
+    label.textContent = i;
+    svg.appendChild(label);
+    
+    // Grid line
+    const gridLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    gridLine.setAttribute("x1", xPos);
+    gridLine.setAttribute("y1", padding);
+    gridLine.setAttribute("x2", xPos);
+    gridLine.setAttribute("y2", height - padding);
+    gridLine.setAttribute("class", "graph-grid");
+    svg.appendChild(gridLine);
+  }
+  
+  // Draw the path line
+  let pathData = "";
+  let points = [];
+  
+  for (let i = 0; i < path.length; i++) {
+    const x = padding + i * xScale;
+    const y = height - padding - (path[i] - diskMin) * yScale;
+    points.push({x, y});
+    
+    if (i === 0) {
+      pathData += `M ${x} ${y}`;
+    } else {
+      pathData += ` L ${x} ${y}`;
+    }
+    
+    // Draw point at each step
+    const point = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    point.setAttribute("cx", x);
+    point.setAttribute("cy", y);
+    point.setAttribute("r", 4);
+    point.setAttribute("class", "graph-point");
+    svg.appendChild(point);
+  }
+  
+  // Draw the connecting line
+  const pathLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  pathLine.setAttribute("d", pathData);
+  pathLine.setAttribute("class", "graph-line");
+  
+  // Insert the line before points so points appear on top
+  svg.insertBefore(pathLine, svg.firstChild);
+  
+  // Current position marker (initially at position 0)
+  const currentPoint = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  currentPoint.setAttribute("cx", points[0].x);
+  currentPoint.setAttribute("cy", points[0].y);
+  currentPoint.setAttribute("r", 6);
+  currentPoint.setAttribute("class", "current-point");
+  currentPoint.setAttribute("id", "currentPosition");
+  svg.appendChild(currentPoint);
+}
+
+// Update the current position marker on the graph
+function updateGraphMarker(index) {
+  const svg = document.getElementById("graph");
+  const width = svg.clientWidth;
+  const height = svg.clientHeight;
+  const padding = 60;
+  
+  const currentPoint = document.getElementById("currentPosition");
+  if (!currentPoint) return;
+  
+  const path = currentPoint.getAttribute("data-path").split(",").map(Number);
+  const diskMin = parseInt(currentPoint.getAttribute("data-min"));
+  const diskMax = parseInt(currentPoint.getAttribute("data-max"));
+  
+  const xScale = (width - padding * 2) / (path.length - 1);
+  const yScale = (height - padding * 2) / (diskMax - diskMin || 1);
+  
+  const x = padding + index * xScale;
+  const y = height - padding - (path[index] - diskMin) * yScale;
+  
+  currentPoint.setAttribute("cx", x);
+  currentPoint.setAttribute("cy", y);
+
+  // In your drawLineGraph function, add this at the end to store data for animation
+currentPoint.setAttribute("data-path", path.join(","));
+currentPoint.setAttribute("data-min", diskMin);
+currentPoint.setAttribute("data-max", diskMax);
+
+}
+
+  </script>
+</body>
+</html>

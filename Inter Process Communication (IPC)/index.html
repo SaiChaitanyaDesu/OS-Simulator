@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPC Simulator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title-header">OSSim - OS Simulator</h1>
+        
+        <div class="intro-box">
+            <div class="intro-line">Welcome to our Operating Systems Lab mini project. Here, we explore various concepts and practical aspects of operating systems.</div>
+            <div class="intro-line">Feel free to navigate through the project and explore the different sections.</div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="pipes">Pipes</div>
+            <div class="tab" data-tab="message-passing">Message Passing</div>
+            <div class="tab" data-tab="shared-memory">Shared Memory</div>
+            <div class="tab" data-tab="semaphores">Semaphores</div>
+            <div class="tab" data-tab="message-queues">Message Queues</div>
+        </div>
+        
+        <!-- Pipes -->
+        <div class="tab-content active" id="pipes">
+            <h2>Pipes Simulation</h2>
+            <p>Pipes allow unidirectional data flow between processes.</p>
+            
+            <div class="grid">
+                <div class="process">
+                    <div class="process-title">Process A (Writer)</div>
+                    <div>
+                        <input type="text" id="pipe-input" placeholder="Enter data to send...">
+                        <button id="send-pipe">Send</button>
+                    </div>
+                    <div class="message-box" id="process-a-log"></div>
+                </div>
+                
+                <div class="process">
+                    <div class="process-title">Process B (Reader)</div>
+                    <div class="message-box" id="process-b-log"></div>
+                </div>
+            </div>
+            
+            <div class="pipe">
+                <div class="data-packet" id="data-packet" style="left: -20px;"></div>
+            </div>
+            
+            <div class="log" id="pipe-log"></div>
+        </div>
+        
+        <!-- Message Passing -->
+        <div class="tab-content" id="message-passing">
+            <h2>Message Passing Simulation</h2>
+            <p>Processes communicate by sending messages to each other.</p>
+            
+            <div class="grid">
+                <div class="process">
+                    <div class="process-title">
+                        Process 1
+                        <span>PID: 1001</span>
+                    </div>
+                    <div>
+                        <input type="text" id="p1-message" placeholder="Type message...">
+                        <button id="p1-send">Send</button>
+                    </div>
+                    <div class="message-box" id="p1-message-box"></div>
+                </div>
+                
+                <div class="process">
+                    <div class="process-title">
+                        Process 2
+                        <span>PID: 1002</span>
+                    </div>
+                    <div>
+                        <input type="text" id="p2-message" placeholder="Type message...">
+                        <button id="p2-send">Send</button>
+                    </div>
+                    <div class="message-box" id="p2-message-box"></div>
+                </div>
+            </div>
+            
+            <div class="log" id="message-log"></div>
+        </div>
+        
+        <!-- Shared Memory -->
+        <div class="tab-content" id="shared-memory">
+            <h2>Shared Memory Simulation</h2>
+            <p>Multiple processes can access the same memory segment.</p>
+            
+            <div class="grid">
+                <div class="process">
+                    <div class="process-title">Process X</div>
+                    <div>
+                        <select id="memory-index">
+                            <option value="0">Address 0</option>
+                            <option value="1">Address 1</option>
+                            <option value="2">Address 2</option>
+                            <option value="3">Address 3</option>
+                            <option value="4">Address 4</option>
+                        </select>
+                        <input type="text" id="memory-value" placeholder="Value" maxlength="1">
+                        <button id="write-memory">Write</button>
+                    </div>
+                    <div class="message-box" id="process-x-log"></div>
+                </div>
+                
+                <div class="process">
+                    <div class="process-title">Process Y</div>
+                    <div>
+                        <select id="read-index">
+                            <option value="0">Address 0</option>
+                            <option value="1">Address 1</option>
+                            <option value="2">Address 2</option>
+                            <option value="3">Address 3</option>
+                            <option value="4">Address 4</option>
+                        </select>
+                        <button id="read-memory">Read</button>
+                    </div>
+                    <div class="message-box" id="process-y-log"></div>
+                </div>
+            </div>
+            
+            <div class="shared-memory">
+                <h3>Shared Memory Segment</h3>
+                <div id="memory-cells">
+                    <div class="memory-cell" id="cell-0">0</div>
+                    <div class="memory-cell" id="cell-1">0</div>
+                    <div class="memory-cell" id="cell-2">0</div>
+                    <div class="memory-cell" id="cell-3">0</div>
+                    <div class="memory-cell" id="cell-4">0</div>
+                </div>
+            </div>
+            
+            <div class="log" id="shared-memory-log"></div>
+        </div>
+        
+        <!-- Semaphores -->
+        <div class="tab-content" id="semaphores">
+            <h2>Semaphores Simulation</h2>
+            <p>Semaphores control access to shared resources.</p>
+            
+            <div class="semaphore">
+                <div class="semaphore-light" id="semaphore-light"></div>
+                <span>Resource Access: <span id="semaphore-status">Locked</span></span>
+            </div>
+            
+            <div class="grid">
+                <div class="process">
+                    <div class="process-title">Process 1</div>
+                    <div>
+                        <button id="p1-acquire">Acquire Lock</button>
+                        <button id="p1-release" disabled>Release Lock</button>
+                    </div>
+                    <div class="message-box" id="p1-sem-log"></div>
+                </div>
+                
+                <div class="process">
+                    <div class="process-title">Process 2</div>
+                    <div>
+                        <button id="p2-acquire">Acquire Lock</button>
+                        <button id="p2-release" disabled>Release Lock</button>
+                    </div>
+                    <div class="message-box" id="p2-sem-log"></div>
+                </div>
+            </div>
+            
+            <div class="shared-memory">
+                <h3>Critical Section (Shared Resource)</h3>
+                <div id="critical-section">
+                    Resource is currently not being used
+                </div>
+            </div>
+            
+            <div class="log" id="semaphore-log"></div>
+        </div>
+        
+        <!-- Message Queues -->
+        <div class="tab-content" id="message-queues">
+            <h2>Message Queues Simulation</h2>
+            <p>Message queues allow async communication between processes.</p>
+            
+            <div class="grid">
+                <div class="process">
+                    <div class="process-title">Producer Process</div>
+                    <div>
+                        <input type="text" id="queue-message" placeholder="Create message...">
+                        <select id="message-priority">
+                            <option value="1">Priority: Low</option>
+                            <option value="2">Priority: Medium</option>
+                            <option value="3">Priority: High</option>
+                        </select>
+                        <button id="enqueue">Send to Queue</button>
+                    </div>
+                    <div class="message-box" id="producer-log"></div>
+                </div>
+                
+                <div class="process">
+                    <div class="process-title">Consumer Process</div>
+                    <div>
+                        <button id="dequeue">Receive from Queue</button>
+                        <label style="color: #f0f0f0;">
+                            <input type="checkbox" id="auto-consume"> Auto-consume
+                        </label>
+                    </div>
+                    <div class="message-box" id="consumer-log"></div>
+                </div>
+            </div>
+            
+            <div class="mailbox">
+                <h3>Message Queue <span id="queue-count">(0)</span></h3>
+                <div id="message-queue"></div>
+            </div>
+            
+            <div class="log" id="queue-log"></div>
+        </div>
+    </div>
+    
+    <script src="index.js"></script>
+</body>

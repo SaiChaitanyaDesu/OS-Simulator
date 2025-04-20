@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>Thread Synchronization</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand" onclick="window.location.href='../index.html'">OSSim</div>
+    <div class="nav-links">
+      <div class="dropdown">
+        <button class="dropbtn">
+          <i class="fas fa-bars"></i> Topics
+        </button>
+        <div class="dropdown-content">
+          <a href="../Scheduling_Algorithms/index.html">Scheduling Algorithms</a>
+          <a href="../Process_Synchronization/index.html">Process Synchronization</a>
+          <a href="../Thread_Synchronization/threadindex.html">Threading and Synchronization</a>
+          <a href="../Deadlock/da.html">Banker's Algorithm</a>
+          <a href="../Second_Chance Algo/extra_page_replacement.html">Clock Algorithms</a>
+          <a href="../Memory_management/info.html">MVT/MFT</a>
+          <a href="../File_Organization/index.html">File Organization</a>
+          <a href="../Memory_Allocation/memory_visualizer.html">Memory Allocation</a>
+          <a href="../Page_Replacement/page_replacement.html">Page Replacement</a>
+          <a href="../Disk_Scheduling/intro.html">Disk Scheduling</a>
+          <a href="../File_Allocation/file_allocation.html">File Allocation</a>
+          <a href="../Security_Algorithms/security_theory.html">Security Algorithms</a>
+          <a href="../Paging/Paging_theory.html">Paging Technique</a>
+          <a href="../Inter_Process_Communication/index.html">Inter-Process Communication and Shared Memory</a>
+        </div>
+      </div>
+      <a href="../index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+      <a href="../help.html" class="nav-item"><i class="fas fa-question-circle"></i> Help</a>
+      <a href="about.html" class="nav-item"><i class="fas fa-info-circle"></i> About</a>
+    </div>
+  </nav>
+  
+  <hr class="navbar-divider">
+
+  <div class="jumbotron">
+    <h1 class="display-4">$ OSSim - OS Simulator</h1>
+    <h1 class="display-4">Thread Synchronization</h1>
+    <hr class="my-4">
+    <p class="lead">This simulation demonstrates thread synchronization using JavaScript. When two threads attempt to access a shared resource, a lock ensures that only one accesses it at a time, maintaining data consistency and avoiding race conditions.</p>
+    
+    <div class="container">
+      <p><strong>Shared Counter:</strong> <span id="counter">0</span></p>
+      <button class="ipc-button" onclick="startThreads()">Start Threads</button>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+  <script src="thread.js"></script>
+</body>
+</html>

@@ -1,234 +1,231 @@
 /* OS-Inspired CSS Theme */
 :root {
-    --terminal-green: #0cfa37;
-    --terminal-bg: #1e1e1e;
-    --terminal-text: #f0f0f0;
-    --console-blue: #0a85ff;
-    --warning-orange: #ff9800;
-    --error-red: #ff3b30;
-    --success-green: #34c759;
-    --dark-bg: #222;
-    --window-border: #444;
-    --taskbar-bg: #333;
-  }
-  
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Consolas', 'Courier New', monospace;
-  }
-  
-  body {
-    background-color: var(--terminal-bg);
-    color: var(--terminal-text);
-    line-height: 1.6;
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
-    overflow-x: hidden;
-  }
-  
-  /* Terminal-like Container */
-  .container {
-    max-width: 1000px;
-    margin: 30px auto;
-    padding: 25px;
-    background-color: var(--dark-bg);
-    border-radius: 8px;
-    border: 2px solid var(--window-border);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    position: relative;
-  }
-  
-  /* Window Controls (simulating OS window) */
-  .container::before {
-    content: "● ● ●";
-    color: #ff5f56 #ffbd2e #27c93f;
-    letter-spacing: 10px;
-    font-size: 14px;
-    position: absolute;
-    top: 10px;
-    left: 15px;
-  }
-  
-  h1 {
-    margin: 15px 0 20px;
-    color: var(--terminal-green);
-    font-weight: bold;
-    text-align: center;
-    font-size: 2.2rem;
-    text-shadow: 0 0 10px rgba(12, 250, 55, 0.3);
-    padding-top: 15px;
-  }
-  
-  h1::before {
-    content: "$ ";
-    opacity: 0.8;
-  }
-  
-  p {
-    color: var(--terminal-text);
-    margin-bottom: 15px;
-    font-size: 1rem;
-    padding-left: 20px;
-  }
-  
-  p::before {
-    content: "> ";
-    color: var(--console-blue);
-  }
-  
-  /* Navigation - styled like a taskbar */
-  /* nav {
-    width: 1000px;
-    margin: 0 auto;
-  } */
+  --terminal-green: #0cfa37;
+  --terminal-bg: #1e1e1e;
+  --terminal-text: #f0f0f0;
+  --console-blue: #0a85ff;
+  --warning-orange: #ff9800;
+  --error-red: #ff3b30;
+  --success-green: #34c759;
+  --dark-bg: #222;
+  --window-border: #444;
+  --taskbar-bg: #333;
+}
 
-  .buttons {
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-  
-  .btn-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
-    background-color: var(--taskbar-bg);
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid var(--window-border);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Buttons styled as command buttons */
-  .btn {
-    display: block;
-    padding: 12px 15px;
-    background-color: #333;
-    color: var(--terminal-text);
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: 500;
-    text-align: center;
-    transition: all 0.25s ease;
-    border: 1px solid #555;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .btn::before {
-    content: ">";
-    position: absolute;
-    left: 10px;
-    opacity: 0;
-    transition: all 0.2s ease;
-  }
-  
-  .btn:hover {
-    background-color: #444;
-    padding-left: 25px;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    border-color: var(--terminal-green);
-  }
-  
-  .btn:hover::before {
-    opacity: 1;
-    color: var(--terminal-green);
-  }
-  
-  /* Different colors for different categories of algorithms */
-  .btn-container a:nth-child(3n+1) {
-    border-left: 3px solid var(--terminal-green);
-  }
-  
-  .btn-container a:nth-child(3n+2) {
-    border-left: 3px solid var(--console-blue);
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Consolas', 'Courier New', monospace;
+}
 
-  .btn-container a:nth-child(3n+3) {
-    border-left: 3px solid var(--warning-orange);
-  }
+body {
+  background-color: var(--terminal-bg);
+  color: var(--terminal-text);
+  line-height: 1.6;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+  overflow-x: hidden;
+}
 
-  .line-break {
-    display: none;
-  }
-  
-  /* Team Members - like a system process list */
-  .team-members {
-    background-color: var(--dark-bg);
-    padding: 25px;
-    border-radius: 8px;
-    margin-top: 30px;
-    border: 1px solid var(--window-border);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .team-members b {
-    display: block;
-    font-size: 1.5rem;
-    color: var(--console-blue);
-    margin-bottom: 20px;
-    text-align: center;
-    border-bottom: 1px dashed #444;
-    padding-bottom: 10px;
-  }
-  
-  .team-members b::before {
-    content: "ps -aux | grep ";
-    color: var(--terminal-green);
-    font-size: 1.2rem;
-  }
-  
-  .team-members ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .team-members li {
-    font-size: 1rem;
-    color: var(--terminal-text);
-    padding: 8px 12px;
-    margin-bottom: 6px;
-    background-color: #222;
-    border-left: 4px solid var(--terminal-green);
-    transition: all 0.2s ease;
-  }
-  
-  .team-members li:hover {
-    background-color: #2a2a2a;
-    transform: translateX(5px);
-  }
-  
-  /* Simulating process ID and user */
-  .team-members li::before {
-    content: "user@ossim:~$ ";
-    color: var(--console-blue);
-    margin-right: 5px;
-  }
-  
-  /* Section with matrix effect background */
-  section {
-    background-color: var(--terminal-bg) !important;
-    background-image: radial-gradient(rgba(0, 150, 0, 0.1) 2px, transparent 2px) !important;
-    background-size: 30px 30px !important;
-    height: auto !important;
-    padding: 40px 0;
-  }
-  
-  /* Blinking cursor effect */
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-  
-  h1::after {
-    content: "█";
-    color: var(--terminal-green);
-    animation: blink 1s step-end infinite;
-    margin-left: 5px;
-  }
+/* Terminal-like Container */
+.container {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: var(--dark-bg);
+  border-radius: 8px;
+  border: 2px solid var(--window-border);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
 
-  
+.container p {
+  font-size: medium;
+}
+
+/* Window Controls (simulating OS window) */
+.container::before {
+  content: "● ● ●";
+  color: #ff5f56 #ffbd2e #27c93f;
+  letter-spacing: 10px;
+  font-size: 14px;
+  position: absolute;
+  top: 10px;
+  left: 15px;
+}
+
+h1 {
+  margin: 15px 0 20px;
+  color: var(--terminal-green);
+  font-weight: bold;
+  text-align: center;
+  font-size: 2.2rem;
+  text-shadow: 0 0 10px rgba(12, 250, 55, 0.3);
+  padding-top: 15px;
+}
+
+h1::before {
+  content: "$ ";
+  opacity: 0.8;
+}
+
+p {
+  color: var(--terminal-text);
+  margin-bottom: 15px;
+  font-size: 1rem;
+  padding-left: 20px;
+}
+
+p::before {
+  content: "> ";
+  color: var(--console-blue);
+}
+
+.buttons {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.btn-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  background-color: var(--taskbar-bg);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--window-border);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Buttons styled as command buttons */
+.btn {
+  display: block;
+  padding: 12px 15px;
+  background-color: #333;
+  color: var(--terminal-text);
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.25s ease;
+  border: 1px solid #555;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: ">";
+  position: absolute;
+  left: 10px;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #444;
+  padding-left: 25px;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border-color: var(--terminal-green);
+}
+
+.btn:hover::before {
+  opacity: 1;
+  color: var(--terminal-green);
+}
+
+/* Different colors for different categories of algorithms */
+.btn-container a:nth-child(3n+1) {
+  border-left: 3px solid var(--terminal-green);
+}
+
+.btn-container a:nth-child(3n+2) {
+  border-left: 3px solid var(--console-blue);
+}
+
+.btn-container a:nth-child(3n+3) {
+  border-left: 3px solid var(--warning-orange);
+}
+
+.line-break {
+  display: none;
+}
+
+/* Team Members - like a system process list */
+.team-members {
+  background-color: var(--dark-bg);
+  padding: 25px;
+  border-radius: 8px;
+  margin-top: 30px;
+  border: 1px solid var(--window-border);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.team-members b {
+  display: block;
+  font-size: 1.5rem;
+  color: var(--console-blue);
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 1px dashed #444;
+  padding-bottom: 10px;
+}
+
+.team-members b::before {
+  content: "ps -aux | grep ";
+  color: var(--terminal-green);
+  font-size: 1.2rem;
+}
+
+.team-members ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.team-members li {
+  font-size: 1rem;
+  color: var(--terminal-text);
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  background-color: #222;
+  border-left: 4px solid var(--terminal-green);
+  transition: all 0.2s ease;
+}
+
+.team-members li:hover {
+  background-color: #2a2a2a;
+  transform: translateX(5px);
+}
+
+/* Simulating process ID and user */
+.team-members li::before {
+  content: "user@ossim:~$ ";
+  color: var(--console-blue);
+  margin-right: 5px;
+}
+
+/* Section with matrix effect background */
+section {
+  background-color: var(--terminal-bg) !important;
+  background-image: radial-gradient(rgba(0, 150, 0, 0.1) 2px, transparent 2px) !important;
+  background-size: 30px 30px !important;
+  height: auto !important;
+  padding: 40px 0;
+}
+
+/* Blinking cursor effect */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+h1::after {
+  content: "█";
+  color: var(--terminal-green);
+  animation: blink 1s step-end infinite;
+  margin-left: 5px;
+}
+
 .navbar {
   width: 100%;
   display: flex;
@@ -252,6 +249,7 @@
   font-size: 1.5rem;
   font-weight: bold;
   color: #00bcd4;
+  cursor: pointer;
 }
 
 .nav-links {
@@ -272,7 +270,7 @@
 }
 
 .dropdown {
-  position: relative;
+  position: sticky;
   display: inline-block;
 }
 
@@ -300,7 +298,8 @@
   box-shadow: 0 8px 16px rgba(0,0,0,0.2);
   z-index: 1;
   border-radius: 6px;
-  overflow: hidden;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .dropdown-content a {
@@ -330,44 +329,65 @@
   margin-top: 5px;
 }
 
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .container {
-      margin: 15px;
-      padding: 20px;
-    }
-    
-    h1 {
-      font-size: 1.8rem;
-      padding-top: 20px;
-    }
-    
-    .btn-container {
-      grid-template-columns: 1fr 1fr;
-    }
+.container-f {
+  background-color: var(--header-bg);
+  text-align: center;
+  padding: 1rem;
+  margin-top: 2px;
+  border-top: 1px solid var(--accent-color);
+}
 
-    .nav-links {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .dropdown-content {
-      position: static;
-      width: 100%;
-    }
+.footer-divider {
+  border: none;
+  height: 2px;
+  width: 90%;
+  margin: 0 auto;
+  background: linear-gradient(to right, #00bcd4, #006064);
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    margin: 15px;
+    padding: 20px;
   }
   
-  @media (max-width: 480px) {
-    .btn-container {
-      grid-template-columns: 1fr;
-    }
-    
-    .container::before {
-      display: none;
-    }
-    
-    h1 {
-      padding-top: 0;
-    }
+  h1 {
+    font-size: 1.8rem;
+    padding-top: 20px;
   }
+  
+  .btn-container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dropdown-content {
+    position: static;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .container::before {
+    display: none;
+  }
+  
+  h1 {
+    padding-top: 0;
+  }
+}

@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
+    <title>OS-Sim - Help</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --accent-color: #00ff66;
+            --secondary-color: #0088ff;
+            --tertiary-color: #ff8800;
+            --card-bg: #2a2a2a;
+            --header-bg: #222222;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1f1f1f;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            max-width: 100%;
+            overflow-x: hidden;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            overflow-x: hidden
+        }
+        
+        header {
+            background-color: #1f1f1f;
+            color: var(--terminal-text);
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+        
+        /* .logo {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+         */
+        /* nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+        
+        nav ul li a {
+            color: var(--text-color);
+            text-decoration: none;
+        }
+        
+        nav ul li a:hover {
+            color: var(--accent-color);
+        } */
+
+        .navbar {
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            transition: box-shadow 0.3s ease, border-bottom 0.3s ease;
+            background-color: #1f1f1f;
+
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 2px 10px rgba(0, 188, 212, 0.3);
+            border-bottom: 2px solid #00bcd4;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00bcd4;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            padding-right: 45px;
+        }
+
+        .nav-item {
+            color: #f1f1f1;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+            margin-right: 5px;
+            white-space: nowrap;
+        }
+
+        .nav-item:last-child {
+            margin-right: 20px; /* Increase this value as needed */
+        }
+
+        .nav-item:hover {
+            color: #00bcd4;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            background-color: #1f1f1f;
+            color: #f1f1f1;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dropbtn:hover {
+            color: #00bcd4;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #2a2a2a;
+            min-width: 250px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 6px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .dropdown-content a {
+            color: #f1f1f1;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #00bcd4;
+            color: #000;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropbttn {
+            background-color: #1f1f1f;
+            color: #f1f1f1;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .navbar-divider {
+            border: none;
+            height: 2px;
+            width: 90%;
+            margin: 0 auto;
+            background: linear-gradient(to right, #00bcd4, #006064);
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .terminal-header {
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+        
+        .section {
+            margin-bottom: 3rem;
+        }
+        
+        h2 {
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            color: var(--secondary-color);
+        }
+        
+        .terminal-text {
+            font-family: 'Courier New', monospace;
+            padding-left: 1rem;
+            border-left: 3px solid var(--accent-color);
+        }
+        
+        .terminal-text::before {
+            content: '> ';
+            color: var(--accent-color);
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary-color);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .card-a {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary-color);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 85%;
+        }
+
+        .author-container {
+            margin-top: auto; /* This pushes the container to the bottom */
+            padding-top: 15px; /* Add some space between content and author */
+            font-weight: 600;
+        }
+
+        .author {
+            display: flex;
+            align-items: center;
+        }
+
+        .author i {
+            margin-right: 6px;
+            color: #007bff; /* Icon color */
+        }
+
+        .author span {
+            color: #00a8ff; /* Name color */
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-a:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .card-a h3 {
+            margin-top: 0;
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: var(--tertiary-color);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+        }
+        
+        .timeline-container {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+        
+        .timeline-container::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: var(--bg-color);
+            border: 4px solid var(--tertiary-color);
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .left {
+            left: 0;
+        }
+        
+        .right {
+            left: 50%;
+        }
+        
+        .left::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            right: 30px;
+            border: medium solid var(--card-bg);
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent var(--card-bg);
+        }
+        
+        .right::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 22px;
+            width: 0;
+            z-index: 1;
+            left: 30px;
+            border: medium solid var(--card-bg);
+            border-width: 10px 10px 10px 0;
+            border-color: transparent var(--card-bg) transparent transparent;
+        }
+        
+        .right::after {
+            left: -10px;
+        }
+        
+        .timeline-content {
+            padding: 20px 30px;
+            background-color: var(--card-bg);
+            position: relative;
+            border-radius: 6px;
+        }
+        
+        .accordion {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            text-align: left;
+            border: none;
+            outline: none;
+            transition: 0.4s;
+            margin-bottom: 2px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            border-left: 3px solid var(--accent-color);
+        }
+        
+        .active, .accordion:hover {
+            background-color: #3a3a3a;
+        }
+        
+        .panel {
+            padding: 0 18px;
+            background-color: var(--bg-color);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .img-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .os-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid var(--card-bg);
+        }
+        
+        .tab {
+            overflow: hidden;
+            background-color: var(--card-bg);
+            margin-bottom: 1rem;
+        }
+        
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            color: var(--text-color);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .tab button:hover {
+            background-color: #3a3a3a;
+        }
+        
+        .tab button.active {
+            background-color: var(--accent-color);
+            color: black;
+        }
+        
+        .tabcontent {
+            display: none;
+            padding: 1.5rem;
+            background-color: var(--card-bg);
+            border-top: none;
+            font-size: medium;
+        }
+        
+        footer {
+            background-color: var(--header-bg);
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--accent-color);
+        }
+        
+        @media screen and (max-width: 800px) {
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-container {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-container::before {
+                left: 60px;
+                border: medium solid var(--card-bg);
+                border-width: 10px 10px 10px 0;
+                border-color: transparent var(--card-bg) transparent transparent;
+            }
+            
+            .left::after, .right::after {
+                left: 21px;
+            }
+            
+            .right {
+                left: 0%;
+            }
+            
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-brand" onclick="window.location.href='../index.html'">OSSim</div>
+            <div class="nav-links">
+              <div class="dropdown">
+                <button class="dropbttn">
+                  <i class="fas fa-bars"></i> Topics
+                </button>
+                <div class="dropdown-content">
+                    <a href="Scheduling_Algorithms/index.html">Scheduling Algorithms</a>
+                    <a href="Process_Synchronization/index.html">Process Synchronization</a>
+                    <a href="Thread_Synchronization/threadindex.html">Threading and Synchronization</a>
+                    <a href="Deadlock/da.html">Banker's Algorithm</a>
+                    <a href="Second_Chance Algo/extra_page_replacement.html">Clock Algorithms</a>
+                    <a href="Memory_management/info.html">MVT/MFT</a>
+                    <a href="File_Organization/index.html">File Organization</a>
+                    <a href="Memory_Allocation/memory_visualizer.html">Memory Allocation</a>
+                    <a href="Page_Replacement/page_replacement.html">Page Replacement</a>
+                    <a href="Disk_Scheduling/intro.html">Disk Scheduling</a>
+                    <a href="File_Allocation/file_allocation.html">File Allocation</a>
+                    <a href="Security_Algorithms/security_theory.html">Security Algorithms</a>
+                    <a href="Paging/Paging_theory.html">Paging Technique</a>
+                    <a href="Inter_Process_Communication/index.html">Inter-Process Communication and Shared Memory</a>
+                </div>
+              </div>
+              <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+              <a href="help.html" class="nav-item"><i class="fas fa-question-circle"></i> Help</a>
+              <a href="#page-top" class="nav-item"><i class="fas fa-info-circle"></i> About Us</a>
+            </div>
+          </nav>
+
+          <hr class="navbar-divider">  
+    </header>
+    
+    <div class="container">
+        <div class="terminal-header">
+            $ OSSim - Help Documentation
+        </div>
+        
+        <div class="section">
+            <h2>What is an Operating System?</h2>
+            <p class="terminal-text">An Operating System (OS) is system software that manages computer hardware, 
+                software resources, and provides common services for computer programs.</p>
+            <p>Operating systems act as an intermediary between users and the computer hardware. The hardware components
+                 of a computer system cannot understand human instructions directly. The OS translates user actions into 
+                 machine-understandable instructions and vice versa.</p>
+            
+            <div class="img-container">
+                <img class="os-img" src="conceptual_view.jpg" alt="Operating System Architecture">
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Operating System Functions</h2>
+            
+            <div class="tab">
+                <button class="tablinks" onclick="openTab(event, 'Resource')" id="defaultOpen">Resource Management</button>
+                <button class="tablinks" onclick="openTab(event, 'Process')">Process Management</button>
+                <button class="tablinks" onclick="openTab(event, 'Memory')">Memory Management</button>
+                <button class="tablinks" onclick="openTab(event, 'File')">File Management</button>
+                <button class="tablinks" onclick="openTab(event, 'Security')">Security</button>
+            </div>
+            
+            <div id="Resource" class="tabcontent">
+                <h3>Resource Management</h3>
+                <p>The OS manages various computer resources like CPU, memory, disk space, and peripheral devices. 
+                    It allocates these resources to different programs as needed, ensuring efficient utilization.</p>
+                <p>Key aspects include:</p>
+                <ul>
+                    <li>CPU scheduling algorithms</li>
+                    <li>Device management</li>
+                    <li>Power management</li>
+                    <li>I/O handling</li>
+                </ul>
+            </div>
+            
+            <div id="Process" class="tabcontent">
+                <h3>Process Management</h3>
+                <p>The OS creates, schedules, and terminates processes. It handles process synchronization and communication 
+                    between processes.</p>
+                <p>Key components:</p>
+                <ul>
+                    <li>Process scheduling</li>
+                    <li>Process creation and termination</li>
+                    <li>Thread management</li>
+                    <li>Process synchronization mechanisms (locks, semaphores, etc.)</li>
+                    <li>Deadlock handling</li>
+                </ul>
+            </div>
+            
+            <div id="Memory" class="tabcontent">
+                <h3>Memory Management</h3>
+                <p>The OS manages the computer's main memory (RAM) and keeps track of which processes are using which 
+                    parts of memory.</p>
+                <p>Key techniques include:</p>
+                <ul>
+                    <li>Virtual memory</li>
+                    <li>Paging and segmentation</li>
+                    <li>Page replacement algorithms</li>
+                    <li>Memory allocation techniques</li>
+                    <li>Memory protection</li>
+                </ul>
+            </div>
+            
+            <div id="File" class="tabcontent">
+                <h3>File Management</h3>
+                <p>The OS manages files and directories on storage devices. It handles file creation, deletion, and access control.</p>
+                <p>Key aspects include:</p>
+                <ul>
+                    <li>File system implementation</li>
+                    <li>Directory structure management</li>
+                    <li>File access methods</li>
+                    <li>File allocation techniques</li>
+                    <li>File protection mechanisms</li>
+                </ul>
+            </div>
+            
+            <div id="Security" class="tabcontent">
+                <h3>Security and Protection</h3>
+                <p>The OS provides security mechanisms to protect data and resources from unauthorized access and misuse.</p>
+                <p>Security features include:</p>
+                <ul>
+                    <li>User authentication</li>
+                    <li>Access control</li>
+                    <li>Encryption</li>
+                    <li>Activity logging</li>
+                    <li>Firewall and network security</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Brief History of Operating Systems</h2>
+            
+            <div class="timeline">
+                <div class="timeline-container left">
+                    <div class="timeline-content">
+                        <h3>1940s-1950s: First Generation</h3>
+                        <p>No true operating systems existed. Programs were executed one at a time and programmers 
+                            interacted directly with the hardware using machine language.</p>
+                    </div>
+                </div>
+                <div class="timeline-container right">
+                    <div class="timeline-content">
+                        <h3>1950s-1960s: Second Generation</h3>
+                        <p>Simple batch processing systems were introduced. IBM's GM-NAA I/O system was one of the first 
+                            operating systems developed for the IBM 704 in 1956.</p>
+                    </div>
+                </div>
+                <div class="timeline-container left">
+                    <div class="timeline-content">
+                        <h3>1960s-1970s: Third Generation</h3>
+                        <p>Multiprogramming was introduced. IBM's OS/360 and UNIX were developed during this period. 
+                            UNIX, created at Bell Labs in 1969, became highly influential in modern OS design.</p>
+                    </div>
+                </div>
+                <div class="timeline-container right">
+                    <div class="timeline-content">
+                        <h3>1970s-1980s: Fourth Generation</h3>
+                        <p>Personal computers emerged. CP/M (1974), MS-DOS (1981), and early versions of Apple's Macintosh 
+                            OS (1984) were developed. The concept of GUIs became popular.</p>
+                    </div>
+                </div>
+                <div class="timeline-container left">
+                    <div class="timeline-content">
+                        <h3>1990s-2000s: Fifth Generation</h3>
+                        <p>Windows 95/98/XP, Mac OS X, and Linux became mainstream. Internet connectivity and distributed 
+                            computing became standard features.</p>
+                    </div>
+                </div>
+                <div class="timeline-container right">
+                    <div class="timeline-content">
+                        <h3>2000s-Present: Modern Era</h3>
+                        <p>Mobile operating systems like iOS and Android emerged. Cloud computing, virtualization, and microkernel 
+                            architectures became prominent. Real-time operating systems for IoT devices gained importance.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Types of Operating Systems</h2>
+            
+            <div class="card-container">
+                <div class="card">
+                    <h3>Batch Operating Systems</h3>
+                    <p>Jobs are grouped together and processed in batches without user interaction. Examples: IBM's OS/360, 
+                        early mainframe systems.</p>
+                </div>
+                <div class="card">
+                    <h3>Multi-programming OS</h3>
+                    <p>Multiple programs can be loaded into memory and executed concurrently using CPU scheduling.</p>
+                </div>
+                <div class="card">
+                    <h3>Multi-tasking OS</h3>
+                    <p>Allows running multiple tasks concurrently. Examples: Most modern desktop OS like Windows, macOS, Linux.</p>
+                </div>
+                <div class="card">
+                    <h3>Real-time OS</h3>
+                    <p>Designed for time-critical applications with deterministic processing. Examples: QNX, VxWorks, RTLinux.</p>
+                </div>
+                <div class="card">
+                    <h3>Distributed OS</h3>
+                    <p>Manages a group of networked computers, making them appear as a single system. Examples: Amoeba, Mach.</p>
+                </div>
+                <div class="card">
+                    <h3>Network OS</h3>
+                    <p>Designed to support workstations, PCs, and file servers connected via LAN. Examples: Novell NetWare, 
+                        Windows Server.</p>
+                </div>
+                <div class="card">
+                    <h3>Mobile OS</h3>
+                    <p>Specifically designed for mobile devices. Examples: Android, iOS, HarmonyOS.</p>
+                </div>
+                <div class="card">
+                    <h3>Embedded OS</h3>
+                    <p>Designed for embedded systems with specific functions. Examples: Embedded Linux, FreeRTOS.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Frequently Asked Questions</h2>
+            
+            <button class="accordion">What is the difference between a kernel and an operating system?</button>
+            <div class="panel">
+                <p>The kernel is the core component of an operating system that provides the most basic level of control over 
+                    the computer's hardware resources. It manages CPU, memory, and I/O devices.</p>
+                <p>An operating system is the entire package, including the kernel, system utilities, user interfaces, and 
+                    applications that make the computer usable for end-users.</p>
+            </div>
+            
+            <button class="accordion">What is virtual memory?</button>
+            <div class="panel">
+                <p>Virtual memory is a memory management technique that provides an idealized abstraction of the storage 
+                    resources that are actually available on a given machine, creating the illusion to users of a very large memory.</p>
+                <p>It allows a computer to compensate for physical memory shortages by temporarily transferring data from 
+                    RAM to disk storage. This technique increases the available memory for programs to use.</p>
+            </div>
+            
+            <button class="accordion">What is a process and how is it different from a thread?</button>
+            <div class="panel">
+                <p>A process is an instance of a program in execution. It has its own memory space, system resources, and 
+                    consists of at least one thread (the main thread).</p>
+                <p>A thread is the smallest unit of execution within a process. Multiple threads within the same process 
+                    share the same memory space and resources but execute independently.</p>
+                <p>The key difference: Processes are isolated from each other, while threads within the same process 
+                    share resources.</p>
+            </div>
+            
+            <button class="accordion">What is a deadlock in operating systems?</button>
+            <div class="panel">
+                <p>A deadlock is a situation where two or more processes are unable to proceed because each is waiting 
+                    for resources that are held by another process in the set.</p>
+                <p>Four conditions must be present for a deadlock to occur:</p>
+                <ol>
+                    <li>Mutual Exclusion: At least one resource must be held in a non-sharable mode.</li>
+                    <li>Hold and Wait: A process is holding at least one resource while waiting for additional resources.</li>
+                    <li>No Preemption: Resources cannot be forcibly taken away from a process.</li>
+                    <li>Circular Wait: A circular chain of processes exists, with each waiting for a resource held by 
+                        the next process in the chain.</li>
+                </ol>
+            </div>
+            
+            <button class="accordion">What is a file system?</button>
+            <div class="panel">
+                <p>A file system is a method used by operating systems to store, organize, and retrieve files on 
+                    storage devices like hard drives, SSDs, and USB drives.</p>
+                <p>Common file systems include:</p>
+                <ul>
+                    <li>FAT32 and NTFS (Windows)</li>
+                    <li>ext2, ext3, ext4 (Linux)</li>
+                    <li>APFS and HFS+ (macOS)</li>
+                    <li>ZFS (Solaris, FreeBSD)</li>
+                </ul>
+                <p>File systems handle tasks like tracking free and used space, managing file metadata, and 
+                    implementing file access control.</p>
+            </div>
+        </div>
+        
+        <div class="section" id="page-top">
+            <h2>OS-Sim Project Modules</h2>
+            <p>The OS-Sim project explores various concepts related to operating systems. Here are the main 
+                modules available in the simulator:</p>
+            
+            <div class="card-container">
+                <div class="card-a">
+                    <h3>Scheduling Algorithms</h3>
+                    <p>Explores CPU scheduling algorithms like FCFS, SJF, Round Robin, and Priority Scheduling and 
+                        real time scheduling algorithms like EDF, RMS.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Lahari Naik, Anvesha</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>Process Synchronization</h3>
+                    <p>Demonstrates techniques for coordinating processes, including semaphores, monitors, and mutex locks.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Ashish,Sai Chaitanya, Aryan</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>Threading and Synchronization</h3>
+                    <p>Explores thread management and synchronization mechanisms in multi-threaded environments.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Mahi Tejesh Reddy</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>Banker's Algorithm</h3>
+                    <p>Simulates the Banker's algorithm for deadlock avoidance in resource allocation.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Lahari Naik, Anvesha</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>Clock Algorithms</h3>
+                    <p>Demonstrates the Second chance and Enhanced second chance algorithms.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Atharv Vikas</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>MVT/MFT</h3>
+                    <p>Shows Multiprogramming with Variable/Fixed number of Tasks memory allocation techniques.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Chinmay R</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>File Organization</h3>
+                    <p>Demonstrates different file organization techniques and access methods.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Sai Chaitanya</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>Memory Allocation</h3>
+                    <p>Explores various memory allocation algorithms like First-Fit, Next-Fit, Best-Fit, and Worst-Fit.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Aryan</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>Page Replacement</h3>
+                    <p>Simulates page replacement algorithms like FIFO, LRU, MRU, Random and Optimal.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Arjun Rijesh</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>Disk Scheduling</h3>
+                    <p>Demonstrates disk scheduling algorithms like FCFS, SSTF, SCAN, C-SCAN, LOOK and C-LOOK.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Kranthi Kiran</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>File Allocation</h3>
+                    <p>Shows techniques like contiguous, linked, and indexed file allocation.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Atharv Vikas</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>Security Algorithms</h3>
+                    <p>Explores various hashing techniques used in operating systems.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Sai Chaitanya</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>Paging Technique</h3>
+                    <p>Demonstrates how paging works in virtual memory systems.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Sai Chaitanya</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-a">
+                    <h3>Inter-Process Communication</h3>
+                    <p>Shows mechanisms for process communication and shared memory management.</p>
+                    <div class="author-container">
+                        <div class="author">
+                            <i class="fas fa-user"></i>
+                            <span style="color: #00a8ff; margin-left: 5px;">Mahi Tejesh Reddy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>OSSim - Operating Systems Simulator &copy; 2025</p>
+    </footer>
+
+    <script>
+        // Accordion functionality
+        var acc = document.getElementsByClassName("accordion");
+        for (var i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        }
+        
+        // Tab functionality
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        
+        // Get the element with id="defaultOpen" and click on it
+        document.getElementById("defaultOpen").click();
+
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 10) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

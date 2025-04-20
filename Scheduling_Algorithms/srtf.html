@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SRTF Scheduling Simulation</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #1f1f1f;
+      color: white;
+      line-height: 1.6;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      overflow-x: hidden;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      background: #161b22;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      margin: auto;
+      border: 1px solid rgba(88, 166, 255, 0.1);
+      position: relative;
+    }
+    .container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: #58a6ff;
+      border-radius: 10px 0 0 10px;
+    }
+    h1, h3, h4 {
+      color: #58a6ff;
+      margin-top: 40px;
+    }
+    .table th, .table td {
+      color: #c9d1d9;
+      background-color: #21262d !important;
+    }
+    .gantt-chart, .queue-area {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-top: 40px;
+      padding: 15px;
+      border: 2px solid #58a6ff;
+      border-radius: 5px;
+      background: #21252b;
+      min-height: 100px;
+      overflow-x: auto;
+      box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+    }
+    .gantt-bar {
+      height: 30px;
+      background: #28a745;
+      border-radius: 5px;
+      margin: 2px;
+      position: relative;
+      min-width: 40px;
+    }
+    .gantt-label {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+    }
+    .time-label {
+      position: absolute;
+      top: 35px;
+      color: #c9d1d9;
+      font-size: 0.8rem;
+    }
+    .process-queue {
+      display: flex;
+      margin: 10px 0;
+    }
+    .process-item {
+      padding: 8px 15px;
+      margin-right: 5px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+    }
+    .simulation-area {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #58a6ff;
+      border-radius: 5px;
+      background: #21262d;
+    }
+    .cpu-box {
+      width: 120px;
+      height: 60px;
+      border: 2px solid #58a6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin: 15px 0;
+      background-color: #2a3142;
+      color: white;
+      border-radius: 5px;
+    }
+    .tab-container {
+      margin-top: 20px;
+    }
+    .tab-buttons {
+      display: flex;
+      margin-bottom: 0;
+      border-bottom: 1px solid #58a6ff;
+    }
+    .tab-button {
+      background-color: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #58a6ff;
+      border-bottom: none;
+      border-radius: 5px 5px 0 0;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    .tab-button.active {
+      background-color: #2a3142;
+      color: #58a6ff;
+    }
+    .tab-content {
+      border: 1px solid #58a6ff;
+      border-top: none;
+      padding: 15px;
+      background-color: #21262d;
+      border-radius: 0 0 5px 5px;
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+      margin-bottom: 5px;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      border-radius: 3px;
+    }
+    .animation-controls {
+      margin: 15px 0;
+    }
+    .btn {
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+    .form-range {
+      background-color: #21262d;
+    }
+    .form-control {
+      background-color: #2a3142;
+      color: #c9d1d9;
+      border-color: #58a6ff;
+    }
+    .form-control:focus {
+      background-color: #2a3142;
+      color: #c9d1d9;
+    }
+    .input-group-text {
+      background-color: #58a6ff;
+      color: #fff;
+      border-color: #58a6ff;
+    }
+    .explanation-section {
+      background-color: #21262d;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      border-left: 4px solid #17a2b8;
+    }
+    .example-table {
+      margin: 20px 0;
+    }
+    .example-gantt {
+      margin: 20px 0;
+      position: relative;
+      height: 60px;
+    }
+    .example-gantt-bar {
+      position: absolute;
+      height: 30px;
+      top: 0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    .example-gantt-time {
+      position: absolute;
+      top: 35px;
+      color: #c9d1d9;
+      font-size: 0.8rem;
+    }
+    .formula {
+      background-color: #2a3142;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html">
+    <button class="btn btn-info">Back</button>
+  </a>
+
+  <div class="container">
+    <h1>Shortest Remaining Time First (SRTF) CPU Scheduling Simulation</h1>
+    
+    <div class="explanation-section">
+      <h3>Explanation</h3>
+      <p>Shortest Remaining Time First (SRTF) is a preemptive version of the Shortest Job First (SJF) algorithm. In SRTF, the process with the smallest remaining execution time is selected for execution. The running process can be preempted if a new process arrives with a smaller burst time.</p>
+      
+      <h4>Key Characteristics:</h4>
+      <ul>
+        <li><strong>Preemptive:</strong> The current process can be interrupted if a new process with shorter remaining time arrives.</li>
+        <li><strong>Optimal average waiting time:</strong> Theoretically provides the minimum average waiting time among all scheduling algorithms.</li>
+        <li><strong>Priority:</strong> Based on the shortest remaining burst time.</li>
+      </ul>
+      
+      <h4>Algorithm Steps:</h4>
+      <ol>
+        <li>When a new process arrives, compare its burst time with the remaining burst time of the running process.</li>
+        <li>If the new process has a shorter burst time, preempt the current process and start executing the new one.</li>
+        <li>Otherwise, continue with the current process.</li>
+        <li>Repeat this check at every process arrival and completion.</li>
+      </ol>
+      
+      <h4>Performance Metrics:</h4>
+      <ul>
+        <li><strong>Waiting Time (WT):</strong> Time a process waits in the ready queue before getting CPU.</li>
+        <li><strong>Turnaround Time (TAT):</strong> Total time taken from submission to completion.</li>
+        <li><strong>Response Time:</strong> Time from submission until the first CPU response.</li>
+      </ul>
+      
+      <div class="formula">
+        <p>Turnaround Time = Completion Time - Arrival Time</p>
+        <p>Waiting Time = Turnaround Time - Burst Time</p>
+      </div>
+      
+      <h4>Example:</h4>
+      <p>Consider the following processes with their arrival time and burst time:</p>
+      
+      <table class="table table-bordered example-table">
+        <thead class="table-dark">
+          <tr>
+            <th>Process</th>
+            <th>Arrival Time</th>
+            <th>Burst Time</th>
+            <th>Completion Time</th>
+            <th>Turnaround Time</th>
+            <th>Waiting Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>P1</td>
+            <td>0</td>
+            <td>6</td>
+            <td>16</td>
+            <td>16</td>
+            <td>10</td>
+          </tr>
+          <tr>
+            <td>P2</td>
+            <td>1</td>
+            <td>4</td>
+            <td>5</td>
+            <td>4</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td>P3</td>
+            <td>2</td>
+            <td>8</td>
+            <td>24</td>
+            <td>22</td>
+            <td>14</td>
+          </tr>
+          <tr>
+            <td>P4</td>
+            <td>3</td>
+            <td>3</td>
+            <td>8</td>
+            <td>5</td>
+            <td>2</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <p>Gantt Chart:</p>
+      <div class="example-gantt">
+        <div class="example-gantt-bar" style="left: 0; width: 20px; background-color: #28a745;">P1</div>
+        <div class="example-gantt-time" style="left: 0px;">0</div>
+        <div class="example-gantt-time" style="left: 20px;">1</div>
+        
+        <div class="example-gantt-bar" style="left: 20px; width: 80px; background-color: #dc3545;">P2</div>
+        <div class="example-gantt-time" style="left: 100px;">5</div>
+        
+        <div class="example-gantt-bar" style="left: 100px; width: 60px; background-color: #17a2b8;">P4</div>
+        <div class="example-gantt-time" style="left: 160px;">8</div>
+        
+        <div class="example-gantt-bar" style="left: 160px; width: 160px; background-color: #28a745;">P1</div>
+        <div class="example-gantt-time" style="left: 320px;">16</div>
+        
+        <div class="example-gantt-bar" style="left: 320px; width: 160px; background-color: #fd7e14;">P3</div>
+        <div class="example-gantt-time" style="left: 480px;">24</div>
+      </div>
+      
+      <p>Calculation:</p>
+      <ul>
+        <li>Average Waiting Time = (10 + 0 + 14 + 2) / 4 = 26 / 4 = 6.5 units</li>
+        <li>Average Turnaround Time = (16 + 4 + 22 + 5) / 4 = 47 / 4 = 11.75 units</li>
+      </ul>
+      
+      <h4>Sequence of Events:</h4>
+      <ol>
+        <li>P1 arrives at time 0 and starts execution.</li>
+        <li>P2 arrives at time 1 with burst time 4, which is less than P1's remaining time (5), so P1 is preempted and P2 starts.</li>
+        <li>P3 arrives at time 2, but its burst time (8) is greater than P2's remaining time (3), so P2 continues.</li>
+        <li>P4 arrives at time 3, but its burst time (3) is equal to P2's remaining time (2), so P2 continues.</li>
+        <li>P2 completes at time 5, then P4 starts as it has the shortest remaining time (3).</li>
+        <li>P4 completes at time 8, then P1 resumes (remaining time: 5).</li>
+        <li>P1 completes at time 16, then P3 starts and completes at time 24.</li>
+      </ol>
+      
+      <h4>Advantages:</h4>
+      <ul>
+        <li>Provides minimum average waiting time among all scheduling algorithms.</li>
+        <li>Responsive to short processes.</li>
+        <li>Good for interactive systems where quick response time is important.</li>
+      </ul>
+      
+      <h4>Disadvantages:</h4>
+      <ul>
+        <li><strong>Starvation:</strong> Long processes may never get executed if shorter processes keep arriving.</li>
+        <li><strong>Overhead:</strong> Requires constant monitoring of remaining burst times and frequent context switches.</li>
+        <li><strong>Unpredictable:</strong> Cannot accurately predict completion times due to preemptions.</li>
+        <li><strong>Requires burst time knowledge:</strong> Implementation requires knowing burst times in advance, which is often not possible in real systems.</li>
+      </ul>
+      
+      <h4>Best Used For:</h4>
+      <ul>
+        <li>Interactive systems that require quick response times.</li>
+        <li>Systems where process burst times are known in advance.</li>
+        <li>Environments where minimizing average waiting time is a priority.</li>
+      </ul>
+    </div>
+
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <div class="tab-button active" onclick="openTab('inputTab')">Process Input</div>
+        <div class="tab-button" onclick="openTab('simulationTab')">Simulation</div>
+        <div class="tab-button" onclick="openTab('resultsTab')">Results</div>
+      </div>
+      
+      <div class="tab-content">
+        <div id="inputTab" class="tab-panel active">
+          <h3>Process Input</h3>
+          <div class="input-group mb-3">
+            <span class="input-group-text">Process ID</span>
+            <input type="text" id="processId" class="form-control" placeholder="P1, P2, etc.">
+            
+            <span class="input-group-text">Arrival Time</span>
+            <input type="number" id="arrivalTime" class="form-control" min="0" value="0">
+            
+            <span class="input-group-text">Burst Time</span>
+            <input type="number" id="burstTime" class="form-control" min="1" value="4">
+            
+            <button class="btn btn-primary" onclick="addProcess()">Add Process</button>
+          </div>
+          
+          <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+              <tr>
+                <th>Process ID</th>
+                <th>Arrival Time</th>
+                <th>Burst Time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="processTableBody">
+              <!-- Process rows will be added here -->
+            </tbody>
+          </table>
+          
+          <button class="btn btn-success" onclick="runSimulation()">Run Simulation</button>
+          <button class="btn btn-danger" onclick="resetSimulation()">Reset</button>
+          <button class="btn btn-info" onclick="initializeExampleProcesses()">Load Example Processes</button>
+        </div>
+        
+        <div id="simulationTab" class="tab-panel">
+          <h3>SRTF Simulation</h3>
+          
+          <div class="simulation-area">
+            <div class="current-time mb-3">
+              <h4>Current Time: <span id="currentTimeDisplay">0</span></h4>
+            </div>
+            
+            <div class="mb-3">
+              <h5>Ready Queue:</h5>
+              <div class="process-queue" id="readyQueue"></div>
+            </div>
+            
+            <div class="mb-3">
+              <h5>CPU:</h5>
+              <div class="cpu-box" id="cpuBox">IDLE</div>
+            </div>
+            
+            <div class="mb-3">
+              <h5>Completed:</h5>
+              <div class="process-queue" id="completedProcesses"></div>
+            </div>
+            
+            <div class="animation-controls">
+              <button id="startButton" class="btn btn-success" onclick="startSimulationAnimation()">Start</button>
+              <button id="pauseButton" class="btn btn-warning" onclick="pauseSimulationAnimation()">Pause</button>
+              <button id="resetAnimationButton" class="btn btn-danger" onclick="resetSimulationAnimation()">Reset</button>
+              <button id="stepButton" class="btn btn-info" onclick="stepSimulation()">Step</button>
+              <div class="mt-3">
+                <label for="simulationSpeed" class="form-label">Speed: <span id="speedValue">5</span>x</label>
+                <input type="range" class="form-range" id="simulationSpeed" min="1" max="10" value="5" oninput="document.getElementById('speedValue').textContent = this.value">
+              </div>
+            </div>
+            
+            <h4>Real-time Gantt Chart</h4>
+            <div class="gantt-chart" id="animatedGanttChart"></div>
+          </div>
+        </div>
+        
+        <div id="resultsTab" class="tab-panel">
+          <h3>Simulation Results</h3>
+          
+          <div class="mb-4">
+            <h4>Gantt Chart</h4>
+            <div class="legend" id="ganttLegend"></div>
+            <div class="gantt-chart" id="ganttChart"></div>
+          </div>
+          
+          <h4>Process Details</h4>
+          <table class="table table-bordered">
+            <thead class="table-dark">
+              <tr>
+                <th>Process ID</th>
+                <th>Arrival Time</th>
+                <th>Burst Time</th>
+                <th>Completion Time</th>
+                <th>Turnaround Time</th>
+                <th>Waiting Time</th>
+                <th>Response Time</th>
+              </tr>
+            </thead>
+            <tbody id="resultTableBody">
+              <!-- Result rows will be added here -->
+            </tbody>
+          </table>
+          
+          <div id="averageStats">
+            <!-- Average stats will be displayed here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let processes = [];
+    let simulationResults = [];
+    let ganttChartData = [];
+    let nextProcessId = 1;
+    let animationTimer;
+    let currentSimulationTime = 0;
+    let isAnimationRunning = false;
+    let animationSpeed = 5;
+    let processColors = {};
+    
+    // Animation state
+    let simulationState = {
+      currentTime: 0,
+      readyQueue: [],
+      runningProcess: null,
+      completedProcesses: [],
+      processProgress: {},
+      currentBurstRemaining: 0,
+      processStartTimes: {},
+      firstResponseTimes: {},
+      contextSwitches: 0
+    };
+
+    // Initialize with some example processes
+    function initializeExampleProcesses() {
+      processes = [
+        { id: "P1", arrivalTime: 0, burstTime: 6 },
+        { id: "P2", arrivalTime: 1, burstTime: 4 },
+        { id: "P3", arrivalTime: 2, burstTime: 8 },
+        { id: "P4", arrivalTime: 3, burstTime: 3 }
+      ];
+      updateProcessTable();
+    }
+
+    function addProcess() {
+      const processId = document.getElementById("processId").value || `P${nextProcessId}`;
+      const arrivalTime = parseInt(document.getElementById("arrivalTime").value) || 0;
+      const burstTime = parseInt(document.getElementById("burstTime").value) || 1;
+      
+      if (burstTime <= 0) {
+        alert("Burst time must be greater than 0");
+        return;
+      }
+      
+      processes.push({ id: processId, arrivalTime, burstTime });
+      nextProcessId++;
+      
+      // Reset input fields
+      document.getElementById("processId").value = "";
+      document.getElementById("arrivalTime").value = "";
+      document.getElementById("burstTime").value = "4";
+      
+      updateProcessTable();
+    }
+    
+    function removeProcess(index) {
+      processes.splice(index, 1);
+      updateProcessTable();
+    }
+    
+    function updateProcessTable() {
+      const tableBody = document.getElementById("processTableBody");
+      tableBody.innerHTML = "";
+      
+      processes.forEach((process, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${process.id}</td>
+          <td>${process.arrivalTime}</td>
+          <td>${process.burstTime}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="removeProcess(${index})">Remove</button></td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+    
+    function resetSimulation() {
+      processes = [];
+      updateProcessTable();
+      clearSimulationResults();
+      resetSimulationAnimation();
+    }
+    
+    function clearSimulationResults() {
+      simulationResults = [];
+      ganttChartData = [];
+      document.getElementById("resultTableBody").innerHTML = "";
+      document.getElementById("averageStats").innerHTML = "";
+      document.getElementById("ganttChart").innerHTML = "";
+      document.getElementById("ganttLegend").innerHTML = "";
+    }
+    
+    function runSimulation() {
+      if (processes.length === 0) {
+        alert("Please add at least one process");
+        return;
+      }
+      
+      // Prepare for SRTF simulation
+      const simulationData = {
+        processes: processes.map(p => ({ ...p, remainingTime: p.burstTime, completed: false, startTime: null, completionTime: null, firstResponse: null })),
+        time: 0,
+        ganttChart: [],
+        finished: 0,
+        currentProcess: null,
+        contextSwitches: 0
+      };
+      
+      // Run the simulation
+      simulateSRTF(simulationData);
+      
+      // Process results
+      processSimulationResults(simulationData);
+      
+      // Display results
+      displayResults();
+      
+      // Setup simulation animation
+      resetSimulationAnimation();
+      
+      // Switch to simulation tab
+      openTab('simulationTab');
+    }
+    
+    function simulateSRTF(simData) {
+      // Sort processes by arrival time
+      simData.processes.sort((a, b) => a.arrivalTime - b.arrivalTime);
+      
+      // Run simulation until all processes are completed
+      while (simData.finished < simData.processes.length) {
+        // Add newly arrived processes to consideration
+        const arrivedProcesses = simData.processes.filter(p => 
+          p.arrivalTime <= simData.time && !p.completed && p.remainingTime > 0
+        );
+        
+        if (arrivedProcesses.length === 0) {
+          // No process available at this time, increment time and continue
+          simData.time++;
+          
+          // Add idle time to Gantt chart if needed
+          if (simData.ganttChart.length > 0 && 
+              simData.ganttChart[simData.ganttChart.length - 1].processId !== "IDLE") {
+            simData.ganttChart.push({
+              processId: "IDLE",
+              startTime: simData.time - 1,
+              endTime: simData.time
+            });
+          } else if (simData.ganttChart.length === 0) {
+            simData.ganttChart.push({
+              processId: "IDLE",
+              startTime: 0,
+              endTime: simData.time
+            });
+          } else {
+            // Update the end time of the last IDLE period
+            simData.ganttChart[simData.ganttChart.length - 1].endTime = simData.time;
+          }
+          
+          continue;
+        }
+        
+        // Find the process with the shortest remaining time
+        let shortestProcess = arrivedProcesses.reduce((shortest, current) => 
+          current.remainingTime < shortest.remainingTime ? current : shortest
+        , arrivedProcesses[0]);
+        
+        // If we're switching processes, record a context switch
+        if (simData.currentProcess !== null && 
+            simData.currentProcess.id !== shortestProcess.id && 
+            !simData.currentProcess.completed) {
+          simData.contextSwitches++;
+        }
+        
+        // Record first response time if this is the first time the process gets CPU
+        if (shortestProcess.firstResponse === null) {
+          shortestProcess.firstResponse = simData.time;
+        }
+        
+        // Record start time if process is starting for the first time
+        if (shortestProcess.startTime === null) {
+          shortestProcess.startTime = simData.time;
+        }
+        
+        // Update Gantt chart
+        if (simData.ganttChart.length > 0 && 
+            simData.ganttChart[simData.ganttChart.length - 1].processId === shortestProcess.id) {
+          // Extend the current process's execution
+          simData.ganttChart[simData.ganttChart.length - 1].endTime = simData.time + 1;
+        } else {
+          // Start a new execution period
+          simData.ganttChart.push({
+            processId: shortestProcess.id,
+            startTime: simData.time,
+            endTime: simData.time + 1
+          });
+        }
+        
+        // Execute the process for one time unit
+        shortestProcess.remainingTime--;
+        simData.time++;
+        
+        // If process is completed, record completion time
+        if (shortestProcess.remainingTime === 0) {
+          shortestProcess.completed = true;
+          shortestProcess.completionTime = simData.time;
+          simData.finished++;
+        }
+        
+        // Update current process
+        simData.currentProcess = shortestProcess;
+      }
+    }
+    
+    function processSimulationResults(simData) {
+      simulationResults = simData.processes.map(p => {
+        const turnaroundTime = p.completionTime - p.arrivalTime;
+        const waitingTime = turnaroundTime - p.burstTime;
+        const responseTime = p.firstResponse - p.arrivalTime;
+        
+        return {
+          id: p.id,
+          arrivalTime: p.arrivalTime,
+          burstTime: p.burstTime,
+          completionTime: p.completionTime,
+          turnaroundTime: turnaroundTime,
+          waitingTime: waitingTime,
+          responseTime: responseTime
+        };
+      });
+      
+      ganttChartData = simData.ganttChart;
+      
+      // Assign colors to processes
+      processColors = {};
+      simulationResults.forEach(process => {
+        processColors[process.id] = getRandomColor(process.id);
+      });
+      processColors["IDLE"] = "#6c757d"; // Gray for idle
+    }
+    
+    function displayResults() {
+      // Display Gantt chart
+      const ganttChart = document.getElementById("ganttChart");
+      const ganttLegend = document.getElementById("ganttLegend");
+      ganttChart.innerHTML = "";
+      ganttLegend.innerHTML = "";
+      
+      // Create legend
+      Object.keys(processColors).forEach(processId => {
+        if (processId !== "IDLE") {
+          const legendItem = document.createElement("div");
+          legendItem.className = "legend-item";
+          
+          const colorBox = document.createElement("div");
+          colorBox.className = "legend-color";
+          colorBox.style.backgroundColor = processColors[processId];
+          
+          const label = document.createElement("span");
+          label.textContent = processId;
+          label.style.color = "#c9d1d9";
+          
+          legendItem.appendChild(colorBox);
+          legendItem.appendChild(label);
+          ganttLegend.appendChild(legendItem);
+        }
+      });
+      
+      // Add IDLE to legend
+      const idleLegendItem = document.createElement("div");
+      idleLegendItem.className = "legend-item";
+      
+      const idleColorBox = document.createElement("div");
+      idleColorBox.className = "legend-color";
+      idleColorBox.style.backgroundColor = processColors["IDLE"];
+      
+      const idleLabel = document.createElement("span");
+      idleLabel.textContent = "IDLE";
+      idleLabel.style.color = "#c9d1d9";
+      
+      idleLegendItem.appendChild(idleColorBox);
+      idleLegendItem.appendChild(idleLabel);
+      ganttLegend.appendChild(idleLegendItem);
+      
+      // Draw Gantt chart bars
+      ganttChartData.forEach((segment) => {
+        const width = (segment.endTime - segment.startTime) * 30;
+        
+        const ganttBar = document.createElement("div");
+        ganttBar.className = "gantt-bar";
+        ganttBar.style.width = `${width}px`;
+        ganttBar.style.backgroundColor = processColors[segment.processId];
+        
+        const processLabel = document.createElement("div");
+        processLabel.className = "gantt-label";
+        processLabel.textContent = segment.processId;
+        ganttBar.appendChild(processLabel);
+        // Draw Gantt chart bars (continued)
+        const startLabel = document.createElement("div");
+        startLabel.className = "time-label";
+        startLabel.style.left = "0";
+        startLabel.textContent = segment.startTime;
+        ganttBar.appendChild(startLabel);
+        
+        const endLabel = document.createElement("div");
+        endLabel.className = "time-label";
+        endLabel.style.right = "0";
+        endLabel.textContent = segment.endTime;
+        ganttBar.appendChild(endLabel);
+        
+        ganttChart.appendChild(ganttBar);
+      });
+      
+      // Display results table
+      const resultTableBody = document.getElementById("resultTableBody");
+      resultTableBody.innerHTML = "";
+      
+      simulationResults.forEach(process => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${process.id}</td>
+          <td>${process.arrivalTime}</td>
+          <td>${process.burstTime}</td>
+          <td>${process.completionTime}</td>
+          <td>${process.turnaroundTime}</td>
+          <td>${process.waitingTime}</td>
+          <td>${process.responseTime}</td>
+        `;
+        resultTableBody.appendChild(row);
+      });
+      
+      // Calculate and display average metrics
+      const avgTurnaroundTime = simulationResults.reduce((sum, process) => sum + process.turnaroundTime, 0) / simulationResults.length;
+      const avgWaitingTime = simulationResults.reduce((sum, process) => sum + process.waitingTime, 0) / simulationResults.length;
+      const avgResponseTime = simulationResults.reduce((sum, process) => sum + process.responseTime, 0) / simulationResults.length;
+      
+      const averageStats = document.getElementById("averageStats");
+      averageStats.innerHTML = `
+        <div class="alert alert-info mt-3">
+          <h5>Average Metrics:</h5>
+          <p>Average Turnaround Time: ${avgTurnaroundTime.toFixed(2)}</p>
+          <p>Average Waiting Time: ${avgWaitingTime.toFixed(2)}</p>
+          <p>Average Response Time: ${avgResponseTime.toFixed(2)}</p>
+          <p>Total Context Switches: ${simulationState.contextSwitches}</p>
+        </div>
+      `;
+      
+      // Switch to results tab
+      openTab('resultsTab');
+    }
+    
+    function getRandomColor(processId) {
+      // Predefined colors for consistency
+      const colors = [
+        "#28a745", // green
+        "#dc3545", // red
+        "#17a2b8", // cyan
+        "#fd7e14", // orange
+        "#6610f2", // purple
+        "#e83e8c", // pink
+        "#20c997", // teal
+        "#6f42c1", // indigo
+        "#d63384", // pink
+        "#fd7e14"  // orange
+      ];
+      
+      // Convert processId to a number for color selection
+      let hashCode = 0;
+      if (typeof processId === 'string') {
+        for (let i = 0; i < processId.length; i++) {
+          hashCode += processId.charCodeAt(i);
+        }
+      } else {
+        hashCode = processId;
+      }
+      
+      return colors[hashCode % colors.length];
+    }
+    
+    function openTab(tabId) {
+      // Hide all tab panels
+      const tabPanels = document.getElementsByClassName("tab-panel");
+      for (let i = 0; i < tabPanels.length; i++) {
+        tabPanels[i].className = "tab-panel";
+      }
+      
+      // Deactivate all tab buttons
+      const tabButtons = document.getElementsByClassName("tab-button");
+      for (let i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].className = "tab-button";
+      }
+      
+      // Activate the selected tab and its button
+      document.getElementById(tabId).className = "tab-panel active";
+      const activeButton = document.querySelector(`.tab-button[onclick="openTab('${tabId}')"]`);
+      if (activeButton) {
+        activeButton.className = "tab-button active";
+      }
+    }
+    
+    function resetSimulationAnimation() {
+      // Reset animation state
+      simulationState = {
+        currentTime: 0,
+        readyQueue: [],
+        runningProcess: null,
+        completedProcesses: [],
+        processProgress: {},
+        currentBurstRemaining: 0,
+        processStartTimes: {},
+        firstResponseTimes: {},
+        contextSwitches: 0
+      };
+      
+      // Initialize process progress
+      processes.forEach(process => {
+        simulationState.processProgress[process.id] = 0;
+      });
+      
+      // Update UI
+      updateSimulationUI();
+      
+      // Clear animated gantt chart
+      document.getElementById("animatedGanttChart").innerHTML = "";
+      
+      // Reset animation status
+      isAnimationRunning = false;
+      clearInterval(animationTimer);
+      
+      // Enable start button
+      document.getElementById("startButton").disabled = false;
+      document.getElementById("pauseButton").disabled = true;
+    }
+    
+    function startSimulationAnimation() {
+      if (isAnimationRunning) return;
+      
+      isAnimationRunning = true;
+      animationSpeed = parseInt(document.getElementById("simulationSpeed").value);
+      
+      // Disable start button, enable pause button
+      document.getElementById("startButton").disabled = true;
+      document.getElementById("pauseButton").disabled = false;
+      
+      // Run animation
+      animationTimer = setInterval(stepSimulation, 1000 / animationSpeed);
+    }
+    
+    function pauseSimulationAnimation() {
+      isAnimationRunning = false;
+      clearInterval(animationTimer);
+      
+      // Enable start button, disable pause button
+      document.getElementById("startButton").disabled = false;
+      document.getElementById("pauseButton").disabled = true;
+    }
+    
+    function stepSimulation() {
+  // Get processes arriving at current time
+  const arrivingProcesses = processes.filter(p => 
+    p.arrivalTime === simulationState.currentTime && 
+    !simulationState.completedProcesses.includes(p.id)
+  );
+
+  // Add arriving processes to ready queue
+  arrivingProcesses.forEach(process => {
+    const remainingTime = process.burstTime - (simulationState.processProgress[process.id] || 0);
+    simulationState.readyQueue.push({
+      id: process.id,
+      remainingTime: remainingTime
+    });
+  });
+
+  // Sort ready queue by remaining time (SRTF priority)
+  simulationState.readyQueue.sort((a, b) => a.remainingTime - b.remainingTime);
+
+  // Check if we need to preempt current process
+  let shouldPreempt = false;
+  if (simulationState.runningProcess !== null) {
+    if (simulationState.readyQueue.length > 0 && 
+        simulationState.readyQueue[0].remainingTime < simulationState.currentBurstRemaining) {
+      shouldPreempt = true;
+    }
+  }
+
+  // Handle preemption or new process selection
+  if (simulationState.runningProcess === null || shouldPreempt) {
+    // If preempting, put current process back in ready queue
+    if (shouldPreempt) {
+      simulationState.readyQueue.push({
+        id: simulationState.runningProcess,
+        remainingTime: simulationState.currentBurstRemaining
+      });
+      simulationState.readyQueue.sort((a, b) => a.remainingTime - b.remainingTime);
+      simulationState.contextSwitches++;
+      
+      // Close the current Gantt segment for the preempted process
+      closeCurrentGanttSegment();
+    }
+
+    // Get the next process to run
+    if (simulationState.readyQueue.length > 0) {
+      const nextProcess = simulationState.readyQueue.shift();
+      simulationState.runningProcess = nextProcess.id;
+      simulationState.currentBurstRemaining = nextProcess.remainingTime;
+      
+      // Record first response time if not recorded yet
+      if (!simulationState.firstResponseTimes[nextProcess.id]) {
+        simulationState.firstResponseTimes[nextProcess.id] = simulationState.currentTime;
+      }
+      
+      // Start new Gantt segment
+      startNewGanttSegment(nextProcess.id);
+    } else {
+      // CPU is idle
+      simulationState.runningProcess = null;
+      simulationState.currentBurstRemaining = 0;
+      startNewGanttSegment("IDLE");
+    }
+  }
+
+  // Execute current process for 1 time unit
+  if (simulationState.runningProcess !== null) {
+    simulationState.processProgress[simulationState.runningProcess] = 
+      (simulationState.processProgress[simulationState.runningProcess] || 0) + 1;
+    simulationState.currentBurstRemaining--;
+    
+    // Update current Gantt segment
+    updateCurrentGanttSegment();
+
+    // Check if process completed
+    if (simulationState.currentBurstRemaining <= 0) {
+      simulationState.completedProcesses.push(simulationState.runningProcess);
+      simulationState.runningProcess = null;
+      closeCurrentGanttSegment();
+    }
+  } else {
+    // CPU is idle - extend idle segment
+    updateCurrentGanttSegment();
+  }
+
+  // Increment time
+  simulationState.currentTime++;
+
+  // Update UI
+  updateSimulationUI();
+
+  // Check if simulation is complete
+  if (simulationState.completedProcesses.length >= processes.length) {
+    pauseSimulationAnimation();
+    showCompletionStats();
+  }
+}
+
+// Gantt chart helper functions
+let currentGanttSegment = null;
+
+function startNewGanttSegment(processId) {
+  const ganttChart = document.getElementById("animatedGanttChart");
+  
+  // Create new segment
+  currentGanttSegment = {
+    processId: processId,
+    startTime: simulationState.currentTime,
+    element: document.createElement("div")
+  };
+  
+  currentGanttSegment.element.className = "gantt-bar";
+  currentGanttSegment.element.style.width = "30px";
+  currentGanttSegment.element.style.backgroundColor = processColors[processId] || "#6c757d";
+  
+  const processLabel = document.createElement("div");
+  processLabel.className = "gantt-label";
+  processLabel.textContent = processId;
+  currentGanttSegment.element.appendChild(processLabel);
+  
+  const startLabel = document.createElement("div");
+  startLabel.className = "time-label";
+  startLabel.style.left = "0";
+  startLabel.textContent = simulationState.currentTime;
+  currentGanttSegment.element.appendChild(startLabel);
+  
+  const endLabel = document.createElement("div");
+  endLabel.className = "time-label";
+  endLabel.style.right = "0";
+  endLabel.textContent = simulationState.currentTime + 1;
+  currentGanttSegment.element.appendChild(endLabel);
+  
+  ganttChart.appendChild(currentGanttSegment.element);
+}
+
+function updateCurrentGanttSegment() {
+  if (!currentGanttSegment) return;
+  
+  // Update segment width
+  const duration = simulationState.currentTime + 1 - currentGanttSegment.startTime;
+  currentGanttSegment.element.style.width = `${duration * 30}px`;
+  
+  // Update end time label
+  const endLabel = currentGanttSegment.element.querySelector(".time-label:last-child");
+  endLabel.textContent = simulationState.currentTime + 1;
+}
+
+function closeCurrentGanttSegment() {
+  currentGanttSegment = null;
+}
+    
+    function addGanttSegment(processId) {
+      const ganttChart = document.getElementById("animatedGanttChart");
+      const lastSegment = ganttChart.lastChild;
+      
+      if (lastSegment && lastSegment.getAttribute("data-process") === processId) {
+        // Extend the last segment
+        const width = parseInt(lastSegment.style.width.replace("px", "")) + 30;
+        lastSegment.style.width = `${width}px`;
+        
+        // Update end time label
+        const endLabel = lastSegment.querySelector(".time-label:last-child");
+        endLabel.textContent = simulationState.currentTime + 1;
+      } else {
+        // Create new segment
+        const ganttBar = document.createElement("div");
+        ganttBar.className = "gantt-bar";
+        ganttBar.style.width = "30px";
+        ganttBar.style.backgroundColor = processColors[processId] || "#6c757d";
+        ganttBar.setAttribute("data-process", processId);
+        
+        const processLabel = document.createElement("div");
+        processLabel.className = "gantt-label";
+        processLabel.textContent = processId;
+        ganttBar.appendChild(processLabel);
+        
+        const startLabel = document.createElement("div");
+        startLabel.className = "time-label";
+        startLabel.style.left = "0";
+        startLabel.textContent = simulationState.currentTime;
+        ganttBar.appendChild(startLabel);
+        
+        const endLabel = document.createElement("div");
+        endLabel.className = "time-label";
+        endLabel.style.right = "0";
+        endLabel.textContent = simulationState.currentTime + 1;
+        ganttBar.appendChild(endLabel);
+        
+        ganttChart.appendChild(ganttBar);
+      }
+    }
+    
+    function updateSimulationUI() {
+      // Update time display
+      document.getElementById("currentTimeDisplay").textContent = simulationState.currentTime;
+      
+      // Update ready queue
+      const readyQueueElement = document.getElementById("readyQueue");
+      readyQueueElement.innerHTML = "";
+      
+      simulationState.readyQueue.forEach(process => {
+        const processElement = document.createElement("div");
+        processElement.className = "process-item";
+        processElement.style.backgroundColor = processColors[process.id] || "#6c757d";
+        processElement.textContent = `${process.id} (${process.remainingTime})`;
+        readyQueueElement.appendChild(processElement);
+      });
+      
+      // Update CPU
+      const cpuBox = document.getElementById("cpuBox");
+      if (simulationState.runningProcess) {
+        cpuBox.textContent = `${simulationState.runningProcess} (${simulationState.currentBurstRemaining})`;
+        cpuBox.style.backgroundColor = processColors[simulationState.runningProcess] || "#6c757d";
+      } else {
+        cpuBox.textContent = "IDLE";
+        cpuBox.style.backgroundColor = "#6c757d";
+      }
+      
+      // Update completed processes
+      const completedElement = document.getElementById("completedProcesses");
+      completedElement.innerHTML = "";
+      
+      simulationState.completedProcesses.forEach(processId => {
+        const processElement = document.createElement("div");
+        processElement.className = "process-item";
+        processElement.style.backgroundColor = processColors[processId] || "#6c757d";
+        processElement.textContent = processId;
+        completedElement.appendChild(processElement);
+      });
+    }
+    
+    // Initialize with example processes on page load
+    window.onload = function() {
+      // Set up tab switching
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+          const tabId = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+          openTab(tabId);
+        });
+      });
+      
+      // Disable pause button initially
+      document.getElementById("pauseButton").disabled = true;
+    };
+  </script>
+</body>
+</html>

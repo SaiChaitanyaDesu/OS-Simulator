@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RMS Scheduling Simulation</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #1f1f1f;
+      color: white;
+      line-height: 1.6;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      overflow-x: hidden;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      background: #161b22;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+      margin: auto;
+      border: 1px solid rgba(88, 166, 255, 0.1);
+      position: relative;
+    }
+    .container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: #58a6ff;
+      border-radius: 10px 0 0 10px;
+    }
+    h1, h3, h4 {
+      color: #58a6ff;
+      margin-top: 40px;
+    }
+    .table th, .table td {
+      color: #c9d1d9;
+      background-color: #21262d !important;
+    }
+    .gantt-chart, .queue-area {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-top: 40px;
+      padding: 15px;
+      border: 2px solid #58a6ff;
+      border-radius: 5px;
+      background: #21252b;
+      min-height: 100px;
+      overflow-x: auto;
+      box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+    }
+    .gantt-bar {
+      height: 30px;
+      background: #28a745;
+      border-radius: 5px;
+      margin: 2px;
+      position: relative;
+      min-width: 40px;
+    }
+    .gantt-label {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+    }
+    .time-label {
+      position: absolute;
+      top: 35px;
+      color: #c9d1d9;
+      font-size: 0.8rem;
+    }
+    .process-queue {
+      display: flex;
+      margin: 10px 0;
+    }
+    .process-item {
+      padding: 8px 15px;
+      margin-right: 5px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+    }
+    .simulation-area {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #58a6ff;
+      border-radius: 5px;
+      background: #21262d;
+    }
+    .cpu-box {
+      width: 120px;
+      height: 60px;
+      border: 2px solid #58a6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin: 15px 0;
+      background-color: #2a3142;
+      color: white;
+      border-radius: 5px;
+    }
+    .tab-container {
+      margin-top: 20px;
+    }
+    .tab-buttons {
+      display: flex;
+      margin-bottom: 0;
+      border-bottom: 1px solid #58a6ff;
+    }
+    .tab-button {
+      background-color: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #58a6ff;
+      border-bottom: none;
+      border-radius: 5px 5px 0 0;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    .tab-button.active {
+      background-color: #2a3142;
+      color: #58a6ff;
+    }
+    .tab-content {
+      border: 1px solid #58a6ff;
+      border-top: none;
+      padding: 15px;
+      background-color: #21262d;
+      border-radius: 0 0 5px 5px;
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-right: 20px;
+      margin-bottom: 5px;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      border-radius: 3px;
+    }
+    .animation-controls {
+      margin: 15px 0;
+    }
+    .btn {
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+    .form-range {
+      background-color: #21262d;
+    }
+    .form-control {
+      background-color: #2a3142;
+      color: #c9d1d9;
+      border-color: #58a6ff;
+    }
+    .form-control:focus {
+      background-color: #2a3142;
+      color: #c9d1d9;
+    }
+    .input-group-text {
+      background-color: #58a6ff;
+      color: #fff;
+      border-color: #58a6ff;
+    }
+    .explanation-section {
+      background-color: #21262d;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      border-left: 4px solid #17a2b8;
+    }
+    .example-table {
+      margin: 20px 0;
+    }
+    .example-gantt {
+      margin: 20px 0;
+      position: relative;
+      height: 60px;
+    }
+    .example-gantt-bar {
+      position: absolute;
+      height: 30px;
+      top: 0;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    .example-gantt-time {
+      position: absolute;
+      top: 35px;
+      color: #c9d1d9;
+      font-size: 0.8rem;
+    }
+    .formula {
+      background-color: #2a3142;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html">
+    <button class="btn btn-info">Back</button>
+  </a>
+
+  <div class="container">
+    <h1>Rate Monotonic Scheduling (RMS) Simulation</h1>
+    
+    <div class="explanation-section">
+      <h3>Explanation</h3>
+      <p>Rate Monotonic Scheduling (RMS) is a priority assignment algorithm used in real-time operating systems. In RMS, tasks with shorter periods are assigned higher priorities.</p>
+      
+      <h4>Key Characteristics:</h4>
+      <ul>
+        <li><strong>Preemptive:</strong> Higher priority tasks can interrupt lower priority tasks.</li>
+        <li><strong>Static priority:</strong> Task priorities are fixed and based on their periods.</li>
+        <li><strong>Periodic tasks:</strong> Tasks run periodically with fixed intervals.</li>
+      </ul>
+      
+      <h4>Algorithm Steps:</h4>
+      <ol>
+        <li>Assign priorities to tasks based on their periods (shorter period = higher priority).</li>
+        <li>At any point, execute the highest priority task that is ready.</li>
+        <li>If a higher priority task becomes ready, preempt the current lower priority task.</li>
+        <li>Resume lower priority tasks when higher priority tasks complete.</li>
+      </ol>
+      
+      <h4>Performance Metrics:</h4>
+      <ul>
+        <li><strong>Response Time:</strong> Time from task release to completion.</li>
+        <li><strong>CPU Utilization:</strong> Fraction of processor time spent executing tasks.</li>
+        <li><strong>Schedulability:</strong> Whether all tasks can meet their deadlines.</li>
+      </ul>
+      
+      <div class="formula">
+        <p>For n periodic tasks, RMS is guaranteed to be schedulable if:</p>
+        <p>Σ(C<sub>i</sub>/T<sub>i</sub>) ≤ n(2<sup>1/n</sup> - 1)</p>
+        <p>Where C<sub>i</sub> is the computation time and T<sub>i</sub> is the period of task i.</p>
+      </div>
+      
+      <h4>Example:</h4>
+      <p>Consider the following periodic tasks:</p>
+      
+      <table class="table table-bordered example-table">
+        <thead class="table-dark">
+          <tr>
+            <th>Task</th>
+            <th>Period</th>
+            <th>Execution Time</th>
+            <th>Priority (RMS)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>T1</td>
+            <td>4</td>
+            <td>1</td>
+            <td>Highest (1)</td>
+          </tr>
+          <tr>
+            <td>T2</td>
+            <td>6</td>
+            <td>2</td>
+            <td>Medium (2)</td>
+          </tr>
+          <tr>
+            <td>T3</td>
+            <td>8</td>
+            <td>2</td>
+            <td>Lowest (3)</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <p>Gantt Chart for first hyperperiod (LCM of periods = 24):</p>
+      <div class="example-gantt">
+        <div class="example-gantt-bar" style="left: 0; width: 20px; background-color: #28a745;">T1</div>
+        <div class="example-gantt-time" style="left: 0px;">0</div>
+        <div class="example-gantt-time" style="left: 20px;">1</div>
+        
+        <div class="example-gantt-bar" style="left: 20px; width: 40px; background-color: #dc3545;">T2</div>
+        <div class="example-gantt-time" style="left: 60px;">3</div>
+        
+        <div class="example-gantt-bar" style="left: 60px; width: 20px; background-color: #fd7e14;">T3</div>
+        <div class="example-gantt-time" style="left: 80px;">4</div>
+        
+        <div class="example-gantt-bar" style="left: 80px; width: 20px; background-color: #28a745;">T1</div>
+        <div class="example-gantt-time" style="left: 100px;">5</div>
+        
+        <div class="example-gantt-bar" style="left: 100px; width: 20px; background-color: #fd7e14;">T3</div>
+        <div class="example-gantt-time" style="left: 120px;">6</div>
+      </div>
+      
+      <h4>Calculation:</h4>
+      <p>Utilization = C1/T1 + C2/T2 + C3/T3 = 1/4 + 2/6 + 2/8 = 0.25 + 0.33 + 0.25 = 0.83</p>
+      <p>RMS schedulability bound for 3 tasks = 3(2^(1/3) - 1) ≈ 0.78</p>
+      <p>Since 0.83 > 0.78, the RMS sufficient condition is not met. However, this doesn't mean the tasks can't be scheduled - we need to check the actual schedule.</p>
+      
+      <h4>Advantages:</h4>
+      <ul>
+        <li>Simple to implement.</li>
+        <li>Optimal for fixed-priority scheduling of periodic tasks.</li>
+        <li>Well-supported by theoretical analysis.</li>
+        <li>Predictable behavior in overload situations.</li>
+      </ul>
+      
+      <h4>Disadvantages:</h4>
+      <ul>
+        <li>Not always optimal for mixed task sets (periodic and aperiodic).</li>
+        <li>Doesn't consider task deadlines that differ from periods.</li>
+        <li>Can't achieve 100% processor utilization (theoretical limit is ln(2) ≈ 69% for large number of tasks).</li>
+        <li>Doesn't handle resource sharing without additional protocols.</li>
+      </ul>
+      
+      <h4>Best Used For:</h4>
+      <ul>
+        <li>Real-time systems with periodic tasks.</li>
+        <li>Systems where shorter period tasks need faster response.</li>
+        <li>Applications where simplicity of implementation is important.</li>
+        <li>Systems where task periods are known in advance.</li>
+      </ul>
+    </div>
+
+    <div class="tab-container">
+      <div class="tab-buttons">
+        <div class="tab-button active" onclick="openTab('inputTab')">Task Input</div>
+        <div class="tab-button" onclick="openTab('simulationTab')">Simulation</div>
+        <div class="tab-button" onclick="openTab('resultsTab')">Results</div>
+      </div>
+      
+      <div class="tab-content">
+        <div id="inputTab" class="tab-panel active">
+          <h3>Task Input</h3>
+          <div class="input-group mb-3">
+            <span class="input-group-text">Task ID</span>
+            <input type="text" id="taskId" class="form-control" placeholder="T1, T2, etc.">
+            
+            <span class="input-group-text">Period</span>
+            <input type="number" id="period" class="form-control" min="1" value="4">
+            
+            <span class="input-group-text">Execution Time</span>
+            <input type="number" id="executionTime" class="form-control" min="1" value="1">
+            
+            <button class="btn btn-primary" onclick="addTask()">Add Task</button>
+          </div>
+          
+          <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+              <tr>
+                <th>Task ID</th>
+                <th>Period</th>
+                <th>Execution Time</th>
+                <th>Priority (RMS)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="taskTableBody">
+              <!-- Task rows will be added here -->
+            </tbody>
+          </table>
+          
+          <div class="mb-3">
+            <span class="input-group-text">Simulation Duration</span>
+            <input type="number" id="simulationDuration" class="form-control" min="1" value="24">
+          </div>
+          
+          <button class="btn btn-success" onclick="runSimulation()">Run Simulation</button>
+          <button class="btn btn-danger" onclick="resetSimulation()">Reset</button>
+          <button class="btn btn-info" onclick="initializeExampleTasks()">Load Example Tasks</button>
+        </div>
+        
+        <div id="simulationTab" class="tab-panel">
+          <h3>RMS Simulation</h3>
+          
+          <div class="simulation-area">
+            <div class="current-time mb-3">
+              <h4>Current Time: <span id="currentTimeDisplay">0</span></h4>
+            </div>
+            
+            <div class="mb-3">
+              <h5>Ready Queue:</h5>
+              <div class="process-queue" id="readyQueue"></div>
+            </div>
+            
+            <div class="mb-3">
+              <h5>CPU:</h5>
+              <div class="cpu-box" id="cpuBox">IDLE</div>
+            </div>
+            
+            <div class="mb-3">
+              <h5>Task Status:</h5>
+              <div id="taskStatus"></div>
+            </div>
+            
+            <div class="animation-controls">
+              <button id="startButton" class="btn btn-success" onclick="startSimulationAnimation()">Start</button>
+              <button id="pauseButton" class="btn btn-warning" onclick="pauseSimulationAnimation()">Pause</button>
+              <button id="resetAnimationButton" class="btn btn-danger" onclick="resetSimulationAnimation()">Reset</button>
+              <button id="stepButton" class="btn btn-info" onclick="stepSimulation()">Step</button>
+              <div class="mt-3">
+                <label for="simulationSpeed" class="form-label">Speed: <span id="speedValue">5</span>x</label>
+                <input type="range" class="form-range" id="simulationSpeed" min="1" max="10" value="5" oninput="document.getElementById('speedValue').textContent = this.value">
+              </div>
+            </div>
+            
+            <h4>Real-time Gantt Chart</h4>
+            <div class="gantt-chart" id="animatedGanttChart"></div>
+          </div>
+        </div>
+        
+        <div id="resultsTab" class="tab-panel">
+          <h3>Simulation Results</h3>
+          
+          <div class="mb-4">
+            <h4>Gantt Chart</h4>
+            <div class="legend" id="ganttLegend"></div>
+            <div class="gantt-chart" id="ganttChart"></div>
+          </div>
+          
+          <h4>Task Performance</h4>
+          <table class="table table-bordered">
+            <thead class="table-dark">
+              <tr>
+                <th>Task ID</th>
+                <th>Period</th>
+                <th>Execution Time</th>
+                <th>Priority</th>
+                <th>Instances</th>
+                <th>Completed</th>
+                <th>Avg Response Time</th>
+                <th>Response Ratio</th>
+              </tr>
+            </thead>
+            <tbody id="resultTableBody">
+              <!-- Result rows will be added here -->
+            </tbody>
+          </table>
+          
+          <div id="schedulabilityStats">
+            <!-- Schedulability stats will be displayed here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let tasks = [];
+    let simulationResults = [];
+    let nextTaskId = 1;
+    let animationTimer;
+    let currentSimulationTime = 0;
+    let isAnimationRunning = false;
+    let animationSpeed = 5;
+    let taskColors = {};
+    let simulationDuration = 24;
+    
+    // Animation state
+    let simulationState = {
+      currentTime: 0,
+      readyQueue: [],
+      runningTask: null,
+      taskInstances: {},
+      taskProgress: {},
+      remainingExecutionTime: 0
+    };
+
+    // Initialize with some example tasks
+    function initializeExampleTasks() {
+      tasks = [
+        { id: "T1", period: 4, executionTime: 1, priority: 1 },
+        { id: "T2", period: 6, executionTime: 2, priority: 2 },
+        { id: "T3", period: 8, executionTime: 2, priority: 3 }
+      ];
+      updateTaskTable();
+    }
+
+    function addTask() {
+      const taskId = document.getElementById("taskId").value || `T${nextTaskId}`;
+      const period = parseInt(document.getElementById("period").value) || 4;
+      const executionTime = parseInt(document.getElementById("executionTime").value) || 1;
+      
+      if (period <= 0) {
+        alert("Period must be greater than 0");
+        return;
+      }
+      
+      if (executionTime <= 0 || executionTime > period) {
+        alert("Execution time must be greater than 0 and less than or equal to period");
+        return;
+      }
+      
+      // Calculate priority (RMS) - lower period = higher priority
+      let priority = 1;
+      for (const task of tasks) {
+        if (task.period < period) {
+          priority++;
+        }
+      }
+      
+      // Adjust priorities for existing tasks
+      for (const task of tasks) {
+        if (task.period > period) {
+          task.priority++;
+        }
+      }
+      
+      tasks.push({ id: taskId, period, executionTime, priority });
+      nextTaskId++;
+      
+      // Reset input fields
+      document.getElementById("taskId").value = "";
+      document.getElementById("period").value = "";
+      document.getElementById("executionTime").value = "";
+      
+      updateTaskTable();
+    }
+    
+    function removeTask(index) {
+      const removedTask = tasks[index];
+      tasks.splice(index, 1);
+      
+      // Adjust priorities for remaining tasks
+      for (const task of tasks) {
+        if (task.priority > removedTask.priority) {
+          task.priority--;
+        }
+      }
+      
+      updateTaskTable();
+    }
+    
+    function updateTaskTable() {
+      const tableBody = document.getElementById("taskTableBody");
+      tableBody.innerHTML = "";
+      
+      // Sort tasks by priority
+      const sortedTasks = [...tasks].sort((a, b) => a.priority - b.priority);
+      
+      sortedTasks.forEach((task, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${task.id}</td>
+          <td>${task.period}</td>
+          <td>${task.executionTime}</td>
+          <td>${task.priority}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="removeTask(${tasks.indexOf(task)})">Remove</button></td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+    
+    function resetSimulation() {
+      tasks = [];
+      updateTaskTable();
+      clearSimulationResults();
+      resetSimulationAnimation();
+    }
+    
+    function clearSimulationResults() {
+      simulationResults = [];
+      document.getElementById("resultTableBody").innerHTML = "";
+      document.getElementById("schedulabilityStats").innerHTML = "";
+      document.getElementById("ganttChart").innerHTML = "";
+      document.getElementById("ganttLegend").innerHTML = "";
+    }
+    
+    function calculateHyperperiod(tasks) {
+      const periods = tasks.map(task => task.period);
+      let hyperperiod = 1;
+      
+      // Calculate LCM of all periods
+      for (let i = 0; i < periods.length; i++) {
+        hyperperiod = lcm(hyperperiod, periods[i]);
+      }
+      
+      return hyperperiod;
+    }
+    
+    function gcd(a, b) {
+      while (b > 0) {
+        const temp = b;
+        b = a % b;
+        a = temp;
+      }
+      return a;
+    }
+    
+    function lcm(a, b) {
+      return a * (b / gcd(a, b));
+    }
+    
+    function runSimulation() {
+      if (tasks.length === 0) {
+        alert("Please add at least one task");
+        return;
+      }
+      
+      // Sort tasks by priority (RMS)
+      const sortedTasks = [...tasks].sort((a, b) => a.priority - b.priority);
+      
+      // Get simulation duration
+      simulationDuration = parseInt(document.getElementById("simulationDuration").value) || 24;
+      
+      // Calculate hyperperiod
+      const hyperperiod = calculateHyperperiod(tasks);
+      
+      // Check if specified duration is too short
+      if (simulationDuration < hyperperiod) {
+        alert(`Warning: Specified duration (${simulationDuration}) is less than the hyperperiod (${hyperperiod}). Consider using at least one complete hyperperiod for complete analysis.`);
+      }
+      
+      // Initialize simulation
+      let schedule = new Array(simulationDuration).fill(null);
+      let taskInstances = {};
+      
+      // Initialize task instances
+      sortedTasks.forEach(task => {
+        taskInstances[task.id] = {
+          nextRelease: 0,
+          releases: [],
+          completions: [],
+          preemptions: []
+        };
+      });
+      
+      // Run simulation
+      for (let time = 0; time < simulationDuration; time++) {
+        // Check for new task releases
+        sortedTasks.forEach(task => {
+          if (time % task.period === 0) {
+            taskInstances[task.id].nextRelease = time;
+            taskInstances[task.id].releases.push({
+              releaseTime: time,
+              executionLeft: task.executionTime,
+              completed: false,
+              completionTime: null,
+              responseTime: null
+            });
+          }
+        });
+        
+        // Find highest priority task that has work to do
+        let selectedTask = null;
+        let selectedReleaseIndex = -1;
+        
+        for (const task of sortedTasks) {
+          const releases = taskInstances[task.id].releases;
+          
+          for (let i = 0; i < releases.length; i++) {
+            if (!releases[i].completed && releases[i].executionLeft > 0) {
+              selectedTask = task;
+              selectedReleaseIndex = i;
+              break;
+            }
+          }
+          
+          if (selectedTask) break;
+        }
+        
+        // Update schedule and task instance state
+        if (selectedTask) {
+          const releaseIndex = selectedReleaseIndex;
+          const taskRelease = taskInstances[selectedTask.id].releases[releaseIndex];
+          
+          // Check if this is a preemption
+          if (time > 0 && schedule[time - 1] !== null && schedule[time - 1].id !== selectedTask.id) {
+            const preemptedTaskId = schedule[time - 1].id;
+            const preemptedReleaseIndex = schedule[time - 1].releaseIndex;
+            
+            taskInstances[preemptedTaskId].preemptions.push({
+              time,
+              preemptedBy: selectedTask.id
+            });
+          }
+          
+          // Execute task
+          schedule[time] = {
+            id: selectedTask.id,
+            releaseIndex: releaseIndex,
+            releaseTime: taskRelease.releaseTime,
+            remainingTime: taskRelease.executionLeft - 1  // After executing this time unit
+          };
+          
+          taskRelease.executionLeft--;
+          
+          // Check if task completed
+          if (taskRelease.executionLeft === 0) {
+            taskRelease.completed = true;
+            taskRelease.completionTime = time + 1;
+            taskRelease.responseTime = taskRelease.completionTime - taskRelease.releaseTime;
+            taskInstances[selectedTask.id].completions.push({
+              releaseTime: taskRelease.releaseTime,
+              completionTime: taskRelease.completionTime,
+              responseTime: taskRelease.responseTime
+            });
+          }
+        }
+      }
+      
+      // Assign colors to tasks
+      taskColors = {};
+      sortedTasks.forEach(task => {
+        taskColors[task.id] = getRandomColor(task.id);
+      });
+      
+      // Store results
+      simulationResults = {
+        schedule,
+        taskInstances,
+        hyperperiod
+      };
+      
+      // Display results
+      displayResults(simulationResults, sortedTasks);
+      
+      // Setup simulation animation
+      resetSimulationAnimation();
+      
+      // Switch to simulation tab
+      openTab('simulationTab');
+    }
+    
+    function displayResults(results, sortedTasks) {
+      // Display Gantt chart
+      const ganttChart = document.getElementById("ganttChart");
+      const ganttLegend = document.getElementById("ganttLegend");
+      ganttChart.innerHTML = "";
+      ganttLegend.innerHTML = "";
+      
+      // Create legend
+      sortedTasks.forEach(task => {
+        const legendItem = document.createElement("div");
+        legendItem.className = "legend-item";
+        
+        const colorBox = document.createElement("div");
+        colorBox.className = "legend-color";
+        colorBox.style.backgroundColor = taskColors[task.id];
+        
+        const label = document.createElement("span");
+        label.textContent = `${task.id} (Priority ${task.priority})`;
+        label.style.color = "#c9d1d9";
+        
+        legendItem.appendChild(colorBox);
+        legendItem.appendChild(label);
+        ganttLegend.appendChild(legendItem);
+      });
+      
+      // Add idle color to legend
+      const idleLegendItem = document.createElement("div");
+      idleLegendItem.className = "legend-item";
+      
+      const idleColorBox = document.createElement("div");
+      idleColorBox.className = "legend-color";
+      idleColorBox.style.backgroundColor = "#6c757d";
+      
+      const idleLabel = document.createElement("span");
+      idleLabel.textContent = "IDLE";
+      idleLabel.style.color = "#c9d1d9";
+      
+      idleLegendItem.appendChild(idleColorBox);
+      idleLegendItem.appendChild(idleLabel);
+      ganttLegend.appendChild(idleLegendItem);
+      
+      // Draw Gantt chart bars
+      let currentTask = null;
+      let barStartTime = 0;
+      
+      for (let t = 0; t <= results.schedule.length; t++) {
+        const scheduleEntry = t < results.schedule.length ? results.schedule[t] : null;
+        
+        if (currentTask === null && scheduleEntry !== null) {
+          // Start of a new task
+          currentTask = scheduleEntry.id;
+          barStartTime = t;
+        } else if (currentTask !== null && (scheduleEntry === null || scheduleEntry.id !== currentTask)) {
+          // End of current task
+          const width = (t - barStartTime) * 20;
+          
+          const ganttBar = document.createElement("div");
+          ganttBar.className = "gantt-bar";
+          ganttBar.style.width = `${width}px`;
+          ganttBar.style.backgroundColor = taskColors[currentTask] || "#6c757d";
+          
+          const taskLabel = document.createElement("div");
+          taskLabel.className = "gantt-label";
+          taskLabel.textContent = currentTask;
+          ganttBar.appendChild(taskLabel);
+          
+          const startTimeLabel = document.createElement("div");
+          startTimeLabel.className = "time-label";
+startTimeLabel.textContent = barStartTime;
+startTimeLabel.style.left = "0px";
+ganttBar.appendChild(startTimeLabel);
+
+const endTimeLabel = document.createElement("div");
+endTimeLabel.className = "time-label";
+endTimeLabel.textContent = t;
+endTimeLabel.style.left = `${width}px`;
+ganttBar.appendChild(endTimeLabel);
+
+ganttChart.appendChild(ganttBar);
+
+// Reset for next task
+currentTask = scheduleEntry ? scheduleEntry.id : null;
+barStartTime = t;
+}
+}
+
+// Display task performance in table
+const resultTableBody = document.getElementById("resultTableBody");
+resultTableBody.innerHTML = "";
+
+sortedTasks.forEach(task => {
+  const taskInstance = results.taskInstances[task.id];
+  const releases = taskInstance.releases.length;
+  const completions = taskInstance.completions.length;
+  
+  // Calculate average response time
+  let totalResponseTime = 0;
+  taskInstance.completions.forEach(completion => {
+    totalResponseTime += completion.responseTime;
+  });
+  
+  const avgResponseTime = completions > 0 ? (totalResponseTime / completions).toFixed(2) : "N/A";
+  const responseRatio = completions > 0 ? (avgResponseTime / task.executionTime).toFixed(2) : "N/A";
+  
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${task.id}</td>
+    <td>${task.period}</td>
+    <td>${task.executionTime}</td>
+    <td>${task.priority}</td>
+    <td>${releases}</td>
+    <td>${completions}</td>
+    <td>${avgResponseTime}</td>
+    <td>${responseRatio}</td>
+  `;
+  resultTableBody.appendChild(row);
+});
+
+// Display schedulability statistics
+const schedulabilityStats = document.getElementById("schedulabilityStats");
+schedulabilityStats.innerHTML = "";
+
+// Calculate utilization
+let totalUtilization = 0;
+sortedTasks.forEach(task => {
+  totalUtilization += task.executionTime / task.period;
+});
+
+// Calculate RMS bound
+const n = sortedTasks.length;
+const rmsBound = n * (Math.pow(2, 1/n) - 1);
+
+const statsDiv = document.createElement("div");
+statsDiv.innerHTML = `
+  <h4>Schedulability Analysis</h4>
+  <p><strong>Total Utilization:</strong> ${(totalUtilization * 100).toFixed(2)}%</p>
+  <p><strong>RMS Schedulability Bound:</strong> ${(rmsBound * 100).toFixed(2)}%</p>
+`;
+
+// Check if all tasks met their deadlines
+let allDeadlinesMet = true;
+let missedDeadlines = [];
+
+sortedTasks.forEach(task => {
+  const taskInstance = results.taskInstances[task.id];
+  
+  taskInstance.releases.forEach((release, index) => {
+    if (!release.completed || release.responseTime > task.period) {
+      allDeadlinesMet = false;
+      missedDeadlines.push(`${task.id} release at t=${release.releaseTime}`);
+    }
+  });
+});
+
+const deadlineStatusDiv = document.createElement("div");
+if (allDeadlinesMet) {
+  deadlineStatusDiv.innerHTML = `
+    <div class="alert alert-success">
+      <strong>All deadlines met!</strong> The task set is schedulable under RMS.
+    </div>
+  `;
+} else {
+  deadlineStatusDiv.innerHTML = `
+    <div class="alert alert-danger">
+      <strong>Some deadlines missed!</strong> The task set is not schedulable under RMS.
+      <ul>
+        ${missedDeadlines.map(miss => `<li>${miss}</li>`).join('')}
+      </ul>
+    </div>
+  `;
+}
+
+schedulabilityStats.appendChild(statsDiv);
+schedulabilityStats.appendChild(deadlineStatusDiv);
+}
+
+function resetSimulationAnimation() {
+currentSimulationTime = 0;
+isAnimationRunning = false;
+clearInterval(animationTimer);
+
+// Reset animation state
+simulationState = {
+  currentTime: 0,
+  readyQueue: [],
+  runningTask: null,
+  taskInstances: {},
+  taskProgress: {},
+  remainingExecutionTime: 0
+};
+
+// Initialize task instances
+tasks.forEach(task => {
+  simulationState.taskInstances[task.id] = {
+    nextRelease: 0,
+    currentInstance: 0,
+    completed: 0
+  };
+  simulationState.taskProgress[task.id] = {
+    remainingTime: 0,
+    releaseTime: 0
+  };
+});
+
+// Reset UI
+document.getElementById("currentTimeDisplay").textContent = "0";
+document.getElementById("readyQueue").innerHTML = "";
+document.getElementById("cpuBox").innerHTML = "IDLE";
+document.getElementById("cpuBox").style.backgroundColor = "#2a3142";
+document.getElementById("taskStatus").innerHTML = "";
+document.getElementById("animatedGanttChart").innerHTML = "";
+
+// Reset button states
+document.getElementById("startButton").disabled = false;
+document.getElementById("pauseButton").disabled = true;
+document.getElementById("resetAnimationButton").disabled = false;
+document.getElementById("stepButton").disabled = false;
+}
+
+function startSimulationAnimation() {
+if (!simulationResults || simulationResults.length === 0) {
+  alert("Please run the simulation first");
+  return;
+}
+
+isAnimationRunning = true;
+document.getElementById("startButton").disabled = true;
+document.getElementById("pauseButton").disabled = false;
+
+// Get animation speed
+animationSpeed = parseInt(document.getElementById("simulationSpeed").value) || 5;
+const interval = 1000 / animationSpeed;
+
+// Start animation loop
+animationTimer = setInterval(() => {
+  stepSimulation();
+}, interval);
+}
+
+function pauseSimulationAnimation() {
+isAnimationRunning = false;
+clearInterval(animationTimer);
+document.getElementById("startButton").disabled = false;
+document.getElementById("pauseButton").disabled = true;
+}
+
+function stepSimulation() {
+if (currentSimulationTime >= simulationDuration) {
+  pauseSimulationAnimation();
+  document.getElementById("startButton").disabled = true;
+  return;
+}
+
+// Update current time display
+document.getElementById("currentTimeDisplay").textContent = currentSimulationTime;
+
+// Check for new task releases
+tasks.forEach(task => {
+  if (currentSimulationTime % task.period === 0) {
+    // Release new instance
+    simulationState.taskInstances[task.id].nextRelease = currentSimulationTime;
+    simulationState.taskInstances[task.id].currentInstance++;
+    
+    // Add to ready queue
+    simulationState.readyQueue.push({
+      id: task.id,
+      priority: task.priority,
+      executionTime: task.executionTime,
+      remainingTime: task.executionTime,
+      releaseTime: currentSimulationTime
+    });
+    
+    // Sort ready queue by priority
+    simulationState.readyQueue.sort((a, b) => a.priority - b.priority);
+  }
+});
+
+// Get current schedule
+const currentScheduleEntry = simulationResults.schedule[currentSimulationTime];
+
+// Update CPU and ready queue display
+updateCPUDisplay(currentScheduleEntry);
+updateReadyQueueDisplay();
+updateTaskStatusDisplay();
+updateAnimatedGanttChart(currentScheduleEntry);
+
+// Move to next time step
+currentSimulationTime++;
+}
+
+function updateCPUDisplay(scheduleEntry) {
+const cpuBox = document.getElementById("cpuBox");
+
+if (scheduleEntry === null) {
+  cpuBox.innerHTML = "IDLE";
+  cpuBox.style.backgroundColor = "#2a3142";
+  simulationState.runningTask = null;
+} else {
+  const taskId = scheduleEntry.id;
+  const remainingTime = scheduleEntry.remainingTime;
+  
+  cpuBox.innerHTML = `${taskId}<br>Remaining: ${remainingTime}`;
+  cpuBox.style.backgroundColor = taskColors[taskId] || "#2a3142";
+  
+  // Update running task
+  simulationState.runningTask = {
+    id: taskId,
+    remainingTime: remainingTime
+  };
+  
+  // Update ready queue by removing running task
+  simulationState.readyQueue = simulationState.readyQueue.filter(
+    task => task.id !== taskId || task.releaseTime !== scheduleEntry.releaseTime
+  );
+}
+}
+
+function updateReadyQueueDisplay() {
+const readyQueueElement = document.getElementById("readyQueue");
+readyQueueElement.innerHTML = "";
+
+simulationState.readyQueue.forEach(task => {
+  const taskElement = document.createElement("div");
+  taskElement.className = "process-item";
+  taskElement.style.backgroundColor = taskColors[task.id] || "#6c757d";
+  taskElement.textContent = `${task.id} (${task.remainingTime})`;
+  readyQueueElement.appendChild(taskElement);
+});
+
+if (simulationState.readyQueue.length === 0) {
+  const emptyElement = document.createElement("div");
+  emptyElement.textContent = "Empty";
+  emptyElement.style.color = "#c9d1d9";
+  readyQueueElement.appendChild(emptyElement);
+}
+}
+
+function updateTaskStatusDisplay() {
+const taskStatusElement = document.getElementById("taskStatus");
+taskStatusElement.innerHTML = "";
+
+tasks.forEach(task => {
+  const taskInstance = simulationState.taskInstances[task.id];
+  const nextRelease = task.period - (currentSimulationTime % task.period);
+  
+  const row = document.createElement("div");
+  row.className = "mb-2";
+  row.innerHTML = `
+    <span style="color: ${taskColors[task.id]}">
+      <strong>${task.id}:</strong> Next release in ${nextRelease} time units
+      | Instances: ${taskInstance.currentInstance}
+      | Priority: ${task.priority}
+    </span>
+  `;
+  
+  taskStatusElement.appendChild(row);
+});
+}
+
+function updateAnimatedGanttChart(scheduleEntry) {
+const ganttChart = document.getElementById("animatedGanttChart");
+
+// Create a new time slot
+const timeSlot = document.createElement("div");
+timeSlot.className = "gantt-bar";
+timeSlot.style.width = "20px";
+
+// Set the color based on the task
+if (scheduleEntry === null) {
+  timeSlot.style.backgroundColor = "#6c757d"; // IDLE
+  timeSlot.innerHTML = `<div class="gantt-label">-</div>`;
+} else {
+  timeSlot.style.backgroundColor = taskColors[scheduleEntry.id] || "#6c757d";
+  timeSlot.innerHTML = `<div class="gantt-label">${scheduleEntry.id}</div>`;
+}
+
+// Add time label
+const timeLabel = document.createElement("div");
+timeLabel.className = "time-label";
+timeLabel.textContent = currentSimulationTime;
+timeSlot.appendChild(timeLabel);
+
+ganttChart.appendChild(timeSlot);
+
+// Scroll to show newest time slot
+ganttChart.scrollLeft = ganttChart.scrollWidth;
+}
+
+function getRandomColor(taskId) {
+// Predefined colors for tasks
+const colors = [
+  "#28a745", // green
+  "#dc3545", // red
+  "#fd7e14", // orange
+  "#6610f2", // purple
+  "#e83e8c", // pink
+  "#17a2b8", // cyan
+  "#ffc107", // yellow
+  "#20c997", // teal
+  "#6f42c1"  // indigo
+];
+
+// Use consistent color for same task ID
+const hash = taskId.split("").reduce((a, b) => {
+  a = ((a << 5) - a) + b.charCodeAt(0);
+  return a & a;
+}, 0);
+
+
+return colors[Math.abs(hash) % colors.length];
+}
+
+function openTab(tabName) {
+// Hide all tab panels
+const tabPanels = document.getElementsByClassName("tab-panel");
+for (let i = 0; i < tabPanels.length; i++) {
+  tabPanels[i].classList.remove("active");
+}
+
+// Deactivate all tab buttons
+const tabButtons = document.getElementsByClassName("tab-button");
+for (let i = 0; i < tabButtons.length; i++) {
+  tabButtons[i].classList.remove("active");
+}
+
+// Show the selected tab panel and activate button
+document.getElementById(tabName).classList.add("active");
+document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add("active");
+}
+
+// Initialize the simulation
+window.onload = function() {
+resetSimulation();
+initializeExampleTasks();
+};
+</script>
+</body>
+</html>

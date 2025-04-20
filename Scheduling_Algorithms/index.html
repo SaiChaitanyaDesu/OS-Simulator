@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPU Scheduling Algorithms</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-primary: #1a1d24;
+      --bg-secondary: #252a34;
+      --bg-card: #2a2f3a;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --accent-orange: #f97316;
+      --accent-teal: #14b8a6;
+      --accent-purple: #a855f7;
+      --accent-pink: #ec4899;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #1f1f1f;
+      color: white;
+      line-height: 1.6;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+    }
+
+    header {
+      margin-bottom: 3rem;
+      border-left: 4px solid var(--accent-blue);
+      padding-left: 1rem;
+    }
+
+    .navbar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1f1f1f;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: box-shadow 0.3s ease, border-bottom 0.3s ease;
+    }
+
+    .navbar.scrolled {
+      box-shadow: 0 2px 10px rgba(0, 188, 212, 0.3);
+      border-bottom: 2px solid #00bcd4;
+    }
+
+    .nav-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00bcd4;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .nav-item {
+      color: #f1f1f1;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+    }
+
+    .nav-item:hover {
+      color: #00bcd4;
+    }
+
+    .dropdown {
+      position: sticky;
+      display: inline-block;
+    }
+
+    .dropbtn {
+      background-color: #1f1f1f;
+      color: #f1f1f1;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dropbtn:hover {
+      color: #00bcd4;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #2a2a2a;
+      min-width: 250px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      z-index: 1;
+      border-radius: 6px;
+      max-height: 500px;
+      overflow-y: auto;
+      /* overflow: hidden; */
+    }
+
+    .dropdown-content a {
+      color: #f1f1f1;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.3s ease;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #00bcd4;
+      color: #000;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .navbar-divider {
+      border: none;
+      height: 2px;
+      width: 90%;
+      margin: 0 auto;
+      background: linear-gradient(to right, #00bcd4, #006064);
+      border-radius: 4px;
+      margin-top: 5px;
+    }  
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    .algorithm-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .algorithm-card {
+      background-color: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .algorithm-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+      padding: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-header h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: white
+    }
+
+    .algo-abbr {
+      display: inline-block;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .fcfs .algo-abbr { background-color: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+    .sjf .algo-abbr { background-color: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
+    .rr .algo-abbr { background-color: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
+    .priority .algo-abbr { background-color: rgba(236, 72, 153, 0.2); color: var(--accent-pink); }
+    .edf .algo-abbr { background-color: rgba(249, 115, 22, 0.2); color: var(--accent-orange); }
+    .rms .algo-abbr { background-color: rgba(219, 53, 97, 0.2); color: var(--accent-read); }
+    .srt .algo-abbr { background-color: rgba(20, 184, 166, 0.2); color: var(--accent-teal); }
+
+    .card-body {
+      padding: 1.25rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-description {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .formula-box {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .key-metrics {
+      margin-bottom: 1.5rem;
+    }
+
+    .key-metrics h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+    }
+
+    .metrics-list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      color: white;
+    }
+
+    .metrics-list li {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    .card-footer {
+      padding: 1rem 1.25rem;
+      background-color: rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .fcfs .cta-button { background-color: var(--accent-blue); color: white; }
+    .sjf .cta-button { background-color: var(--accent-green); color: white; }
+    .rr .cta-button { background-color: var(--accent-purple); color: white; }
+    .priority .cta-button { background-color: var(--accent-pink); color: white; }
+    .edf .cta-button { background-color: var(--accent-orange); color: white; }
+    .rms .cta-button { background-color: var(--accent-red); color: white; }
+    .srt .cta-button { background-color: var(--accent-teal); color: white; }
+
+    .fcfs .cta-button:hover { background-color: #2563eb; }
+    .sjf .cta-button:hover { background-color: #16a34a; }
+    .rr .cta-button:hover { background-color: #9333ea; }
+    .priority .cta-button:hover { background-color: #db2777; }
+    .edf .cta-button:hover { background-color: #ea580c; }
+    .rms .cta-button:hover { background-color: #ea0c0c; }
+    .srt .cta-button:hover { background-color: #0d9488; }
+
+    .complexity {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+    }
+
+    .complexity span {
+      margin-left: 0.5rem;
+      font-family: monospace;
+    }
+
+    .section-title {
+      margin: 2rem 0 1.5rem 0;
+      font-size: 1.8rem;
+      border-left: 4px solid var(--accent-cyan);
+      padding-left: 1rem;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 3rem;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .comparison-table th {
+      background-color: var(--bg-card);
+      font-weight: 600;
+      color: var(--accent-cyan);
+    }
+
+    .comparison-table tr:nth-child(even) {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .comparison-table tr:hover {
+      background-color: rgba(6, 182, 212, 0.1);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-right: 0.5rem;
+    }
+
+    .tag-preemptive { background-color: rgba(236, 72, 153, 0.2); color: var(--accent-pink); }
+    .tag-non-preemptive { background-color: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
+    .tag-starvation { background-color: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+
+    .pros-cons {
+      margin-top: 0.5rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .pros, .cons {
+      flex: 1;
+      font-size: 0.85rem;
+    }
+
+    .pros h4, .cons h4 {
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pros h4::before {
+      content: "✓";
+      color: var(--accent-green);
+    }
+
+    .cons h4::before {
+      content: "×";
+      color: var(--accent-red);
+    }
+
+    .pros ul, .cons ul {
+      padding-left: 1.5rem;
+      color: var(--text-secondary);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--text-secondary);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand" onclick="window.location.href='../index.html'">OSSim</div>
+    <div class="nav-links">
+      <div class="dropdown">
+        <button class="dropbtn">
+          <i class="fas fa-bars"></i> Topics
+        </button>
+        <div class="dropdown-content">
+          <a href="../Scheduling_Algorithms/index.html">Scheduling Algorithms</a>
+          <a href="../Process_Synchronization/index.html">Process Synchronization</a>
+          <a href="../Thread_Synchronization/threadindex.html">Threading and Synchronization</a>
+          <a href="../Deadlock/da.html">Banker's Algorithm</a>
+          <a href="../Second_Chance Algo/extra_page_replacement.html">Clock Algorithms</a>
+          <a href="../Memory_management/info.html">MVT/MFT</a>
+          <a href="../File_Organization/index.html">File Organization</a>
+          <a href="../Memory_Allocation/memory_visualizer.html">Memory Allocation</a>
+          <a href="../Page_Replacement/page_replacement.html">Page Replacement</a>
+          <a href="../Disk_Scheduling/intro.html">Disk Scheduling</a>
+          <a href="../File_Allocation/file_allocation.html">File Allocation</a>
+          <a href="../Security_Algorithms/security_theory.html">Security Algorithms</a>
+          <a href="../Paging/Paging_theory.html">Paging Technique</a>
+          <a href="../Inter_Process_Communication/index.html">Inter-Process Communication and Shared Memory</a>
+        </div>
+      </div>
+      <a href="../index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+      <a href="../help.html" class="nav-item"><i class="fas fa-question-circle"></i> Help</a>
+      <a href="#page-top" class="nav-item"><i class="fas fa-info-circle"></i> About Us</a>
+    </div>
+  </nav>
+  
+  <hr class="navbar-divider">
+
+  <div class="container">
+    <header>
+      <h1>CPU Scheduling Algorithms</h1>
+      <p class="subtitle">Interactive guide to process scheduling techniques in operating systems</p>
+    </header>
+
+    <div class="algorithm-grid">
+      <!-- FCFS Card -->
+      <div class="algorithm-card fcfs">
+        <div class="card-header">
+          <span class="algo-abbr">FCFS</span>
+          <h2>First Come First Serve</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-description">
+            The simplest scheduling algorithm that executes processes in the order they arrive in the ready queue. Non-preemptive by nature and easy to implement.
+          </p>
+          <div class="formula-box">
+            Turnaround Time = Completion Time - Arrival Time<br>
+            Waiting Time = Turnaround Time - Burst Time
+          </div>
+          <div class="key-metrics">
+            <h3>Key Metrics</h3>
+            <ul class="metrics-list">
+              <li>Average Waiting Time</li>
+              <li>Average Turnaround Time</li>
+              <li>Convoy Effect</li>
+            </ul>
+          </div>
+          <div class="pros-cons">
+            <div class="pros">
+              <h4>Pros</h4>
+              <ul>
+                <li>Simple implementation</li>
+                <li>No starvation</li>
+              </ul>
+            </div>
+            <div class="cons">
+              <h4>Cons</h4>
+              <ul>
+                <li>Poor average wait time</li>
+                <li>Convoy effect</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="fcfs.html" class="cta-button">Try Simulator</a>
+          <div class="complexity">Complexity: <span>O(n)</span></div>
+        </div>
+      </div>
+
+      <!-- SJF Card -->
+      <div class="algorithm-card sjf">
+        <div class="card-header">
+          <span class="algo-abbr">SJF</span>
+          <h2>Shortest Job First</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-description">
+            Selects the process with the smallest execution time to execute next. Optimal for minimizing average waiting time but requires knowing the burst time in advance.
+          </p>
+          <div class="formula-box">
+            Turnaround Time = Completion Time - Arrival Time<br>
+            Waiting Time = Turnaround Time - Burst Time
+          </div>
+          <div class="key-metrics">
+            <h3>Key Metrics</h3>
+            <ul class="metrics-list">
+              <li>Average Waiting Time</li>
+              <li>Average Turnaround Time</li>
+              <li>CPU Utilization</li>
+            </ul>
+          </div>
+          <div class="pros-cons">
+            <div class="pros">
+              <h4>Pros</h4>
+              <ul>
+                <li>Optimal average wait time</li>
+                <li>High throughput</li>
+              </ul>
+            </div>
+            <div class="cons">
+              <h4>Cons</h4>
+              <ul>
+                <li>Starvation possible</li>
+                <li>Burst time prediction</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="sjf.html" class="cta-button">Try Simulator</a>
+          <div class="complexity">Complexity: <span>O(n²)</span></div>
+        </div>
+      </div>
+
+      <!-- Round Robin Card -->
+      <div class="algorithm-card rr">
+        <div class="card-header">
+          <span class="algo-abbr">RR</span>
+          <h2>Round Robin</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-description">
+            Assigns a fixed time quantum to each process and cycles through them. Preemptive algorithm suitable for time-sharing systems with fair CPU distribution.
+          </p>
+          <div class="formula-box">
+            Turnaround Time = Completion Time - Arrival Time<br>
+            Waiting Time = Turnaround Time - Burst Time
+          </div>
+          <div class="key-metrics">
+            <h3>Key Metrics</h3>
+            <ul class="metrics-list">
+              <li>Time Quantum</li>
+              <li>Context Switch Overhead</li>
+              <li>Response Time</li>
+            </ul>
+          </div>
+          <div class="pros-cons">
+            <div class="pros">
+              <h4>Pros</h4>
+              <ul>
+                <li>Fair CPU distribution</li>
+                <li>No starvation</li>
+              </ul>
+            </div>
+            <div class="cons">
+              <h4>Cons</h4>
+              <ul>
+                <li>Context switch overhead</li>
+                <li>Time quantum sensitivity</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="rr.html" class="cta-button">Try Simulator</a>
+          <div class="complexity">Complexity: <span>O(n)</span></div>
+        </div>
+      </div>
+
+      <!-- Priority Card -->
+      <div class="algorithm-card priority">
+        <div class="card-header">
+          <span class="algo-abbr">PRI</span>
+          <h2>Priority Scheduling</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-description">
+            Executes processes based on assigned priority values. Can be preemptive or non-preemptive and allows handling of critical tasks with higher priority.
+          </p>
+          <div class="formula-box">
+            Turnaround Time = Completion Time - Arrival Time<br>
+            Waiting Time = Turnaround Time - Burst Time
+          </div>
+          <div class="key-metrics">
+            <h3>Key Metrics</h3>
+            <ul class="metrics-list">
+              <li>Priority Inversions</li>
+              <li>Average Waiting Time</li>
+              <li>Resource Allocation</li>
+            </ul>
+          </div>
+          <div class="pros-cons">
+            <div class="pros">
+              <h4>Pros</h4>
+              <ul>
+                <li>Handles critical tasks</li>
+                <li>Flexible priority assignment</li>
+              </ul>
+            </div>
+            <div class="cons">
+              <h4>Cons</h4>
+              <ul>
+                <li>Priority inversion</li>
+                <li>Starvation possible</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="ps.html" class="cta-button">Try Simulator</a>
+          <div class="complexity">Complexity: <span>O(n²)</span></div>
+        </div>
+      </div>
+
+      <!-- SRTF Card -->
+      <div class="algorithm-card srt">
+        <div class="card-header">
+          <span class="algo-abbr">SRTF</span>
+          <h2>Shortest Remaining Time First</h2>
+        </div>
+        <div class="card-body">
+          <p class="card-description">
+            Preemptive version of SJF that selects the process with the smallest remaining burst time. Optimal for minimizing average waiting time but requires continuous monitoring.
+          </p>
+          <div class="formula-box">
+            Turnaround Time = Completion Time - Arrival Time<br>
+            Waiting Time = Turnaround Time - Burst Time
+          </div>
+          <div class="key-metrics">
+            <h3>Key Metrics</h3>
+            <ul class="metrics-list">
+              <li>Average Waiting Time</li>
+              <li>Preemption Overhead</li>
+              <li>Response Time</li>
+            </ul>
+          </div>
+          <div class="pros-cons">
+            <div class="pros">
+              <h4>Pros</h4>
+              <ul>
+                <li>Optimal average wait time</li>
+                <li>Better response for short processes</li>
+              </ul>
+            </div>
+            <div class="cons">
+              <h4>Cons</h4>
+              <ul>
+                <li>High overhead</li>
+                <li>Complex implementation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="srtf.html" class="cta-button">Try Simulator</a>
+          <div class="complexity">Complexity: <span>O(n²)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Algorithm Comparison</h2>
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Algorithm</th>
+          <th>Type</th>
+          <th>Optimal For</th>
+          <th>Drawbacks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>First Come First Serve (FCFS)</td>
+          <td><span class="tag tag-non-preemptive">Non-Preemptive</span></td>
+          <td>Simplicity, Fairness</td>
+          <td>Convoy Effect, Poor Average Wait Time</td>
+        </tr>
+        <tr>
+          <td>Shortest Job First (SJF)</td>
+          <td><span class="tag tag-non-preemptive">Non-Preemptive</span></td>
+          <td>Minimizing Average Wait Time</td>
+          <td><span class="tag tag-starvation">Starvation</span>, Burst Time Prediction</td>
+        </tr>
+        <tr>
+          <td>Round Robin (RR)</td>
+          <td><span class="tag tag-preemptive">Preemptive</span></td>
+          <td>Time-Sharing Systems, Fair CPU Distribution</td>
+          <td>Context Switch Overhead, Time Quantum Selection</td>
+        </tr>
+        <tr>
+          <td>Priority Scheduling</td>
+          <td><span class="tag tag-preemptive">Preemptive</span>/<span class="tag tag-non-preemptive">Non-Preemptive</span></td>
+          <td>Critical Task Handling, Real-Time Systems</td>
+          <td><span class="tag tag-starvation">Starvation</span>, Priority Inversion</td>
+        </tr>
+        <tr>
+          <td>Shortest Remaining Time First (SRTF)</td>
+          <td><span class="tag tag-preemptive">Preemptive</span></td>
+          <td>Minimizing Average Wait Time, Response Time</td>
+          <td><span class="tag tag-starvation">Starvation</span>, High Overhead</td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <header>
+      <h1>RTOS Scheduling Algorithms</h1>
+      <p class="subtitle">Powering real-time precision and reliability in embedded systems.</p>
+    </header>
+        <div class="algorithm-grid">
+          <!-- EDF Card -->
+          <div class="algorithm-card edf">
+            <div class="card-header">
+              <span class="algo-abbr">EDF</span>
+              <h2>Earliest Deadline First</h2>
+            </div>
+            <div class="card-body">
+              <p class="card-description">
+                Uses dynamic priority scheduling where processes are prioritized based on their deadlines
+                 — the earlier the deadline, the higher the priority. Ideal for real-time systems where meeting deadlines is critical.
+              </p>
+              <div class="formula-box">
+                Turnaround Time = Completion Time - Arrival Time<br>
+                Waiting Time = Turnaround Time - Burst Time<br>
+                Deadline Miss Rate = (Missed Deadlines / Total Tasks) × 100
+              </div>
+              <div class="key-metrics">
+                <h3>Key Metrics</h3>
+                <ul class="metrics-list">
+                  <li>Deadline Sensitivity</li>
+                  <li>Task Utilization</li>
+                  <li>Dynamic Prioritization</li>
+                </ul>
+              </div>
+              <div class="pros-cons">
+                <div class="pros">
+                  <h4>Pros</h4>
+                  <ul>
+                    <li>Optimal for uniprocessor real-time scheduling</li>
+                    <li>Simple and efficient deadline handling</li>
+                  </ul>
+                </div>
+                <div class="cons">
+                  <h4>Cons</h4>
+                  <ul>
+                    <li>Not suitable for overloaded systems</li>
+                    <li>May lead to starvation of long-deadline tasks</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <a href="edf.html" class="cta-button">Try Simulator</a>
+              <div class="complexity">Complexity: <span>O(n log n)</span></div>
+            </div>
+          </div>
+
+          <!-- RMS Card -->
+          <div class="algorithm-card rms">
+            <div class="card-header">
+              <span class="algo-abbr">RMS</span>
+              <h2>Rate Monotonic Scheduling</h2>
+            </div>
+            <div class="card-body">
+              <p class="card-description">
+                A fixed-priority real-time scheduling algorithm where tasks with shorter periods are assigned
+                 higher priority. Ideal for periodic real-time tasks in systems with known execution characteristics.
+              </p>
+              <div class="formula-box">
+                Turnaround Time = Completion Time - Arrival Time<br>
+                Waiting Time = Turnaround Time - Burst Time<br>
+                CPU Utilization ≤ n(2^(1/n) - 1)  [Liu & Layland bound]
+              </div>
+              <div class="key-metrics">
+                <h3>Key Metrics</h3>
+                <ul class="metrics-list">
+                  <li>Task Period</li>
+                  <li>Priority Assignment</li>
+                  <li>System Utilization</li>
+                </ul>
+              </div>
+              <div class="pros-cons">
+                <div class="pros">
+                  <h4>Pros</h4>
+                  <ul>
+                    <li>Simple and easy to implement</li>
+                    <li>Predictable and deterministic behavior</li>
+                  </ul>
+                </div>
+                <div class="cons">
+                  <h4>Cons</h4>
+                  <ul>
+                    <li>Only optimal for static periodic tasks</li>
+                    <li>Low CPU utilization bound (~69% for large n)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <a href="rms.html" class="cta-button">Try Simulator</a>
+              <div class="complexity">Complexity: <span>O(n log n)</span></div>
+            </div>
+          </div>          
+        </div>
+  </div>
+
+  <footer>
+    <p>CPU Scheduling Algorithms Simulator &copy; 2025</p>
+  </footer>
+
+  <script>
+        window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 10) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>

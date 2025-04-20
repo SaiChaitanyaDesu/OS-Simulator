@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>Deadlock Avoidance</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1f1f1f; /* Changed to black */
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      overflow-x: hidden;
+      color: #e0e0e0; /* Light text for contrast */
+      padding-bottom: 20px;
+      transition: background 0.5s ease;
+    }
+
+    h1, h2 {
+      text-align: center;
+      animation: fadeInDown 0.8s ease;
+      color: #2e7d32;
+    }
+
+    .navbar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1f1f1f;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: box-shadow 0.3s ease, border-bottom 0.3s ease;
+      margin-top: 0px;
+    }
+
+    .navbar.scrolled {
+      box-shadow: 0 2px 10px rgba(0, 188, 212, 0.3);
+      border-bottom: 2px solid #00bcd4;
+    }
+
+    .nav-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00bcd4;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      padding-right: 40px;
+    }
+
+    .nav-item {
+      color: #f1f1f1;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+      margin-right: 5px;
+      white-space: nowrap;
+    }
+
+    .nav-item:hover {
+      color: #00bcd4;
+    }
+
+    .dropdown {
+      position: sticky;
+      display: inline-block;
+    }
+
+    .dropbtn {
+      background-color: #1f1f1f;
+      color: #f1f1f1;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dropbtn:hover {
+      color: #00bcd4;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #2a2a2a;
+      min-width: 250px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      z-index: 1;
+      border-radius: 6px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .dropdown-content a {
+      color: #f1f1f1;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.3s ease;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #00bcd4;
+      color: #000;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .navbar-divider {
+      border: none;
+      height: 2px;
+      width: 90%;
+      margin: 0 auto;
+      background: linear-gradient(to right, #00bcd4, #006064);
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #1a1a1a; /* Darker container */
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      animation: fadeIn 0.8s ease;
+      margin-bottom: 30px;
+      border-left: 5px solid #2e7d32;
+    }
+
+    .explanation-container {
+      max-width: 900px;
+      margin: auto;
+      background: #1a1a1a; /* Darker container */
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      animation: fadeIn 0.8s ease;
+      margin-top: 20px;
+      margin-bottom: 30px;
+      border-left: 5px solid #2e7d32;
+    }
+
+    .explanation-section {
+      margin-bottom: 20px;
+    }
+
+    .pros-cons {
+      display: flex;
+      gap: 20px;
+      margin-top: 15px;
+    }
+
+    .pros, .cons {
+      flex: 1;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #2a2a2a; /* Dark background */
+    }
+
+    .example {
+      background-color: #2a2a2a; /* Dark background */
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .section {
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;        
+      justify-content: center;    
+      text-align: center;
+      transition: all 0.5s ease;  
+    }
+
+    .next {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .block {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+      transition: all 0.5s ease;
+    }
+
+    label {
+      font-weight: bold;
+      color: #e0e0e0; /* Light text */
+    }
+
+    input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      margin: 0 5px;
+      border: 1px solid #444;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      background-color: #2a2a2a; /* Dark background */
+      color: #e0e0e0; /* Light text */
+    }
+
+    input[type="number"]:focus {
+      border-color: #2e7d32;
+      box-shadow: 0 0 5px rgba(46, 125, 50, 0.5);
+      transform: scale(1.05);
+    }
+
+    .matrix-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #2a2a2a; /* Dark background */
+      transition: all 0.5s ease;
+    }
+    
+    .matrix-wrapper:hover {
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      transform: translateY(-5px);
+    }
+
+    button {
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #1b5e20;
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .reset-btn {
+      background-color: #c62828;
+    }
+
+    .reset-btn:hover {
+      background-color: #b71c1c;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .output {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: all 0.5s ease;
+      opacity: 0;
+      transform: translateY(20px);
+      background-color: #2a2a2a; /* Dark background */
+    }
+
+    .output.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+      animation: fadeIn 0.8s ease;
+    }
+
+    th, td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    tr:hover td {
+      background-color: #333;
+    }
+
+    th {
+      background-color: #2e7d32;
+      color: white;
+    }
+
+    .process-highlight {
+      background-color: rgba(46, 125, 50, 0.2);
+      font-weight: bold;
+      animation: pulse 1s infinite;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background-color: #333;
+      border: none;
+      border-radius: 5px 5px 0 0;
+      cursor: pointer;
+      margin: 0 5px;
+      transition: all 0.3s ease;
+      color: #e0e0e0; /* Light text */
+    }
+
+    .tab.active {
+      background-color: #2e7d32;
+      color: white;
+    }
+
+    .tab:hover:not(.active) {
+      background-color: #444;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .resource-request {
+      padding: 20px;
+      border: 1px solid #444;
+      border-radius: 8px;
+      margin-top: 20px;
+      transition: all 0.5s ease;
+      background-color: #2a2a2a; /* Dark background */
+    }
+
+    .resource-request h3 {
+      margin-top: 0;
+      color: #2e7d32;
+    }
+
+    .step-animation {
+      padding: 10px;
+      margin: 10px 0;
+      border-left: 3px solid #2e7d32;
+      background-color: #2a2a2a; /* Dark background */
+      animation: slideIn 0.5s ease;
+    }
+
+    .warning-message {
+      background-color: rgba(198, 40, 40, 0.1);
+      border-left: 5px solid #c62828;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 4px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .code-block {
+      background-color: #2a2a2a; /* Dark background */
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px 0;
+      font-family: monospace;
+      overflow-x: auto;
+    }
+
+    .heading-accent {
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 5px rgba(46, 125, 50, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(46, 125, 50, 0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .sequential-fade {
+      opacity: 0;
+      animation: sequentialFade 0.5s ease forwards;
+    }
+
+    @keyframes sequentialFade {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .safe-path {
+      display: inline-block;
+      padding: 5px 10px;
+      margin: 5px;
+      background-color: rgba(46, 125, 50, 0.2);
+      border-radius: 5px;
+      animation: highlight 1s ease;
+    }
+
+    @keyframes highlight {
+      0% {
+        transform: scale(1);
+        background-color: rgba(46, 125, 50, 0.2);
+      }
+      50% {
+        transform: scale(1.1);
+        background-color: #2e7d32;
+        color: white;
+      }
+      100% {
+        transform: scale(1);
+        background-color: rgba(46, 125, 50, 0.2);
+      }
+    }
+
+    select {
+      padding: 5px;
+      background-color: #2a2a2a; /* Dark background */
+      color: #e0e0e0; /* Light text */
+      border: 1px solid #444;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand" onclick="window.location.href='../index.html'">OSSim</div>
+    <div class="nav-links">
+      <div class="dropdown">
+        <button class="dropbtn">
+          <i class="fas fa-bars"></i> Topics
+        </button>
+        <div class="dropdown-content">
+          <a href="../Scheduling_Algorithms/index.html">Scheduling Algorithms</a>
+          <a href="../Process_Synchronization/index.html">Process Synchronization</a>
+          <a href="../Thread_Synchronization/threadindex.html">Threading and Synchronization</a>
+          <a href="../Deadlock/da.html">Banker's Algorithm</a>
+          <a href="../Second_Chance Algo/extra_page_replacement.html">Clock Algorithms</a>
+          <a href="../Memory_management/info.html">MVT/MFT</a>
+          <a href="../File_Organization/index.html">File Organization</a>
+          <a href="../Memory_Allocation/memory_visualizer.html">Memory Allocation</a>
+          <a href="../Page_Replacement/page_replacement.html">Page Replacement</a>
+          <a href="../Disk_Scheduling/intro.html">Disk Scheduling</a>
+          <a href="../File_Allocation/file_allocation.html">File Allocation</a>
+          <a href="../Security_Algorithms/security_theory.html">Security Algorithms</a>
+          <a href="../Paging/Paging_theory.html">Paging Technique</a>
+          <a href="../Inter_Process_Communication/index.html">Inter-Process Communication and Shared Memory</a>
+        </div>
+      </div>
+      <a href="../index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+      <a href="../help.html" class="nav-item"><i class="fas fa-question-circle"></i> Help</a>
+      <a href="#page-top" class="nav-item"><i class="fas fa-info-circle"></i> About Us</a>
+    </div>
+  </nav>
+  
+  <hr class="navbar-divider">
+
+  <div class="explanation-container">
+    <h1>Banker's Algorithm: Deadlock Avoidance</h1>
+    
+    <div class="explanation-section">
+      <h2>What is the Banker's Algorithm?</h2>
+      <p>The Banker's Algorithm is a deadlock avoidance algorithm developed by Edsger Dijkstra that tests for safety by simulating the allocation of predetermined maximum possible amounts of all resources, and then checks if requests can be satisfied safely.</p>
+      
+      <p>The algorithm maintains three important matrices:</p>
+      <ul>
+        <li><span class="heading-accent">Available:</span> The number of available resources of each type</li>
+        <li><span class="heading-accent">Max:</span> The maximum demand of each process</li>
+        <li><span class="heading-accent">Allocation:</span> The resources currently allocated to each process</li>
+        <li><span class="heading-accent">Need:</span> The remaining resources needed by each process (Max - Allocation)</li>
+      </ul>
+      
+      <h2>How Does It Work?</h2>
+      <p>The Banker's Algorithm works in two main components:</p>
+      
+      <ol>
+        <li><strong>Safety Algorithm:</strong> Determines if the system is in a safe state</li>
+        <li><strong>Resource-Request Algorithm:</strong> Determines if requests can be safely granted</li>
+      </ol>
+      
+      <div class="code-block">
+        <p># Safety Algorithm Pseudocode</p>
+        <p>1. Let Work = Available</p>
+        <p>2. Let Finish[i] = false for all i</p>
+        <p>3. Find an i such that:</p>
+        <p>   a. Finish[i] = false</p>
+        <p>   b. Need[i] ≤ Work</p>
+        <p>   c. If no such i exists, go to step 5</p>
+        <p>4. Work = Work + Allocation[i]</p>
+        <p>   Finish[i] = true</p>
+        <p>   Go to step 3</p>
+        <p>5. If Finish[i] = true for all i, system is in safe state</p>
+      </div>
+      
+      <div class="pros-cons">
+        <div class="pros">
+          <h3>Advantages</h3>
+          <ul>
+            <li>Prevents deadlocks by actively avoiding unsafe states</li>
+            <li>Makes efficient use of resources by not requiring them to be held until completion</li>
+            <li>Processes can still request resources dynamically</li>
+            <li>Doesn't require process termination (unlike deadlock recovery)</li>
+          </ul>
+        </div>
+        
+        <div class="cons">
+          <h3>Disadvantages</h3>
+          <ul>
+            <li>Requires knowledge of future resource needs in advance</li>
+            <li>Processes must wait longer for resources (decreased utilization)</li>
+            <li>Maximum number of resources must be stated in advance</li>
+            <li>Computationally expensive for large systems</li>
+            <li>Conservative algorithm that can deny safe allocations</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="example">
+        <h3>Example Scenario</h3>
+        <p>Consider a system with 3 processes (P0, P1, P2) and 3 resource types (A, B, C):</p>
+        <p>Available resources: [3, 3, 2]</p>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+          <div>
+            <p><strong>Max Matrix:</strong></p>
+            <table style="width: auto;">
+              <tr><td>P0</td><td>7</td><td>5</td><td>3</td></tr>
+              <tr><td>P1</td><td>3</td><td>2</td><td>2</td></tr>
+              <tr><td>P2</td><td>9</td><td>0</td><td>2</td></tr>
+            </table>
+          </div>
+          
+          <div>
+            <p><strong>Allocation Matrix:</strong></p>
+            <table style="width: auto;">
+              <tr><td>P0</td><td>0</td><td>1</td><td>0</td></tr>
+              <tr><td>P1</td><td>2</td><td>0</td><td>0</td></tr>
+              <tr><td>P2</td><td>3</td><td>0</td><td>2</td></tr>
+            </table>
+          </div>
+          
+          <div>
+            <p><strong>Need Matrix:</strong></p>
+            <table style="width: auto;">
+              <tr><td>P0</td><td>7</td><td>4</td><td>3</td></tr>
+              <tr><td>P1</td><td>1</td><td>2</td><td>2</td></tr>
+              <tr><td>P2</td><td>6</td><td>0</td><td>0</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <p>In this example, checking the safety algorithm produces the safe sequence: P1 → P0 → P2</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="container">
+    <h1>Bankers Algorithm</h1>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('banker')">Safety Algorithm</button>
+      <button class="tab" onclick="switchTab('request')">Resource Request</button>
+    </div>
+
+    <div id="banker" class="tab-content active">
+      <div class="section">
+        <label>Number of processes:</label>
+        <input type="number" id="numProcesses" min="1" max="10" />
+        <label>Number of resources:</label>
+        <input type="number" id="numResources" min="1" max="10" />
+      </div>
+      <div class="next">
+        <button onclick="generateInputs()">Next</button>
+      </div>
+
+      <div class="block hidden" id="matrixSection">
+        <div class="matrix-wrapper">
+          <h3>Available Resources</h3>
+          <div id="availableInputs"></div>
+        </div>
+
+        <div class="matrix-wrapper">
+          <h3 id="processTitle">Process P0</h3>
+          <div><strong>Allocation:</strong> <div id="allocationInputs"></div></div>
+          <div><strong>Maximum:</strong> <div id="maximumInputs"></div></div>
+          <button id="continueBtn" onclick="saveProcess()">Continue</button>
+        </div>
+
+        <div class="matrix-wrapper hidden" id="summarySection">
+          <h3>All Process Data</h3>
+          <div id="summaryTable"></div>
+          <div class="button-group">
+            <button onclick="runBankers()">Run Algorithm</button>
+            <button class="reset-btn" onclick="resetAlgorithm()">Reset</button>
+          </div>
+        </div>
+      </div>
+      <div class="output" id="outputArea"></div>
+    </div>
+    
+
+    <div id="request" class="tab-content">
+      <h2>Resource Request Algorithm</h2>
+      
+      <div class="section">
+        <div class="resource-request">
+          <h3>Submit a Resource Request</h3>
+          <div id="requestInputsSection" class="hidden">
+            <div class="section">
+              <label>Process ID:</label>
+              <select id="requestProcessId"></select>
+            </div>
+            <div class="section">
+              <label>Resource Request:</label>
+              <div id="resourceRequestInputs"></div>
+            </div>
+            <div class="next">
+              <button onclick="checkResourceRequest()">Check Request Safety</button>
+            </div>
+          </div>
+          <div id="noStateWarning">
+            <p>Please run Safety Algorithm first to establish system state.</p>
+            <button onclick="switchTab('banker')">Go to Safety Algorithm</button>
+          </div>
+          <div id="unsafeStateWarning" class="warning-message hidden">
+            <h4>Cannot Access Resource Request</h4>
+            <p>The system is currently in an unsafe state. Resource requests cannot be processed.</p>
+            <p>Please return to the Safety Algorithm tab and create a safe system state.</p>
+            <button onclick="switchTab('banker')">Go to Safety Algorithm</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="output" id="requestOutputArea"></div>
+    </div>
+  </div>
+  
+
+  <script>
+    let numProcesses = 0, numResources = 0, currentProcess = 0;
+    let allocationMatrix = [], maxMatrix = [], needMatrix = [];
+    let availableResources = [];
+    let systemStateInitialized = false;
+    let systemIsSafe = false;
+
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+      
+      // Setup resource request tab if needed
+      if (tabName === 'request') {
+        if (!systemStateInitialized) {
+          document.getElementById('noStateWarning').classList.remove('hidden');
+          document.getElementById('requestInputsSection').classList.add('hidden');
+          document.getElementById('unsafeStateWarning').classList.add('hidden');
+        } else if (!systemIsSafe) {
+          document.getElementById('noStateWarning').classList.add('hidden');
+          document.getElementById('requestInputsSection').classList.add('hidden');
+          document.getElementById('unsafeStateWarning').classList.remove('hidden');
+        } else {
+          document.getElementById('noStateWarning').classList.add('hidden');
+          document.getElementById('unsafeStateWarning').classList.add('hidden');
+          document.getElementById('requestInputsSection').classList.remove('hidden');
+          setupResourceRequestTab();
+        }
+      }
+    }
+
+    function resetAlgorithm() {
+      // Reset variables
+      numProcesses = 0;
+      numResources = 0;
+      currentProcess = 0;
+      allocationMatrix = [];
+      maxMatrix = [];
+      needMatrix = [];
+      availableResources = [];
+      systemStateInitialized = false;
+      systemIsSafe = false;
+      
+      // Reset UI
+      document.getElementById("numProcesses").value = "";
+      document.getElementById("numResources").value = "";
+      document.getElementById("matrixSection").classList.add("hidden");
+      document.getElementById("outputArea").classList.remove("show");
+      document.getElementById("outputArea").innerHTML = "";
+      document.getElementById("summarySection").classList.add("hidden");
+      
+      // Add fade effect for better UX
+      const container = document.querySelector(".container");
+      container.style.opacity = "0.5";
+      setTimeout(() => {
+        container.style.opacity = "1";
+      }, 300);
+    }
+
+    function setupResourceRequestTab() {
+      // Setup process dropdown
+      const processSelect = document.getElementById('requestProcessId');
+      processSelect.innerHTML = '';
+      for (let i = 0; i < numProcesses; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Process P${i}`;
+        processSelect.appendChild(option);
+      }
+      
+      // Setup resource inputs
+      const resourceInputs = document.getElementById('resourceRequestInputs');
+      resourceInputs.innerHTML = '';
+      for (let i = 0; i < numResources; i++) {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = 0;
+        input.id = `request-${i}`;
+        input.placeholder = `R${i}`;
+        input.classList.add('sequential-fade');
+        input.style.animationDelay = `${i * 0.1}s`;
+        resourceInputs.appendChild(input);
+      }
+    }
+
+    function generateInputs() {
+      numProcesses = parseInt(document.getElementById("numProcesses").value);
+      numResources = parseInt(document.getElementById("numResources").value);
+      if (isNaN(numProcesses) || isNaN(numResources)) return;
+
+      const matrixSection = document.getElementById("matrixSection");
+      matrixSection.classList.remove("hidden");
+      matrixSection.classList.add("fade-in");
+
+      const availableDiv = document.getElementById("availableInputs");
+      availableDiv.innerHTML = "";
+      for (let i = 0; i < numResources; i++) {
+        const input = document.createElement("input");
+        input.type = "number";
+        input.min = 0;
+        input.id = `avail-${i}`;
+        input.placeholder = `R${i}`;
+        input.style.animationDelay = `${i * 0.1}s`;
+        input.classList.add("sequential-fade");
+        setTimeout(() => {
+          availableDiv.appendChild(input);
+        }, i * 100);
+      }
+
+      allocationMatrix = Array(numProcesses).fill().map(() => Array(numResources).fill(0));
+      maxMatrix = Array(numProcesses).fill().map(() => Array(numResources).fill(0));
+      needMatrix = Array(numProcesses).fill().map(() => Array(numResources).fill(0));
+
+      setTimeout(showProcessInputs, 300);
+    }
+
+    function showProcessInputs() {
+      document.getElementById("processTitle").innerText = `Process P${currentProcess}`;
+      document.getElementById("processTitle").classList.add("pulse");
+      setTimeout(() => document.getElementById("processTitle").classList.remove("pulse"), 1000);
+
+      const allocDiv = document.getElementById("allocationInputs");
+      const maxDiv = document.getElementById("maximumInputs");
+
+      allocDiv.innerHTML = "";
+      maxDiv.innerHTML = "";
+
+      for (let j = 0; j < numResources; j++) {
+        const a = document.createElement("input");
+        a.type = "number";
+        a.min = 0;
+        a.id = `alloc-${j}`;
+        a.placeholder = `R${j}`;
+        a.style.animationDelay = `${j * 0.1}s`;
+        a.classList.add("sequential-fade");
+        
+        const m = document.createElement("input");
+        m.type = "number";
+        m.min = 0;
+        m.id = `max-${j}`;
+        m.placeholder = `R${j}`;
+        m.style.animationDelay = `${j * 0.1}s`;
+        m.classList.add("sequential-fade");
+
+        setTimeout(() => {
+          allocDiv.appendChild(a);
+          maxDiv.appendChild(m);
+        }, j * 100);
+      }
+    }
+
+    function saveProcess() {
+      for (let j = 0; j < numResources; j++) {
+        const allocVal = parseInt(document.getElementById(`alloc-${j}`).value);
+        const maxVal = parseInt(document.getElementById(`max-${j}`).value);
+        if (isNaN(allocVal) || isNaN(maxVal)) {
+          alert("Please enter valid numbers for all fields.");
+          return;
+        }
+        allocationMatrix[currentProcess][j] = allocVal;
+        maxMatrix[currentProcess][j] = maxVal;
+        needMatrix[currentProcess][j] = maxVal - allocVal;
+      }
+
+      // Add a subtle flash effect
+      const matrixWrappers = document.querySelectorAll('.matrix-wrapper');
+      matrixWrappers.forEach(wrapper => {
+        wrapper.style.backgroundColor = '#444';
+        setTimeout(() => {
+          wrapper.style.backgroundColor = '#333';
+        }, 300);
+      });
+
+      currentProcess++;
+      if (currentProcess < numProcesses) {
+        showProcessInputs();
+      } else {
+        document.getElementById("continueBtn").classList.add("hidden");
+        displaySummaryTable();
+        const summarySection = document.getElementById("summarySection");
+        summarySection.classList.remove("hidden");
+        summarySection.classList.add("fade-in");
+      }
+    }
+
+    function displaySummaryTable() {
+      let html = '<table><thead><tr><th>Process</th>';
+      for (let i = 0; i < numResources; i++) html += `<th>Max R${i}</th>`;
+      for (let i = 0; i < numResources; i++) html += `<th>Alloc R${i}</th>`;
+      for (let i = 0; i < numResources; i++) html += `<th>Need R${i}</th>`;
+      html += '</tr></thead><tbody>';
+
+      for (let i = 0; i < numProcesses; i++) {
+        html += `<tr data-process="P${i}"><td>P${i}</td>`;
+        for (let j = 0; j < numResources; j++) html += `<td>${maxMatrix[i][j]}</td>`;
+        for (let j = 0; j < numResources; j++) html += `<td>${allocationMatrix[i][j]}</td>`;
+        for (let j = 0; j < numResources; j++) html += `<td>${needMatrix[i][j]}</td>`;
+        html += '</tr>';
+      }
+
+      html += '</tbody></table>';
+      document.getElementById("summaryTable").innerHTML = html;
+    }
+
+    function runBankers() {
+      // Get available resources
+      availableResources = [];
+      for (let i = 0; i < numResources; i++) {
+        availableResources[i] = parseInt(document.getElementById(`avail-${i}`).value);
+        if (isNaN(availableResources[i])) {
+          alert("Please enter valid numbers for available resources.");
+          return;
+        }
+      }
+
+      let finish = Array(numProcesses).fill(false);
+      let safeSeq = [];
+      let work = availableResources.slice();
+      let animationSteps = [];
+
+      // Generate animation steps
+      while (safeSeq.length < numProcesses) {
+        let found = false;
+        for (let i = 0; i < numProcesses; i++) {
+          if (!finish[i]) {
+            let canRun = true;
+            for (let j = 0; j < numResources; j++) {
+              if (needMatrix[i][j] > work[j]) {
+                canRun = false;
+                break;
+              }
+            }
+            if (canRun) {
+              let stepWork = [...work];
+              for (let j = 0; j < numResources; j++) {
+                work[j] += allocationMatrix[i][j];
+              }
+              animationSteps.push({
+                process: i,
+                oldWork: stepWork,
+                newWork: [...work]
+              });
+              safeSeq.push(`P${i}`);
+              finish[i] = true;
+              found = true;
+              break; // Move to next iteration after finding one process
+            }
+          }
+        }
+        if (!found) break;
+      }
+
+      const outputArea = document.getElementById("outputArea");
+      outputArea.innerHTML = "";
+      outputArea.classList.remove("show");
+      
+      setTimeout(() => {
+        // Set system state as initialized
+        systemStateInitialized = true;
+        
+        if (safeSeq.length === numProcesses) {
+          // System is in safe state
+          systemIsSafe = true;
+          
+          // Show animation of safe sequence
+          outputArea.style.background = "rgba(0, 255, 140, 0.1)";
+          outputArea.style.borderLeft = "5px solid #00ff8c";
+                   outputArea.innerHTML = "<h3>Safe Sequence Found!</h3><div id='sequence-container'></div><div id='execution-details'></div>";
+          outputArea.classList.add("show");
+          
+          const sequenceContainer = document.getElementById("sequence-container");
+          const executionDetails = document.getElementById("execution-details");
+          
+          // Animate the sequence
+          animateSequence(safeSeq, animationSteps, sequenceContainer, executionDetails);
+        } else {
+          // System is in unsafe state
+          systemIsSafe = false;
+          
+          outputArea.innerHTML = "<h3>No Safe Sequence found!</h3><p>System is in an unsafe state.</p><p>Resource requests cannot be processed in an unsafe state.</p>";
+          outputArea.style.background = "rgba(255, 100, 100, 0.1)";
+          outputArea.style.borderLeft = "5px solid #ff6464";
+          outputArea.classList.add("show");
+        }
+      }, 300);
+    }
+    
+    function animateSequence(safeSeq, steps, container, detailsContainer) {
+      // Reset container
+      container.innerHTML = "";
+      
+      // Create animation elements
+      safeSeq.forEach((proc, index) => {
+        const procSpan = document.createElement("span");
+        procSpan.textContent = proc;
+        procSpan.className = "safe-path";
+        procSpan.style.animationDelay = `${index * 0.5}s`;
+        procSpan.style.opacity = "0";
+        container.appendChild(procSpan);
+        
+        if (index < safeSeq.length - 1) {
+          const arrow = document.createElement("span");
+          arrow.textContent = " → ";
+          arrow.style.animationDelay = `${index * 0.5 + 0.25}s`;
+          arrow.style.opacity = "0";
+          container.appendChild(arrow);
+        }
+      });
+      
+      // Start animation
+      let delay = 0;
+      let elements = container.querySelectorAll("span");
+      
+      elements.forEach((el, i) => {
+        setTimeout(() => {
+          el.style.opacity = "1";
+          
+          // Highlight the corresponding process row
+          if (el.className === "safe-path") {
+            const processRow = document.querySelector(`tr[data-process="${el.textContent}"]`);
+            if (processRow) {
+              processRow.classList.add("process-highlight");
+              setTimeout(() => {
+                processRow.classList.remove("process-highlight");
+              }, 1000);
+              
+              // Show execution details
+              if (steps[i/2]) {
+                const step = steps[i/2];
+                const detailDiv = document.createElement("div");
+                detailDiv.innerHTML = `
+                  <h4>Step ${i/2 + 1}: Execute ${safeSeq[i/2]}</h4>
+                  <p>Work before: [${step.oldWork.join(', ')}]</p>
+                  <p>Work after: [${step.newWork.join(', ')}]</p>
+                  <hr>
+                `;
+                detailDiv.style.opacity = "0";
+                detailDiv.style.transition = "all 0.5s ease";
+                detailsContainer.appendChild(detailDiv);
+                
+                setTimeout(() => {
+                  detailDiv.style.opacity = "1";
+                }, 200);
+              }
+            }
+          }
+        }, delay);
+        
+        delay += (el.className === "safe-path") ? 1000 : 300;
+      });
+    }
+
+    function checkResourceRequest() {
+      if (!systemStateInitialized) {
+        alert("Please run Banker's Algorithm first to establish system state.");
+        return;
+      }
+      
+      if (!systemIsSafe) {
+        alert("Cannot process resource requests when system is in an unsafe state.");
+        return;
+      }
+      
+      const processId = parseInt(document.getElementById('requestProcessId').value);
+      const request = [];
+      
+      for (let i = 0; i < numResources; i++) {
+        request[i] = parseInt(document.getElementById(`request-${i}`).value);
+        if (isNaN(request[i])) {
+          alert("Please enter valid numbers for resource request.");
+          return;
+        }
+      }
+      
+      const outputArea = document.getElementById("requestOutputArea");
+      outputArea.innerHTML = "";
+      outputArea.classList.remove("show");
+      
+      // Step 1: Check if request <= need
+      let step1Passed = true;
+      for (let i = 0; i < numResources; i++) {
+        if (request[i] > needMatrix[processId][i]) {
+          step1Passed = false;
+          break;
+        }
+      }
+      
+      if (!step1Passed) {
+        outputArea.innerHTML = `
+          <h3>Request Denied</h3>
+          <div class="step-animation">
+            <p><strong>Step 1 Failed:</strong> Request exceeds declared maximum need.</p>
+            <p>Process P${processId} requested more resources than it initially declared.</p>
+          </div>
+        `;
+        outputArea.style.background = "rgba(255, 100, 100, 0.1)";
+        outputArea.style.borderLeft = "5px solid #ff6464";
+        outputArea.classList.add("show");
+        return;
+      }
+      
+      // Step 2: Check if request <= available
+      let step2Passed = true;
+      for (let i = 0; i < numResources; i++) {
+        if (request[i] > availableResources[i]) {
+          step2Passed = false;
+          break;
+        }
+      }
+      
+      if (!step2Passed) {
+        outputArea.innerHTML = `
+          <h3>Request Denied</h3>
+          <div class="step-animation">
+            <p><strong>Step 1 Passed:</strong> Request is within declared maximum need.</p>
+            <p><strong>Step 2 Failed:</strong> Insufficient resources available.</p>
+            <p>Process P${processId} must wait until resources are available.</p>
+          </div>
+        `;
+        outputArea.style.background = "rgba(255, 100, 100, 0.1)";
+        outputArea.style.borderLeft = "5px solid #ff6464";
+        outputArea.classList.add("show");
+        return;
+      }
+      
+      // Step 3: Check if state is safe after pretending to allocate
+      // Make temporary copies of state matrices
+      let tempAvailable = [...availableResources];
+      let tempAllocation = allocationMatrix.map(row => [...row]);
+      let tempNeed = needMatrix.map(row => [...row]);
+      
+      // Pretend to allocate resources
+      for (let i = 0; i < numResources; i++) {
+        tempAvailable[i] -= request[i];
+        tempAllocation[processId][i] += request[i];
+        tempNeed[processId][i] -= request[i];
+      }
+      
+      // Check if resulting state is safe
+      let finish = Array(numProcesses).fill(false);
+      let safeSeq = [];
+      let work = [...tempAvailable];
+      
+      while (safeSeq.length < numProcesses) {
+        let found = false;
+        for (let i = 0; i < numProcesses; i++) {
+          if (!finish[i]) {
+            let canRun = true;
+            for (let j = 0; j < numResources; j++) {
+              if (tempNeed[i][j] > work[j]) {
+                canRun = false;
+                break;
+              }
+            }
+            if (canRun) {
+              for (let j = 0; j < numResources; j++) {
+                work[j] += tempAllocation[i][j];
+              }
+              safeSeq.push(`P${i}`);
+              finish[i] = true;
+              found = true;
+              break;
+            }
+          }
+        }
+        if (!found) break;
+      }
+      
+      if (safeSeq.length === numProcesses) {
+        outputArea.innerHTML = `
+          <h3>Request Granted</h3>
+          <div class="step-animation">
+            <p><strong>Step 1 Passed:</strong> Request is within declared maximum need.</p>
+            <p><strong>Step 2 Passed:</strong> Sufficient resources available.</p>
+            <p><strong>Step 3 Passed:</strong> System would remain in safe state after allocation.</p>
+            <p>Safe sequence with this allocation: ${safeSeq.join(' → ')}</p>
+          </div>
+          <div class="step-animation">
+            <p>Resources would be allocated to Process P${processId}.</p>
+            <p>New available resources: [${tempAvailable.join(', ')}]</p>
+          </div>
+        `;
+        outputArea.style.background = "rgba(0, 255, 140, 0.1)";
+        outputArea.style.borderLeft = "5px solid #00ff8c";
+        outputArea.classList.add("show");
+        
+        // Update the actual system state (if this were a real implementation)
+        // availableResources = tempAvailable;
+        // allocationMatrix = tempAllocation;
+        // needMatrix = tempNeed;
+      } else {
+        outputArea.innerHTML = `
+          <h3>Request Denied</h3>
+          <div class="step-animation">
+            <p><strong>Step 1 Passed:</strong> Request is within declared maximum need.</p>
+            <p><strong>Step 2 Passed:</strong> Sufficient resources available.</p>
+            <p><strong>Step 3 Failed:</strong> System would enter unsafe state after allocation.</p>
+            <p>No safe sequence found with this allocation.</p>
+          </div>
+        `;
+        outputArea.style.background = "rgba(255, 100, 100, 0.1)";
+        outputArea.style.borderLeft = "5px solid #ff6464";
+        outputArea.classList.add("show");
+      }
+    }
+
+
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 10) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>

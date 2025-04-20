@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Multi-level Paging Simulator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <style type="text/css">
+    body {
+      background-image: url('Animated_Shape.svg');
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-top: 60px;
+      border-bottom: none;
+    }
+    
+    .card {
+      box-shadow: 0 4px 8px 0 rgba(246, 242, 242, 0.922);
+      transition: 0.3s;
+      width: 80%;
+      max-width: 800px;
+      text-align: center;
+      margin: 30px auto;
+      background-color: rgba(190, 225, 230, 0.85);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    
+    .card:hover {
+      box-shadow: 0 12px 20px 0 rgba(243, 239, 239, 0.95);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-control {
+      width: 300px;
+      max-width: 90%;
+      margin: 0 auto;
+      border-radius: 5px;
+      height: 40px;
+    }
+    
+    .btn {
+      background-color: #1abc9c;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+    
+    .btn:hover {
+      background-color: #16a085;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(26, 188, 156, 0.4);
+    }
+    
+    .btn:disabled {
+      background-color: #95a5a6;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .result-card {
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      color: #333;
+      display: none;
+    }
+    
+    .result-title {
+      color: #2c3e50;
+      font-weight: bold;
+      font-size: 20px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #1abc9c;
+      padding-bottom: 10px;
+    }
+    
+    .result-item {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    
+    .result-item b {
+      color: #16a085;
+    }
+    
+    .table-container {
+      margin-top: 30px;
+      overflow-x: auto;
+    }
+    
+    .address-table {
+      margin: 0 auto;
+      border-collapse: separate;
+      border-spacing: 2px;
+    }
+    
+    .address-table th, .address-table td {
+      padding: 10px 15px;
+      text-align: center;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(26, 188, 156, 0.3);
+      transition: all 0.3s;
+    }
+    
+    .back-btn:hover {
+      background-color: #16a085;
+      box-shadow: 0 0 15px rgba(26, 188, 156, 0.5);
+    }
+    
+    .reset-btn {
+      background-color: #3498db;
+      margin-left: 10px;
+    }
+    
+    .reset-btn:hover {
+      background-color: #2980b9;
+    }
+    
+    #error-message {
+      color: #e74c3c;
+      font-weight: bold;
+      margin: 10px 0;
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="container">
+  <button onclick="window.location.href='Paging_theory.html';" class="back-btn">Back</button>
+
+  <div class="page-header">
+    <h1>MULTI-LEVEL PAGING</h1>
+  </div>
+  
+  <center>
+    <h2>LOGICAL ADDRESS SPLIT</h2>
+  </center>
+  
+  <div class="card">
+    <form id="paging-form">
+      <div class="form-group">
+        <input type="number" id="virtualaddress" class="form-control" placeholder="Enter the virtual address (bits):" min="8" max="64" required>
+      </div>
+      
+      <div class="form-group">
+        <input type="number" id="page" class="form-control" placeholder="Enter the Page size (must be power of 2):" min="1" required>
+      </div>
+      
+      <div class="form-group">
+        <select id="ps" class="form-control" required>
+          <option value="" disabled selected>Select the unit of Page size</option>
+          <option value="K">KB (Kilobytes)</option>
+          <option value="M">MB (Megabytes)</option>
+          <option value="G">GB (Gigabytes)</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <input type="number" id="pte" class="form-control" placeholder="Enter page table entry size (bytes):" min="1" required>
+      </div>
+      
+      <div class="form-group">
+        <p id="error-message"></p>
+        <button type="button" id="compute-btn" class="btn" onclick="mlp()">Compute</button>
+        <button type="button" id="reset-btn" class="btn reset-btn" onclick="resetForm()">Reset</button>
+      </div>
+    </form>
+    
+    <div id="results" class="result-card">
+      <div class="result-title">Multi-Level Paging Calculation Results</div>
+      <div id="result-content"></div>
+      
+      <div class="table-container">
+        <h4>Virtual Address Bit Distribution</h4>
+        <table id="address-table" class="address-table"></table>
+      </div>
+    </div>
+  </div>
+
+<script>
+function resetForm() {
+  document.getElementById("paging-form").reset();
+  document.getElementById("error-message").style.display = "none";
+  document.getElementById("results").style.display = "none";
+  document.getElementById("result-content").innerHTML = "";
+  document.getElementById("address-table").innerHTML = "";
+  document.getElementById("compute-btn").disabled = false;
+}
+
+function isPowerOfTwo(n) {
+  return n && (n & (n - 1)) === 0;
+}
+
+function addResultItem(text) {
+  var resultDiv = document.getElementById("result-content");
+  var item = document.createElement("div");
+  item.className = "result-item";
+  item.innerHTML = text;
+  resultDiv.appendChild(item);
+}
+
+function formatNumberWithCommas(number) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function mlp() {
+  // Clear previous results
+  document.getElementById("error-message").style.display = "none";
+  document.getElementById("result-content").innerHTML = "";
+  document.getElementById("address-table").innerHTML = "";
+  
+  // Get input values
+  var va = parseInt(document.getElementById("virtualaddress").value);
+  var ps = parseInt(document.getElementById("page").value);
+  var unitSelect = document.getElementById("ps");
+  var txt = unitSelect.value;
+  var pte = parseInt(document.getElementById("pte").value);
+  
+  // Validate inputs
+  if (isNaN(va) || isNaN(ps) || isNaN(pte) || txt === "") {
+    document.getElementById("error-message").innerHTML = "Please fill in all fields with valid numbers.";
+    document.getElementById("error-message").style.display = "block";
+    return;
+  }
+  
+  if (va < 8 || va > 64) {
+    document.getElementById("error-message").innerHTML = "Virtual address bits should be between 8 and 64.";
+    document.getElementById("error-message").style.display = "block";
+    return;
+  }
+  
+  if (!isPowerOfTwo(ps)) {
+    document.getElementById("error-message").innerHTML = "Page size must be a power of 2.";
+    document.getElementById("error-message").style.display = "block";
+    return;
+  }
+  
+  if (pte <= 0) {
+    document.getElementById("error-message").innerHTML = "Page table entry size must be greater than 0.";
+    document.getElementById("error-message").style.display = "block";
+    return;
+  }
+  
+  // Calculate virtual address space
+  var vas = Math.pow(2, va);
+  
+  // Determine page size in bytes
+  var j = 0;
+  if (txt === 'K') 
+    j = 10;
+  else if (txt === 'M')
+    j = 20;
+  else if (txt === 'G')
+    j = 30;
+  
+  // Calculate page size in bytes and bit representation
+  var i = 0;
+  var psCopy = ps;
+  while (psCopy !== 1) {
+    psCopy = psCopy / 2;
+    i++;
+  }
+  
+  var page_size = Math.pow(2, i + j);
+  
+  // Check if page size is greater than virtual address space
+  if (page_size > vas) {
+    document.getElementById("error-message").innerHTML = "Page size cannot be larger than virtual address space.";
+    document.getElementById("error-message").style.display = "block";
+    return;
+  }
+  
+  // Calculate number of pages
+  var no_pages = vas / page_size;
+  
+  // Calculate inner page table size
+  var size = no_pages * pte;
+  
+  // Show results div
+  document.getElementById("results").style.display = "block";
+  
+  // Add result items
+  addResultItem("<b>Virtual Address:</b> " + va + " bits");
+  addResultItem("<b>Virtual Address Space:</b> " + formatNumberWithCommas(vas) + " bytes" + 
+                (vas >= Math.pow(2, 30) ? " (" + (vas / Math.pow(2, 30)).toFixed(2) + " GB)" : 
+                 vas >= Math.pow(2, 20) ? " (" + (vas / Math.pow(2, 20)).toFixed(2) + " MB)" : 
+                 vas >= Math.pow(2, 10) ? " (" + (vas / Math.pow(2, 10)).toFixed(2) + " KB)" : ""));
+  
+  addResultItem("<b>Page Size:</b> " + ps + " " + unitSelect.options[unitSelect.selectedIndex].text);
+  addResultItem("<b>Page Table Entry Size:</b> " + pte + " bytes");
+  addResultItem("<b>Number of Pages in Process:</b> " + formatNumberWithCommas(no_pages));
+  addResultItem("<b>Size of Inner-most Page Table:</b> " + formatNumberWithCommas(size) + " bytes" + 
+                (size >= Math.pow(2, 30) ? " (" + (size / Math.pow(2, 30)).toFixed(2) + " GB)" : 
+                 size >= Math.pow(2, 20) ? " (" + (size / Math.pow(2, 20)).toFixed(2) + " MB)" : 
+                 size >= Math.pow(2, 10) ? " (" + (size / Math.pow(2, 10)).toFixed(2) + " KB)" : ""));
+  
+  // Calculate levels of page tables needed
+  var level = 1;
+  var pageSizes = [size];
+  
+  // Check if more levels are needed
+  var size1 = (size / page_size) * pte;
+  if (size1 >= size) {
+    document.getElementById("error-message").innerHTML = "Invalid inputs: Upper level page table is larger than lower level.";
+    document.getElementById("error-message").style.display = "block";
+    return;
+  }
+  
+  while (size > page_size) {
+    size = (size / page_size) * pte;
+    level++;
+    pageSizes.push(size);
+    
+    addResultItem("<b>Size of Level " + level + " Page Table:</b> " + formatNumberWithCommas(size) + " bytes" + 
+                 (size >= Math.pow(2, 20) ? " (" + (size / Math.pow(2, 20)).toFixed(2) + " MB)" : 
+                  size >= Math.pow(2, 10) ? " (" + (size / Math.pow(2, 10)).toFixed(2) + " KB)" : ""));
+  }
+  
+  // Calculate bit distribution
+  var l = page_size / pte;
+  addResultItem("<b>Entries per Page Table Page:</b> " + formatNumberWithCommas(l));
+  
+  var count1 = 0;
+  var lCopy = l;
+  while (lCopy !== 1) {
+    lCopy = lCopy / 2;
+    count1++;
+  }
+  
+  var k = size / pte;
+  var count = 0;
+  var kCopy = k;
+  while (kCopy !== 1) {
+    kCopy = kCopy / 2;
+    count++;
+  }
+  
+  // Create result array for bit distribution
+  var result = new Array(level + 1);
+  
+  for (var g = 1; g < level; g++) {
+    result[g] = count1;
+  }
+  
+  result[0] = count;
+  result[level] = i + j;
+  
+  // Create address breakdown table with labels
+  var addressTable = document.getElementById("address-table");
+  
+  // Create header row
+  var headerRow = document.createElement("tr");
+  
+  for (var h = 0; h < result.length; h++) {
+    var th = document.createElement("th");
+    if (h === 0) {
+      th.textContent = "Outer PT Index";
+    } else if (h === result.length - 1) {
+      th.textContent = "Page Offset";
+    } else {
+      th.textContent = "Level " + h + " PT Index";
+    }
+    headerRow.appendChild(th);
+  }
+  
+  addressTable.appendChild(headerRow);
+  
+  // Create bit count row
+  var bitRow = document.createElement("tr");
+  
+  // Calculate total bits for verification
+  var totalBits = 0;
+  
+  for (var idx = 0; idx < result.length; idx++) {
+    var td = document.createElement("td");
+    td.textContent = result[idx] + " bits";
+    totalBits += result[idx];
+    
+    // Apply different colors based on level
+    var colors = ["#2ecc71", "#e67e22", "#f1c40f", "#9b59b6", "#3498db", "#e74c3c"];
+    td.style.backgroundColor = colors[idx % colors.length];
+    td.style.color = "#fff";
+    
+    bitRow.appendChild(td);
+  }
+  
+  addressTable.appendChild(bitRow);
+  
+  // Create address bits representation row
+  var addressBitsRow = document.createElement("tr");
+  var startBit = 0;
+  
+  for (var bitIdx = 0; bitIdx < result.length; bitIdx++) {
+    var bitTd = document.createElement("td");
+    var endBit = startBit + result[bitIdx] - 1;
+    bitTd.textContent = "bits " + startBit + " to " + endBit;
+    bitTd.style.backgroundColor = "#ecf0f1";
+    bitTd.style.color = "#2c3e50";
+    addressBitsRow.appendChild(bitTd);
+    startBit = endBit + 1;
+  }
+  
+  addressTable.appendChild(addressBitsRow);
+  
+  // Verify total bits matches VA size
+  if (totalBits !== va) {
+    addResultItem("<b style='color:red'>Warning: Total bits (" + totalBits + ") does not match virtual address size (" + va + ").</b>");
+  }
+}
+</script>
+
+</body>
+</html>

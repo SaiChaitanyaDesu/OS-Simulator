@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OS Simulator - Paging Algorithm</title>
+  <meta name="description" content="Operating System Simulator for Paging Algorithms">
+  <meta name="keywords" content="OS, paging, memory management, simulator">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link href="assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="logo">
+        <a href="../index.html">
+          <span class="logo-text">OS</span>Simulator
+        </a>
+      </div>
+      
+      <div class="nav-toggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+      <ul class="nav-menu">
+        <li><a href="../index.html" class="active">Home</a></li>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#simulator">Simulator</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Paging Algorithm <span>Simulator</span></h1>
+        <p>Understand memory management through interactive visualization</p>
+        <a href="#overview" class="btn btn-primary">Get Started</a>
+      </div>
+      <div class="hero-image">
+        <div class="code-block">
+          <pre><code>
+// Memory Allocation
+function allocatePage(page, frame) {
+  if (frameTable[frame].free) {
+    frameTable[frame] = {
+      pageId: page.id,
+      free: false
+    };
+    return true;
+  }
+  return false;
+}
+          </code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overview Section -->
+  <section id="overview" class="section overview">
+    <div class="container">
+      <div class="section-header">
+        <h2>Overview</h2>
+        <div class="underline"></div>
+      </div>
+      
+      <div class="grid-container">
+        <div class="grid-item">
+          <img src="page_mapping.png" alt="Page mapping diagram">
+          <p class="image-caption">Pages and Frames Mapping</p>
+        </div>
+        
+        <div class="grid-item">
+          <div class="content-box">
+            <h3>Understanding Paging</h3>
+            <p>Paging is a memory management scheme that eliminates the need for contiguous allocation of physical memory. This scheme permits the physical address space of a process to be non-contiguous.</p>
+            <p>The mapping from virtual to physical address is done by the memory management unit (MMU) which is a hardware device and this mapping is known as paging technique.</p>
+            
+            <div class="key-points">
+              <h4>Key Concepts</h4>
+              <ul>
+                <li><i class="fas fa-check-circle"></i> The Physical Address Space is conceptually divided into fixed-size blocks, called frames</li>
+                <li><i class="fas fa-check-circle"></i> The Logical address Space is also split into fixed-size blocks, called pages</li>
+                <li><i class="fas fa-check-circle"></i> Page Size = Frame Size</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="pros-cons">
+        <div class="pros">
+          <h4><i class="fas fa-plus-circle"></i> Advantages</h4>
+          <ul>
+            <li>Reduces external fragmentation</li>
+            <li>Simple to implement</li>
+            <li>Efficient memory management technique</li>
+            <li>Easy swapping due to equal size pages and frames</li>
+          </ul>
+        </div>
+        
+        <div class="cons">
+          <h4><i class="fas fa-minus-circle"></i> Disadvantages</h4>
+          <ul>
+            <li>Still suffers from internal fragmentation</li>
+            <li>Page table requires extra memory space</li>
+            <li>May not be optimal for systems with small RAM</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Simulator Section -->
+  <section id="simulator" class="section simulator">
+    <div class="container">
+      <div class="section-header">
+        <h2>Simulator</h2>
+        <div class="underline"></div>
+      </div>
+      
+      <div class="grid-container">
+        <div class="grid-item">
+          <img src="paging_info.jpeg" alt="Paging mechanism illustration">
+          <p class="image-caption">Paging Mechanism</p>
+        </div>
+        
+        <div class="grid-item">
+          <div class="content-box">
+            <h3>Interactive Paging Simulator</h3>
+            
+            <div class="simulator-info">
+              <div class="info-card">
+                <div class="card-header">
+                  <i class="fas fa-keyboard"></i>
+                  <h4>Inputs</h4>
+                </div>
+                <ul>
+                  <li>Number of Pages and Frames</li>
+                  <li>Size of a Page/Frame</li>
+                  <li>Page Table Contents</li>
+                  <li>Logical Address</li>
+                </ul>
+              </div>
+              
+              <div class="info-card">
+                <div class="card-header">
+                  <i class="fas fa-desktop"></i>
+                  <h4>Output</h4>
+                </div>
+                <p>The output reflects the physical address which contains the instructions you want to access. In computers, MMU (memory management unit) handles converting logical addresses to physical addresses.</p>
+              </div>
+            </div>
+            
+            <div class="simulator-btns">
+              <a href="paging.html" class="btn btn-simulator">Single Page Simulation</a>
+              <a href="mlp.html" class="btn btn-simulator">Multi-level Simulation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="section faq">
+    <div class="container">
+      <div class="section-header">
+        <h2>Frequently Asked Questions</h2>
+        <div class="underline"></div>
+      </div>
+      
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-question-circle"></i>
+            <h3>What is paging and why do we need it?</h3>
+            <i class="fas fa-chevron-down toggle"></i>
+          </div>
+          <div class="faq-answer">
+            <p>Paging is used for faster access to data. When a program needs a page, it is available in the main memory as the OS copies a certain number of pages from your storage device to main memory. Paging allows the physical address space of a process to be noncontiguous.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-question-circle"></i>
+            <h3>How is paging different from segmentation?</h3>
+            <i class="fas fa-chevron-down toggle"></i>
+          </div>
+          <div class="faq-answer">
+            <p>In Paging, a process address space is broken into fixed sized blocks called pages. In Segmentation, a process address space is broken in varying sized blocks called sections.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-question-circle"></i>
+            <h3>What are pages and frames?</h3>
+            <i class="fas fa-chevron-down toggle"></i>
+          </div>
+          <div class="faq-answer">
+            <p>A page (or memory page, or virtual page, or logical page) is a fixed-length contiguous block of virtual memory. A frame (or memory frame, or physical page, or page frame) is a fixed-length block of RAM (i.e., physical memory).</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-question-circle"></i>
+            <h3>What is a paging table?</h3>
+            <i class="fas fa-chevron-down toggle"></i>
+          </div>
+          <div class="faq-answer">
+            <p>A page table is the data structure used by a virtual memory system in a computer operating system to store the mapping between virtual addresses and physical addresses.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+      <div class="copyright">
+        <p>Operating Systems Simulator &copy; 2025</p>
+      </div>
+  </footer>
+
+  <!-- Back to Top Button -->
+  <a href="#" class="back-to-top">
+    <i class="fas fa-arrow-up"></i>
+  </a>
+
+  <!-- JS Files -->
+  <script>
+    // Simple JavaScript for FAQ Toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const faqItems = document.querySelectorAll('.faq-question');
+      faqItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const answer = item.nextElementSibling;
+          const toggle = item.querySelector('.toggle');
+          
+          answer.classList.toggle('active');
+          toggle.classList.toggle('rotate');
+        });
+      });
+      
+      // Mobile Nav Toggle
+      const navToggle = document.querySelector('.nav-toggle');
+      const navMenu = document.querySelector('.nav-menu');
+      
+      navToggle.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+      });
+      
+      // Back to Top Button
+      const backToTop = document.querySelector('.back-to-top');
+      window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+          backToTop.classList.add('show');
+        } else {
+          backToTop.classList.remove('show');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

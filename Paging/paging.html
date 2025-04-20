@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <style>
+/* Main color scheme */
+:root {
+  --primary-color: #6956E5;
+  --secondary-color: #F6F8FF;
+  --text-dark: #2A2C3E;
+  --text-light: #FFFFFF;
+  --card-bg: #FFFFFF;
+  --accent-color: #6956E5;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color:rgb(209, 247, 247);
+  color: var(--text-dark);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* Header styling */
+.part {
+  background-color: var(--primary-color);
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--text-light);
+}
+
+.part h1 {
+  font-size: 2.5rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Card styling */
+.card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  width: 80%;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  text-align: left;
+  background-color: var(--card-bg);
+}
+
+/* Form inputs */
+#inputs {
+  color: var(--text-dark);
+  margin-top: 20px;
+}
+
+input[type="number"],
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.error {
+  color: #d9534f;
+  font-size: 12px;
+  margin-top: 3px;
+  visibility: hidden;
+}
+
+/* Button styling */
+.btn {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin: 10px;
+}
+
+.btn:hover {
+  background-color: #5847c7;
+  transform: translateY(-2px);
+}
+
+/* Table styling */
+.table {
+  width: 80%;
+  max-width: 800px;
+  margin: 2rem auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+#Table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--card-bg);
+  color: var(--text-dark);
+}
+
+#Table th {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  padding: 12px;
+  text-align: center;
+  font-weight: 500;
+}
+
+#Table td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #eee;
+}
+
+/* Navigation */
+nav {
+  background-color: var(--card-bg);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li {
+  margin-left: 2rem;
+}
+
+nav ul li a {
+  color: var(--text-dark);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Back button */
+.back-button {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(105, 86, 229, 0.3);
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  font-weight: 500;
+}
+
+.back-button:hover {
+  background-color: #5847c7;
+}
+
+/* Overview section */
+.overview-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+}
+
+.overview-text {
+  flex: 1;
+  padding-right: 2rem;
+}
+
+.overview-image {
+  flex: 1;
+  text-align: center;
+}
+
+.overview-image img {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card {
+    width: 90%;
+    padding: 1.5rem;
+  }
+  
+  .table {
+    width: 90%;
+  }
+  
+  .overview-section {
+    flex-direction: column;
+  }
+  
+  .overview-text {
+    padding-right: 0;
+    margin-bottom: 2rem;
+  }
+}
+    </style>
+    
+    <title>Paging</title>
+    
+   
+</head>
+<body>
+
+    <div style="
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    ">
+    <button onclick="window.location.href='Paging_theory.html';"
+      style="
+        background-color:rgb(134, 215, 215);
+        color: black;
+        border: none;
+        padding: 10px 20px; 
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0, 255, 153, 0.3);
+      ">
+      Back
+    </button>
+    </div>
+        
+    <div class="part">
+        <h1><center  class="colors"> Paging</center></h1>
+    </div>
+    
+
+    <div class="card" >
+
+    <form action="#">
+    <div id="inputs"  class="colors">
+        
+        Enter the number of pages: <br>
+        <div>
+            <input type="number" id="no_of_pages">
+        </div>
+        <div class="error" id="error1">
+            *Required
+        </div>
+        <br>
+        
+        Enter the number of frames: <br>
+        <div>
+            <input type="number" id="no_of_frames">
+        </div>
+        <div class="error" id="error3">
+            *Required
+        </div>
+        <br>
+       
+        Enter the size of a page/frame: <br>
+        <div>
+            <input type="number" id="size_of_page">
+        </div>
+        <div class="error" id="error2">
+            *Required
+        </div>
+        <br>
+
+        
+
+        Enter the frame number allotted for each page:
+        <div>
+            <input type="text" id="frame_string">
+        </div>
+        <div class="error" id="error4">
+            *Required
+        </div>
+        <br>
+        Enter the logical address:
+        <div>
+            <input type="number" id="logical_address">
+        </div>
+        <div class="error" id="error5">
+            *Required
+        </div>
+
+        </div>
+        <br>
+        </div>
+        
+        <center style="display: flex; justify-content: center">
+        
+        <input class="btn" type="button" onclick="solve()" id="run" value="Process">
+
+        <input class="btn" type="button" value="Delete A Row" onclick="document.getElementById('Table').deleteRow(1);">
+
+        <input class="btn" type="button" value="Reset" onclick="reset()">
+        </center>
+<br>
+
+</form>
+        <div class="table" style="width: 60%; max-height: 15em; overflow-y: auto; margin: auto">            
+                <table id="Table" class="colors" border="2" style="text-align: center; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>No. of pages </th>
+                            <th>Size of a page/frame</th>
+                            <th>Number of frames</th>
+                            <th>Frame numbers allotted</th>
+                            <th>Logical address</th>
+                            <th>&nbsp; &nbsp; <u> Physical Address </u>&nbsp; &nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       
+                    </tbody>
+                </table>
+        </div>
+    
+    <script defer>
+    var solve = function () {
+        console.log("here");
+        var no_pages = parseInt(document.getElementById("no_of_pages").value);
+        var size = parseInt(document.getElementById("size_of_page").value);
+        var no_frames = parseInt(document.getElementById("no_of_frames").value);
+        var frame_string = document.getElementById("frame_string").value;
+        var log_add = parseInt(document.getElementById("logical_address").value);
+        var arr = new Array();
+        arr = frame_string.split(' ').map(Number);
+        for (i = 1; i <= 5; i++)
+            document.getElementById("error" + i).style.visibility = "hidden";
+        var err = "";
+        if (isNaN(no_pages)) err += 1;
+        if (isNaN(size)) err += 2;
+        if (isNaN(no_frames)) err += 3;
+        if (frame_string === "") err += 4;
+        if (isNaN(log_add)) err += 5;
+
+        if (err != "") {
+            for (i = 0; i < err.length; i++)
+                document.getElementById("error" + err[i]).style.visibility = "visible";
+            return;
+        }
+        if (arr.length != no_pages) {
+            alert("number of pages and page table rows does not match!!!");
+            return;
+        }
+        if (no_pages > no_frames) {
+            alert("no. of pages are greater than the no. of frames!!!");
+            return;
+        }
+        var page = Math.floor(log_add / size);
+        var offset = log_add % size;
+        var table = document.getElementById("Table");
+        var row = table.insertRow(1);
+        var cell0 = row.insertCell(0);
+        cell0.innerHTML = no_pages;
+        var cell1 = row.insertCell(1);
+        cell1.innerHTML = size;
+        var cell2 = row.insertCell(2);
+        cell2.innerHTML = no_frames;
+        var cell3 = row.insertCell(3);
+        cell3.innerHTML = frame_string;
+        var cell4 = row.insertCell(4);
+        cell4.innerHTML = log_add;
+        var cell5 = row.insertCell(5);
+
+        if (page >= no_pages || arr[page] == -1) {
+            cell5.innerHTML = "<strong>Address Not Found!!!</strong>";
+            cell5.bgColor="red";
+        }
+        else{ cell5.innerHTML = ((arr[page] * size) + offset);
+        cell5.bgColor="green";}
+    }
+    </script>
+
+</body>
+
+</html>
+
+
+

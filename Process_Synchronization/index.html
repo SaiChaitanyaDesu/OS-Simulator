@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Process Synchronization Simulations</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #1f1f1f;
+    color: white;
+    line-height: 1.6;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+    overflow-x: hidden;
+}
+
+h1 {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 28px;
+    font-weight: normal;
+}
+
+header p {
+    text-align: center;
+    width: 80%;
+    margin: 0 auto 30px;
+    color: #cccccc;
+}
+
+.navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1f1f1f;
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: box-shadow 0.3s ease, border-bottom 0.3s ease;
+}
+
+.navbar.scrolled {
+    box-shadow: 0 2px 10px rgba(0, 188, 212, 0.3);
+    border-bottom: 2px solid #00bcd4;
+}
+
+.nav-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00bcd4;
+    cursor: pointer;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding-right: 45px;
+}
+
+.nav-item {
+    color: #f1f1f1;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+    margin-right: 5px;
+    white-space: nowrap;
+}
+
+.nav-item:hover {
+    color: #00bcd4;
+}
+
+.dropdown {
+    position: sticky;
+    display: inline-block;
+}
+
+.dropbtn {
+    background-color: #1f1f1f;
+    color: #f1f1f1;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dropbtn:hover {
+    color: #00bcd4;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #2a2a2a;
+    min-width: 250px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 6px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.dropdown-content a {
+    color: #f1f1f1;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #00bcd4;
+    color: #000;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.navbar-divider {
+    border: none;
+    height: 2px;
+    width: 90%;
+    margin: 0 auto;
+    background: linear-gradient(to right, #00bcd4, #006064);
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+/* Simulation links/buttons */
+.simulation-links {
+    display: flex;
+    flex-direction: column;
+    max-width: 600px;
+    margin: 30px auto;
+    gap: 15px;
+}
+
+.simulation-links button {
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #2d335b;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+    text-align: left;
+}
+
+.simulation-links button:hover {
+    background-color: #3d4473;
+}
+
+/* Different colors for the buttons */
+.reader-writer {
+    border-left: 5px solid #4c7cff;
+}
+
+.producer-consumer {
+    border-left: 5px solid #ff6347;
+}
+
+.dining-philosophers {
+    border-left: 5px solid #28a745;
+}
+
+.smoking-problem {
+    border-left: 5px solid #ffc107;
+}
+
+.barber-problem {
+    border-left: 5px solid #9c27b0;
+}
+  </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand" onclick="window.location.href='../index.html'">OSSim</div>
+        <div class="nav-links">
+          <div class="dropdown">
+            <button class="dropbtn">
+              <i class="fas fa-bars"></i> Topics
+            </button>
+            <div class="dropdown-content">
+              <a href="../Scheduling_Algorithms/index.html">Scheduling Algorithms</a>
+              <a href="../Process_Synchronization/index.html">Process Synchronization</a>
+              <a href="../Thread_Synchronization/threadindex.html">Threading and Synchronization</a>
+              <a href="../Deadlock/da.html">Banker's Algorithm</a>
+              <a href="../Second_Chance Algo/extra_page_replacement.html">Clock Algorithms</a>
+              <a href="../Memory_management/info.html">MVT/MFT</a>
+              <a href="../File_Organization/index.html">File Organization</a>
+              <a href="../Memory_Allocation/memory_visualizer.html">Memory Allocation</a>
+              <a href="../Page_Replacement/page_replacement.html">Page Replacement</a>
+              <a href="../Disk_Scheduling/intro.html">Disk Scheduling</a>
+              <a href="../File_Allocation/file_allocation.html">File Allocation</a>
+              <a href="../Security_Algorithms/security_theory.html">Security Algorithms</a>
+              <a href="../Paging/Paging_theory.html">Paging Technique</a>
+              <a href="../Inter_Process_Communication/index.html">Inter-Process Communication and Shared Memory</a>
+            </div>
+          </div>
+          <a href="../index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+          <a href="../help.html" class="nav-item"><i class="fas fa-question-circle"></i> Help</a>
+          <a href="#page-top" class="nav-item"><i class="fas fa-info-circle"></i> About Us</a>
+        </div>
+      </nav>
+      
+      <hr class="navbar-divider">
+    <header>
+        <h1>Process Synchronization Simulations</h1>
+        <p>The problem of Synchronization is a major task handled by the OS. Each problem below demonstrates unique challenges in managing access to shared resources in concurrent programming environments. Click on any of the problems below to learn more!</p>
+    </header>
+    <section class="simulation-links">
+        <button class="reader-writer" onclick="window.location.href='reader_writer.html';">Reader-Writer Problem</button>
+        <button class="producer-consumer" onclick="window.location.href='producer_consumer.html';">Producer-Consumer Problem</button>
+        <button class="dining-philosophers" onclick="window.location.href='readme_din.html';">Dining Philosophers Problem</button>
+        <button class="smoking-problem" onclick="window.location.href='smoking.html';">Smoking Problem</button>
+        <button class="barber-problem" onclick="window.location.href='barber.html';">Barber Problem</button>
+    </section>
+</body>
+</html>

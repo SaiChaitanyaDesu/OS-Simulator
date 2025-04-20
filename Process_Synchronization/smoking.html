@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smokers Synchronization Problem</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #1f1f1f;
+      color: white;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      overflow-x: hidden;
+    }
+    h1, h2 {
+      color: #9370db;
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .home-button-container {
+      display: flex;
+      justify-content: flex-start;
+      padding: 10px 20px;
+      background-color: transparent
+    }
+    .home-button {
+      background-color: #2d3253;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 255, 153, 0.3);
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    #start-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    #pause-btn {
+      background-color: #ff5c5c;
+      color: white;
+    }
+    #reset-btn {
+      background-color: #2d3253;
+      color: white;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    button:disabled {
+      background-color: #3d4266;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    #speed-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: white;
+    }
+    .simulation {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .table {
+      width: 40%;
+      background-color: #2d3356;
+      border-radius: 50%;
+      height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+    .ingredients {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    .ingredient {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .tobacco {
+      background-color: #8B4513;
+    }
+    .paper {
+      background-color: #f5f5dc;
+      color: #333;
+    }
+    .matches {
+      background-color: #FF4500;
+    }
+    .smokers {
+      width: 60%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .smoker {
+      display: flex;
+      align-items: center;
+      background-color: #2d3356;
+      padding: 15px;
+      border-radius: 8px;
+      gap: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .smoker-img {
+      width: 50px;
+      height: 50px;
+      background-color: #3f4575;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+    }
+    .smoker-info {
+      flex-grow: 1;
+    }
+    .smoker-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .status-indicator {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+    }
+    .idle {
+      background-color: gray;
+    }
+    .smoking {
+      background-color: #FF4500;
+      animation: pulse 1s infinite;
+    }
+    .waiting {
+      background-color: #FFA500;
+    }
+    .blocked {
+      background-color: #FF0000;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    .smoke {
+      position: absolute;
+      width: 30px;
+      height: 10px;
+      background-color: rgba(200, 200, 200, 0.7);
+      border-radius: 10px;
+      animation: float 2s infinite ease-in;
+    }
+    @keyframes float {
+      0% { transform: translateY(0) scale(1); opacity: 0.7; }
+      100% { transform: translateY(-50px) scale(2); opacity: 0; }
+    }
+    .log-container {
+      height: 200px;
+      overflow-y: auto;
+      background-color: #1e2340;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      border-bottom: 1px solid #2d3356;
+      color: #d4d4f1;
+    }
+    .log-error {
+      color: #ff6b6b;
+      font-weight: bold;
+    }
+    .explanation {
+      background-color: #1e2340;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    /* Additional styles to match the reader-writer visualization */
+    input[type="range"] {
+      accent-color: #4a8cff;
+      background: #2d3356;
+    }
+    
+    .active-counts {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .active-readers, .active-writers {
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      width: 150px;
+    }
+    
+    .active-readers {
+      background-color: #1e3b2f;
+      color: #4CAF50;
+    }
+    
+    .active-writers {
+      background-color: #3b1e1e;
+      color: #ff5c5c;
+    }
+    
+    .process-queue {
+      background-color: #1e2340;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      min-height: 100px;
+    }
+    
+    .queue-title {
+      color: #9370db;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    /* Style the add buttons to match the image */
+    #start-btn {
+      background-color: #2ecc71;
+    }
+    
+    #pause-btn {
+      background-color: #e74c3c;
+    }
+    
+    #reset-btn {
+      background-color: #9d4edd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="home-button-container">
+    <button onclick="window.location.href='index.html';" class="home-button">
+      Home
+    </button>
+</div>
+
+  <h1>The Smokers Synchronization Problem</h1>
+  
+  <div class="container">
+    <div class="controls">
+      <button id="start-btn">Start Simulation</button>
+      <button id="pause-btn" disabled>Pause</button>
+      <button id="reset-btn">Reset</button>
+      <div id="speed-control">
+        <label for="speed">Speed:</label>
+        <input type="range" id="speed" min="1" max="10" value="5">
+      </div>
+    </div>
+    
+    <div class="simulation">
+      <div class="table">
+        <div class="ingredients" id="table-ingredients">
+          <!-- Ingredients will be added here by JS -->
+        </div>
+      </div>
+      
+      <div class="smokers">
+        <div class="smoker" id="smoker1">
+          <div class="smoker-img">S1</div>
+          <div class="smoker-info">
+            <h3>Smoker 1 (has tobacco)</h3>
+            <div class="smoker-status">
+              <div class="status-indicator idle" id="status1"></div>
+              <span id="status-text1">Idle</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="smoker" id="smoker2">
+          <div class="smoker-img">S2</div>
+          <div class="smoker-info">
+            <h3>Smoker 2 (has paper)</h3>
+            <div class="smoker-status">
+              <div class="status-indicator idle" id="status2"></div>
+              <span id="status-text2">Idle</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="smoker" id="smoker3">
+          <div class="smoker-img">S3</div>
+          <div class="smoker-info">
+            <h3>Smoker 3 (has matches)</h3>
+            <div class="smoker-status">
+              <div class="status-indicator idle" id="status3"></div>
+              <span id="status-text3">Idle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="log-container" id="log">
+      <h2>Simulation Log</h2>
+      <div id="log-entries"></div>
+    </div>
+    
+    <div class="explanation">
+      <h2>The Cigarette Smokers Problem</h2>
+      <p>This is a classic synchronization problem introduced by Suhas Patil in 1971. Here's how it works:</p>
+      <ul>
+        <li>Three smokers are sitting around a table.</li>
+        <li>Each smoker has an infinite supply of one smoking ingredient:
+          <ul>
+            <li>Smoker 1 has tobacco</li>
+            <li>Smoker 2 has cigarette papers</li>
+            <li>Smoker 3 has matches</li>
+          </ul>
+        </li>
+        <li>To smoke a cigarette, a smoker needs all three ingredients.</li>
+        <li>An agent (arbitrator) randomly selects two ingredients and places them on the table.</li>
+        <li>The smoker who has the third ingredient can then pick up the two ingredients from the table, make a cigarette, and smoke it.</li>
+        <li>After the smoker is done smoking, the agent puts two new random ingredients on the table.</li>
+        <li><strong>Synchronization Challenge:</strong> Without proper synchronization, multiple smokers might try to access ingredients simultaneously, leading to conflicts.</li>
+      </ul>
+      <p>This problem demonstrates resource allocation and synchronization challenges in concurrent programming, particularly the coordination of multiple processes that need exclusive access to shared resources.</p>
+    </div>
+  </div>
+  
+  <script>
+    // Global state
+        const state = {
+    isRunning: false,
+    speed: 5,
+    tableIngredients: [],
+    smokerStatuses: ['idle', 'idle', 'idle'],
+    smokingTimeoutId: null,
+    currentlySmoking: null,
+    conflictTimer: null,
+    conflictCount: 0,
+    lastSmokerIndex: -1
+    };
+
+    // DOM Elements
+    const startBtn = document.getElementById('start-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const speedControl = document.getElementById('speed');
+    const tableIngredientsEl = document.getElementById('table-ingredients');
+    const statusIndicators = [
+    document.getElementById('status1'),
+    document.getElementById('status2'),
+    document.getElementById('status3')
+    ];
+    const statusTexts = [
+    document.getElementById('status-text1'),
+    document.getElementById('status-text2'),
+    document.getElementById('status-text3')
+    ];
+    const logEntries = document.getElementById('log-entries');
+
+    // Ingredients data
+    const ingredients = [
+    { name: 'tobacco', class: 'tobacco' },
+    { name: 'paper', class: 'paper' },
+    { name: 'matches', class: 'matches' }
+    ];
+
+    // Event Listeners
+    startBtn.addEventListener('click', startSimulation);
+    pauseBtn.addEventListener('click', pauseSimulation);
+    resetBtn.addEventListener('click', resetSimulation);
+    speedControl.addEventListener('input', updateSpeed);
+
+    // Initialize the simulation
+    function initSimulation() {
+    clearTable();
+    updateSmokerStatuses();
+    addLogEntry('Simulation initialized. Click "Start Simulation" to begin.');
+    }
+
+    // Start the simulation
+    function startSimulation() {
+    if (!state.isRunning) {
+        state.isRunning = true;
+        startBtn.disabled = true;
+        pauseBtn.disabled = false;
+        addLogEntry('Simulation started.');
+        runSimulationStep();
+        setupConflictGenerator();
+    }
+    }
+
+    // Pause the simulation
+    function pauseSimulation() {
+    state.isRunning = false;
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+
+    if (state.smokingTimeoutId) {
+        clearTimeout(state.smokingTimeoutId);
+        state.smokingTimeoutId = null;
+    }
+
+    if (state.conflictTimer) {
+        clearInterval(state.conflictTimer);
+        state.conflictTimer = null;
+    }
+
+    addLogEntry('Simulation paused.');
+    }
+
+    // Reset the simulation
+    function resetSimulation() {
+    pauseSimulation();
+    clearTable();
+    state.smokerStatuses = ['idle', 'idle', 'idle'];
+    state.currentlySmoking = null;
+    state.conflictCount = 0;
+    state.lastSmokerIndex = -1;
+    updateSmokerStatuses();
+
+    logEntries.innerHTML = '';
+    addLogEntry('Simulation reset.');
+    }
+
+    // Update simulation speed
+    function updateSpeed() {
+    state.speed = parseInt(speedControl.value);
+    addLogEntry(`Simulation speed set to ${state.speed}.`);
+
+    if (state.isRunning) {
+        if (state.conflictTimer) {
+        clearInterval(state.conflictTimer);
+        }
+        setupConflictGenerator();
+    }
+    }
+
+    // Setup periodic conflict generator
+    function setupConflictGenerator() {
+    if (state.conflictTimer) {
+        clearInterval(state.conflictTimer);
+    }
+
+    const conflictInterval = 6000 / state.speed;
+    state.conflictTimer = setInterval(() => {
+        if (state.isRunning && state.currentlySmoking !== null) {
+        generateSynchronizationConflict();
+        }
+    }, conflictInterval);
+    }
+
+    // Generate a synchronization conflict
+    function generateSynchronizationConflict() {
+    if (state.currentlySmoking === null) return;
+    if (Math.random() > 0.3) return; // 30% chance to trigger conflict
+
+    const currentSmoker = state.currentlySmoking;
+
+    let conflictingSmokers = [];
+    for (let i = 0; i < 3; i++) {
+        if (i !== currentSmoker && state.smokerStatuses[i] === 'idle') {
+        conflictingSmokers.push(i);
+        }
+    }
+
+    if (conflictingSmokers.length === 0) return;
+
+    const conflictCount = Math.random() < 0.5 ? 1 : Math.min(2, conflictingSmokers.length);
+    for (let i = 0; i < conflictCount; i++) {
+        const randomIndex = Math.floor(Math.random() * conflictingSmokers.length);
+        const conflictingSmoker = conflictingSmokers[randomIndex];
+        conflictingSmokers.splice(randomIndex, 1);
+
+        state.smokerStatuses[conflictingSmoker] = 'blocked';
+        updateSmokerStatuses();
+
+        state.conflictCount++;
+
+        addLogEntry(`Smoker ${conflictingSmoker + 1} is attempting to grab ingredients from the table...`, true);
+        addLogEntry(`SYNCHRONIZATION ERROR #${state.conflictCount}: Smoker ${conflictingSmoker + 1} cannot smoke while Smoker ${currentSmoker + 1} is already smoking!`, true);
+
+        const errorMessages = [
+        `Resource conflict: Table is locked by Smoker ${currentSmoker + 1}`,
+        `Access denied: Smoker ${currentSmoker + 1} is holding the critical section`,
+        `Deadlock risk: Smoker ${conflictingSmoker + 1} is blocked waiting for resources`,
+        `Mutual exclusion violation detected`,
+        `Semaphore would block here - missing proper synchronization!`
+        ];
+
+        addLogEntry(errorMessages[Math.floor(Math.random() * errorMessages.length)], true);
+
+        setTimeout(() => {
+        if (!state.isRunning) return;
+
+        state.smokerStatuses[conflictingSmoker] = 'idle';
+        updateSmokerStatuses();
+        addLogEntry(`Smoker ${conflictingSmoker + 1} returns to idle state.`);
+        }, 1500 / state.speed);
+    }
+    }
+
+    // Run a step of the simulation
+    function runSimulationStep() {
+    if (!state.isRunning) return;
+
+    if (state.currentlySmoking === null) {
+        placeRandomIngredientsOnTable();
+
+        const availableIngredients = state.tableIngredients.map(ing => ing.name);
+        const missingIngredient = ingredients.find(ing => 
+        !availableIngredients.includes(ing.name)
+        ).name;
+
+        let potentialSmokers = [];
+        if (missingIngredient === 'tobacco') potentialSmokers.push(0);
+        else if (missingIngredient === 'paper') potentialSmokers.push(1);
+        else potentialSmokers.push(2);
+
+        if (potentialSmokers[0] === state.lastSmokerIndex) {
+        potentialSmokers = [0, 1, 2].filter(i => i !== state.lastSmokerIndex);
+        }
+
+        const smokerIndex = potentialSmokers[Math.floor(Math.random() * potentialSmokers.length)];
+        state.lastSmokerIndex = smokerIndex;
+
+        state.smokerStatuses[smokerIndex] = 'waiting';
+        updateSmokerStatuses();
+
+        addLogEntry(`Agent placed ${availableIngredients[0]} and ${availableIngredients[1]} on the table.`);
+        addLogEntry(`Smoker ${smokerIndex + 1} (has ${missingIngredient}) is waiting to smoke.`);
+
+        setTimeout(() => {
+        if (!state.isRunning) return;
+
+        clearTable();
+        state.smokerStatuses[smokerIndex] = 'smoking';
+        state.currentlySmoking = smokerIndex;
+        updateSmokerStatuses();
+        addLogEntry(`Smoker ${smokerIndex + 1} picked up ingredients and is now smoking.`);
+
+        addSmokeEffect(smokerIndex);
+
+        const smokingDuration = 6000 / state.speed;
+        state.smokingTimeoutId = setTimeout(() => {
+            if (!state.isRunning) return;
+
+            state.smokerStatuses[smokerIndex] = 'idle';
+            state.currentlySmoking = null;
+            updateSmokerStatuses();
+            addLogEntry(`Smoker ${smokerIndex + 1} finished smoking.`);
+
+            runNextStep();
+        }, smokingDuration);
+        }, 2000 / state.speed);
+    } else {
+        setTimeout(() => {
+        if (state.isRunning) {
+            runNextStep();
+        }
+        }, 1000 / state.speed);
+    }
+    }
+
+    // Helper function to run next step with a slight delay
+    function runNextStep() {
+    setTimeout(() => {
+        if (state.isRunning) {
+        runSimulationStep();
+        }
+    }, 500 / state.speed);
+    }
+
+    // Place two random ingredients on the table
+    function placeRandomIngredientsOnTable() {
+    clearTable();
+    const shuffledIngredients = [...ingredients];
+    for (let i = shuffledIngredients.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledIngredients[i], shuffledIngredients[j]] = [shuffledIngredients[j], shuffledIngredients[i]];
+    }
+
+    state.tableIngredients = [shuffledIngredients[0], shuffledIngredients[1]];
+
+    state.tableIngredients.forEach(ingredient => {
+        const el = document.createElement('div');
+        el.className = `ingredient ${ingredient.class}`;
+        el.textContent = ingredient.name;
+        tableIngredientsEl.appendChild(el);
+    });
+    }
+
+    // Clear ingredients from the table
+    function clearTable() {
+    state.tableIngredients = [];
+    tableIngredientsEl.innerHTML = '';
+    }
+
+    // Update the visual status of smokers
+    function updateSmokerStatuses() {
+    state.smokerStatuses.forEach((status, index) => {
+        statusIndicators[index].className = `status-indicator ${status}`;
+        statusTexts[index].textContent = status.charAt(0).toUpperCase() + status.slice(1);
+    });
+    }
+
+    // Add smoke effect when a smoker is smoking
+    function addSmokeEffect(smokerIndex) {
+    const smoker = document.getElementById(`smoker${smokerIndex + 1}`);
+
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+        if (!state.isRunning) return;
+
+        const smoke = document.createElement('div');
+        smoke.className = 'smoke';
+        smoke.style.left = `${Math.random() * 30 + 10}px`;
+        smoke.style.top = `${Math.random() * 20 + 10}px`;
+        smoker.appendChild(smoke);
+
+        setTimeout(() => {
+            if (smoker.contains(smoke)) {
+            smoker.removeChild(smoke);
+            }
+        }, 2000);
+        }, i * 400);
+    }
+    }
+
+    // Add entry to the log
+    function addLogEntry(text, isError = false) {
+    const entry = document.createElement('div');
+    entry.className = isError ? 'log-entry log-error' : 'log-entry';
+
+    const time = new Date();
+    const timeStr = time.toLocaleTimeString('en-US', { 
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        fractionalSecondDigits: 3
+    });
+
+    entry.textContent = `[${timeStr}] ${text}`;
+    logEntries.appendChild(entry);
+    logEntries.scrollTop = logEntries.scrollHeight;
+    }
+
+    // Initialize simulation on page load
+    initSimulation();
+   </script>
+</body>
+</html>

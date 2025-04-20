@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hierarchical File System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --accent-primary: #8b5cf6;
+      --accent-secondary: #a78bfa;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #1f1f1f;
+      color: white;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .home-button-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 20px 20px; 
+      z-index: 1001;
+    }
+
+    /* Keep your button style */
+    .home-button {
+      background-color: #1e293b;
+      color: var(--text-secondary);
+      font-weight: bold;
+      font-size: medium;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 255, 153, 0.3);
+    }
+
+    header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      color: var(--accent-secondary);
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    .main-container {
+      display: flex;
+      width: 95%;
+      max-width: 1200px;
+      gap: 20px;
+    }
+
+    #file-tree-container {
+      background-color: var(--bg-secondary);
+      border-radius: 12px;
+      width: 30%;
+      min-width: 250px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tree-header {
+      background-color: var(--bg-tertiary);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tree-title {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    #file-tree {
+      font-family: 'Fira Code', monospace;
+      white-space: pre-wrap;
+      padding: 15px;
+      height: 100%;
+      min-height: 300px;
+      overflow-y: auto;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    #file-tree::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #file-tree::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+    }
+
+    #file-tree::-webkit-scrollbar-thumb {
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+    }
+
+    #file-tree::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-primary);
+    }
+
+    #terminal {
+      background-color: var(--bg-secondary);
+      border-radius: 12px;
+      flex: 1;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .terminal-header {
+      background-color: var(--bg-tertiary);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .terminal-controls {
+      display: flex;
+      gap: 8px;
+      margin-right: 15px;
+    }
+
+    .control-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .red { background-color: var(--error); }
+    .yellow { background-color: var(--warning); }
+    .green { background-color: var(--success); }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .terminal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #output {
+      font-family: 'Fira Code', monospace;
+      white-space: pre-wrap;
+      margin-bottom: 15px;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 15px;
+      min-height: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    #output::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #output::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+    }
+
+    #output::-webkit-scrollbar-thumb {
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+    }
+
+    #output::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-primary);
+    }
+
+    .command-line {
+      display: flex;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 0 15px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .prompt {
+      color: var(--accent-primary);
+      margin-right: 10px;
+      font-family: 'Fira Code', monospace;
+      font-weight: 500;
+    }
+
+    #commandInput {
+      flex: 1;
+      padding: 12px 0;
+      background-color: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-family: 'Fira Code', monospace;
+    }
+
+    #commandInput:focus {
+      outline: none;
+    }
+
+    .command-info {
+      margin-top: 20px;
+      background-color: var(--bg-tertiary);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .command-info h3 {
+      margin-bottom: 10px;
+      color: var(--accent-secondary);
+    }
+
+    .commands-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .command-item {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 8px 12px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .command-name {
+      color: var(--accent-secondary);
+      font-family: 'Fira Code', monospace;
+      font-weight: 500;
+    }
+
+    .command-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .current-path {
+      color: var(--accent-primary);
+    }
+
+    #file-tree {
+      font-family: 'Inter', sans-serif;
+      padding: 15px;
+      height: 100%;
+      min-height: 300px;
+      overflow-y: auto;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.4; 
+    }
+
+    #file-tree .folder,
+    #file-tree .file {
+      margin-bottom: 2px; 
+      display: flex;
+      align-items: center;
+    }
+
+    /* Style for folders */
+    #file-tree .folder {
+      color: var(--accent-secondary);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Style for files */
+    #file-tree .file {
+      color: var(--text-primary);
+    }
+
+    /* Folder icon */
+    #file-tree .folder::before {
+      content: "";
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin-right: 4px; 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23a78bfa' viewBox='0 0 24 24'%3E%3Cpath d='M22 8v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6c0-1.1.9-2 2-2h5l2 2h7a2 2 0 012 2z'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    /* Open folder icon */
+    #file-tree .folder.open::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23a78bfa' viewBox='0 0 24 24'%3E%3Cpath d='M2 6a2 2 0 012-2h5l2 2h7a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6z'/%3E%3C/svg%3E");
+    }
+
+    /* File icon */
+    #file-tree .file::before {
+      content: "";
+      display: inline-block;
+      width: 14px; 
+      height: 14px;
+      margin-right: 4px; 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23cbd5e1' viewBox='0 0 24 24'%3E%3Cpath d='M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z'/%3E%3Cpath d='M14 3v5h5'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    #file-tree .indent {
+      margin-left: 16px; 
+    }
+
+    /* Current directory highlight */
+    #file-tree .current-path {
+      color: var(--accent-primary);
+      font-weight: 600;
+      position: relative;
+    }
+
+    #file-tree .current-path::after {
+      content: "•";
+      position: absolute;
+      right: -10px; 
+      color: var(--accent-primary);
+    }
+
+    /* Tree lines - reduced spacing */
+    #file-tree .tree-line {
+      border-left: 1px dashed var(--bg-tertiary);
+      padding-left: 8px; 
+      margin-left: 6px; 
+    }
+
+    /* Collapse/expand controls - more compact */
+    #file-tree .folder .toggle {
+      width: 14px; 
+      height: 14px;
+      margin-right: 3px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 2px;
+      font-size: 12px;
+    }
+
+    #file-tree .folder .toggle:hover {
+      background-color: var(--bg-tertiary);
+    }
+
+    /* Make the vertical gap between tree sections smaller */
+    #file-tree > div {
+      margin-bottom: 1px;
+    }
+
+    @media (max-width: 900px) {
+      .main-container {
+        flex-direction: column;
+      }
+      
+      #file-tree-container {
+        width: 100%;
+        min-height: 200px;
+      }
+      
+      #file-tree {
+        min-height: 200px;
+        max-height: 250px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .commands-list {
+        grid-template-columns: 1fr;
+      }
+
+      #output {
+        min-height: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="home-button-container">
+    <button onclick="window.location.href='index.html';" class="home-button">Back</button>
+  </div>
+
+  <header>
+    <h1>Hierarchical File Organization</h1>
+    <div class="subtitle">Interactive File System Simulator</div>
+  </header>
+  
+  <div class="main-container">
+    <div id="file-tree-container">
+      <div class="tree-header">
+        <div class="tree-title">File System Structure</div>
+      </div>
+      <div id="file-tree">Loading file structure...</div>
+    </div>
+    
+    <div id="terminal">
+      <div class="terminal-header">
+        <div class="terminal-controls">
+          <div class="control-dot red"></div>
+          <div class="control-dot yellow"></div>
+          <div class="control-dot green"></div>
+        </div>
+        <div class="terminal-title">terminal@filesystem</div>
+      </div>
+      
+      <div class="terminal-body">
+        <div id="output">Welcome to the File System Simulator. Type 'help' for commands.</div>
+        
+        <div class="command-line">
+          <span class="prompt">$</span>
+          <input type="text" id="commandInput" placeholder="Enter command..." autofocus />
+        </div>
+        
+        <div class="command-info">
+          <h3>Available Commands</h3>
+          <div class="commands-list">
+            <div class="command-item">
+              <span class="command-name">mkdir</span>
+              <span class="command-desc">Create directory</span>
+            </div>
+            <div class="command-item">
+              <span class="command-name">create</span>
+              <span class="command-desc">Create file</span>
+            </div>
+            <div class="command-item">
+              <span class="command-name">cd</span>
+              <span class="command-desc">Change directory</span>
+            </div>
+            <div class="command-item">
+              <span class="command-name">ls</span>
+              <span class="command-desc">List contents</span>
+            </div>
+            <div class="command-item">
+              <span class="command-name">rm</span>
+              <span class="command-desc">Remove item</span>
+            </div>
+            <div class="command-item">
+              <span class="command-name">rename</span>
+              <span class="command-desc">Rename item</span>
+            </div>
+            <div class="command-item">
+              <span class="command-name">tree</span>
+              <span class="command-desc">Show structure</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class Node {
+      constructor(name, isDirectory) {
+        this.name = name;
+        this.isDirectory = isDirectory;
+        this.child = null;
+        this.next = null;
+        this.parent = null; // Add parent reference
+      }
+    }
+
+    const root = new Node("root", true);
+    let currentDir = root;
+
+    function appendOutput(message) {
+      const output = document.getElementById("output");
+      output.textContent += "\n" + message;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function findNode(parent, name) {
+      let temp = parent.child;
+      while (temp) {
+        if (temp.name === name) return temp;
+        temp = temp.next;
+      }
+      return null;
+    }
+
+    function addChild(parent, child) {
+      // Set the parent reference
+      child.parent = parent;
+      
+      if (!parent.child) {
+        parent.child = child;
+      } else {
+        let temp = parent.child;
+        while (temp.next) temp = temp.next;
+        temp.next = child;
+      }
+      updateFileTree(); // Update the file tree view
+    }
+
+    function deleteNode(parent, name) {
+      let curr = parent.child, prev = null;
+      while (curr) {
+        if (curr.name === name) {
+          if (curr.isDirectory && curr.child) {
+            appendOutput(`Error: Directory '${name}' is not empty.`);
+            return;
+          }
+          if (prev) {
+            prev.next = curr.next;
+          } else {
+            parent.child = curr.next;
+          }
+          appendOutput(`'${name}' deleted.`);
+          updateFileTree(); // Update the file tree view
+          return;
+        }
+        prev = curr;
+        curr = curr.next;
+      }
+      appendOutput(`'${name}' not found.`);
+    }
+
+    function renameNode(parent, oldName, newName) {
+      // Check if new name already exists
+      if (findNode(parent, newName)) {
+        appendOutput(`Error: Name '${newName}' already exists.`);
+        return;
+      }
+
+      // Find node to rename
+      let curr = parent.child;
+      while (curr) {
+        if (curr.name === oldName) {
+          curr.name = newName;
+          appendOutput(`Renamed '${oldName}' to '${newName}'.`);
+          updateFileTree(); // Update the file tree view
+          return;
+        }
+        curr = curr.next;
+      }
+      appendOutput(`'${oldName}' not found.`);
+    }
+
+    function listContents(dir) {
+      let result = `Contents of '${dir.name}':`;
+      let temp = dir.child;
+      while (temp) {
+        result += `\n${temp.name}${temp.isDirectory ? "/" : ""}`;
+        temp = temp.next;
+      }
+      appendOutput(result);
+    }
+
+    function displayTree(node, level = 0, output = [], isLast = true, prefix = "") {
+      const isRoot = level === 0;
+      const isCurrent = node === currentDir;
+      
+      // Start building the line
+      let line = "";
+      
+      // Root level handling
+      if (isRoot) {
+        line = `<div class="${isCurrent ? 'current-path folder' : 'folder'}" data-name="${node.name}">
+                  <span class="toggle">+</span>${node.name}/
+                </div>`;
+      } else {
+        // Create proper indentation with tree lines
+        const indentation = prefix + (isLast ? "" : "");
+        
+        // Determine if it's a file or folder
+        if (node.isDirectory) {
+          line = `<div class="${isCurrent ? 'current-path folder' : 'folder'}" data-name="${node.name}">
+                    ${indentation}<span class="toggle">+</span>${node.name}/
+                  </div>`;
+        } else {
+          line = `<div class="file" data-name="${node.name}">
+                    ${indentation}${node.name}
+                  </div>`;
+        }
+      }
+      
+      output.push(line);
+      
+      // Process children with proper indentation
+      if (node.child) {
+        const childPrefix = isRoot ? "" : prefix + (isLast ? "    " : "│   ");
+        
+        let childNode = node.child;
+        while (childNode) {
+          const hasNext = childNode.next !== null;
+          const childOutput = [];
+          
+          displayTree(childNode, level + 1, childOutput, !hasNext, childPrefix);
+          
+          // Wrap child elements in a div with proper indentation
+          output.push(`<div class="indent tree-line">${childOutput.join("")}</div>`);
+          
+          childNode = childNode.next;
+        }
+      }
+      
+      return output;
+    }
+
+    function initializeFolderToggle() {
+      // Add click event listeners to all folder toggle controls
+      document.querySelectorAll('#file-tree .folder .toggle').forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+          const folderElement = e.target.closest('.folder');
+          const nextElement = folderElement.nextElementSibling;
+          
+          if (nextElement && nextElement.classList.contains('indent')) {
+            // Toggle visibility
+            const isHidden = nextElement.style.display === 'none';
+            nextElement.style.display = isHidden ? 'block' : 'none';
+            
+            // Update toggle symbol
+            e.target.textContent = isHidden ? '-' : '+';
+            
+            // Toggle open class for icon change
+            folderElement.classList.toggle('open');
+          }
+          
+          e.stopPropagation();
+        });
+      });
+      
+      // Make entire folder row clickable (optional)
+      document.querySelectorAll('#file-tree .folder').forEach(folder => {
+        folder.addEventListener('click', (e) => {
+          if (e.target === folder || e.target.parentNode === folder) {
+            const toggle = folder.querySelector('.toggle');
+            if (toggle) toggle.click();
+          }
+        });
+      });
+    }
+
+    function updateFileTree() {
+      const fileTree = document.getElementById("file-tree");
+      const treeOutput = displayTree(root);
+      fileTree.innerHTML = treeOutput.join("");
+      
+      // Initialize folder toggling after updating the tree
+      initializeFolderToggle();
+    }
+
+    function updatePrompt() {
+      document.querySelector('.prompt').textContent = `${currentDir.name} $`;
+      updateFileTree(); // Update the file tree to show new current directory
+    }
+
+    function showHelp() {
+      const helpText = 
+`Available Commands:
+  mkdir <name> - Create directory
+  create <name> - Create file
+  ls - List contents
+  cd <name> - Change directory
+  cd .. - Go to parent directory
+  rm <name> - Remove file or empty directory
+  rename <old_name> <new_name> - Rename file or directory
+  tree - Display file tree
+  exit - Quit program`;
+      appendOutput(helpText);
+    }
+
+    function handleCommand(commandLine) {
+      const args = commandLine.trim().split(" ");
+      const cmd = args[0];
+
+      switch (cmd) {
+        case "help":
+          showHelp();
+          break;
+        case "mkdir":
+          if (args[1] && !findNode(currentDir, args[1])) {
+            addChild(currentDir, new Node(args[1], true));
+            appendOutput(`Directory '${args[1]}' created.`);
+          } else appendOutput(`Error: '${args[1]}' already exists or invalid.`);
+          break;
+        case "create":
+          if (args[1] && !findNode(currentDir, args[1])) {
+            addChild(currentDir, new Node(args[1], false));
+            appendOutput(`File '${args[1]}' created.`);
+          } else appendOutput(`Error: '${args[1]}' already exists or invalid.`);
+          break;
+        case "cd":
+          if (args[1] === "..") {
+            if (currentDir.parent) {
+              currentDir = currentDir.parent;
+              updatePrompt();
+            } else {
+              appendOutput("Already at root.");
+            }
+          } else {
+            const target = findNode(currentDir, args[1]);
+            if (target && target.isDirectory) {
+              currentDir = target;
+              updatePrompt();
+            }
+            else appendOutput("Error: Directory not found.");
+          }
+          break;
+        case "rm":
+          if (args[1]) deleteNode(currentDir, args[1]);
+          else appendOutput("Error: Invalid name.");
+          break;
+        case "rename":
+          if (args[1] && args[2]) {
+            renameNode(currentDir, args[1], args[2]);
+            // If renaming the current directory, update the prompt
+            if (currentDir.name === args[1]) {
+              currentDir.name = args[2];
+              updatePrompt();
+            }
+          } else appendOutput("Error: Usage: rename <old_name> <new_name>");
+          break;
+        case "ls":
+          listContents(currentDir);
+          break;
+        case "tree":
+          const structure = displayTree(root);
+          appendOutput(structure.join("\n"));
+          break;
+        case "exit":
+          appendOutput("Session ended.");
+          document.getElementById("commandInput").disabled = true;
+          break;
+        default:
+          appendOutput("Unknown command. Type 'help' for help.");
+      }
+    }
+
+    document.getElementById("commandInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        const cmd = e.target.value;
+        appendOutput(`\n${currentDir.name}> ${cmd}`);
+        handleCommand(cmd);
+        e.target.value = "";
+      }
+    });
+
+    // Initialize prompt and file tree
+    updatePrompt();
+    updateFileTree();
+  </script>
+</body>
+</html>

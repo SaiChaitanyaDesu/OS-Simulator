@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>File Organization Techniques</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --accent-primary: #8b5cf6;
+      --accent-secondary: #a78bfa;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #1f1f1f;
+      color: white;
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1f1f1f;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      transition: box-shadow 0.3s ease, border-bottom 0.3s ease;
+    }
+
+
+    .navbar.scrolled {
+      box-shadow: 0 2px 10px rgba(0, 188, 212, 0.3);
+      border-bottom: 2px solid #00bcd4;
+    }
+
+    .nav-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00bcd4;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .nav-item {
+      color: #f1f1f1;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+    }
+
+    .nav-item:hover {
+      color: #00bcd4;
+    }
+
+    .dropdown {
+      position: sticky;
+      display: inline-block;
+    }
+
+    .dropbtn {
+      background-color: #1f1f1f;
+      color: #f1f1f1;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dropbtn:hover {
+      color: #00bcd4;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #2a2a2a;
+      min-width: 250px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      z-index: 1;
+      border-radius: 6px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .dropdown-content a {
+      color: #f1f1f1;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.3s ease;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #00bcd4;
+      color: #000;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .navbar-divider {
+      border: none;
+      height: 2px;
+      width: 90%;
+      margin: 0 auto;
+      background: linear-gradient(to right, #00bcd4, #006064);
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+
+    .container-fluid {
+      padding: 40px 20px;
+      margin-top: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .jumbotron {
+      text-align: center;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      width: 95%;
+      max-width: 1100px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .jumbotron h1 {
+      color: var(--accent-secondary);
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+    }
+
+    .lead {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    .column1 {
+      position: relative;
+      width: 100%;
+      max-width: 350px;
+      padding: 25px;
+      margin: 15px;
+      background-color: var(--bg-secondary);
+      color: var(--text-secondary);
+      border-radius: 12px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .column1:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      background-color: var(--bg-tertiary);
+    }
+
+    .column1 h2 {
+      color: var(--accent-secondary);
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+    }
+
+    .column1 p {
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+
+    .column1 button {
+      background-color: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--accent-primary);
+      padding: 8px 12px;
+      margin: 5px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+    }
+
+    .column1 button:hover {
+      background-color: var(--accent-primary);
+    }
+
+    .directory {
+      width: 95%;
+      max-width: 850px;
+      background-color: var(--bg-secondary);
+      padding: 25px;
+      border-radius: 12px;
+      margin: 30px 0;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .directory h3 {
+      color: var(--accent-secondary);
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+      text-align: center;
+    }
+
+    #directory-list {
+      font-family: 'Fira Code', monospace;
+      white-space: pre-wrap;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 15px;
+      min-height: 200px;
+      overflow-y: auto;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    #output {
+      display: block;
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .column1 {
+        max-width: 100%;
+      }
+      
+      .jumbotron h1 {
+        font-size: 2rem;
+      }
+      
+      nav {
+        padding: 0 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!--Navigation Bar-->
+  <nav class="navbar">
+    <div class="nav-brand" onclick="window.location.href='../index.html'">OSSim</div>
+    <div class="nav-links">
+      <div class="dropdown">
+        <button class="dropbtn">
+          <i class="fas fa-bars"></i> Topics
+        </button>
+        <div class="dropdown-content">
+          <a href="../Scheduling_Algorithms/index.html">Scheduling Algorithms</a>
+          <a href="../Process_Synchronization/index.html">Process Synchronization</a>
+          <a href="../Thread_Synchronization/threadindex.html">Threading and Synchronization</a>
+          <a href="../Deadlock/da.html">Banker's Algorithm</a>
+          <a href="../Second_Chance Algo/extra_page_replacement.html">Clock Algorithms</a>
+          <a href="../Memory_management/info.html">MVT/MFT</a>
+          <a href="../File_Organization/index.html">File Organization</a>
+          <a href="../Memory_Allocation/memory_visualizer.html">Memory Allocation</a>
+          <a href="../Page_Replacement/page_replacement.html">Page Replacement</a>
+          <a href="../Disk_Scheduling/intro.html">Disk Scheduling</a>
+          <a href="../File_Allocation/file_allocation.html">File Allocation</a>
+          <a href="../Security_Algorithms/security_theory.html">Security Algorithms</a>
+          <a href="../Paging/Paging_theory.html">Paging Technique</a>
+          <a href="../Inter_Process_Communication/index.html">Inter-Process Communication and Shared Memory</a>
+        </div>
+      </div>
+      <a href="../index.html" class="nav-item"><i class="fas fa-home"></i> Home</a>
+      <a href="../help.html" class="nav-item"><i class="fas fa-question-circle"></i> Help</a>
+      <a href="#page-top" class="nav-item"><i class="fas fa-info-circle"></i> About Us</a>
+    </div>
+  </nav>
+  
+  <hr class="navbar-divider">
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="jumbotron" style="background-color: var(--bg-secondary)">
+        <h1>File Organization Techniques</h1>
+        <p class="lead">
+          File organization techniques refer to the methods and strategies used to structure and manage files on storage devices.
+          Proper organization improves productivity, ensures data integrity, and facilitates efficient data retrieval.
+          Each technique offers different advantages based on access patterns, storage requirements, and application needs.
+        </p>
+      </div>
+
+      <div class="column1">
+        <h2>Single Level Organization</h2>
+        <p>In single-level file organization, all files are stored in a single directory without any subdirectories.
+          This approach is simple for small sets of files but becomes unwieldy as the number of files grows,
+          leading to file clutter and difficulty in finding specific files.</p>
+        <div class="single-level">
+          <a href="single_level.html">
+            <button>Simulate</button>
+          </a>
+        </div>
+      </div>
+
+      <div class="column1">
+        <h2>Hashed File Organization</h2>
+        <p>Hashed file organization uses a hash function to determine the storage location of a record based on a key.
+          It allows fast access for searching, inserting, and deleting. However, it requires collision handling and is 
+          not suitable for range-based queries.</p>
+        <div class="two-level">
+          <a href="hashed.html">
+            <button>Simulate</button>
+          </a>
+        </div>
+      </div>
+
+      <div class="column1">
+        <h2>Hierarchical File Organization</h2>
+        <p>Hierarchical file organization uses a tree-like structure of directories. Each directory can contain both files
+          and subdirectories, allowing for multiple levels of organization. Most modern operating systems
+          use this approach for its flexibility and scalability.</p>
+        <div class="hierarchical">
+          <a href="hierarchical.html">
+            <button>Simulate</button>
+          </a>
+        </div>
+      </div>
+
+      <div class="directory">
+        <h3>Directory Structure</h3>
+        <div id="directory-list">
+          <output id="output">Welcome to File Organization Techniques Demo.
+Click on any operation to visualize file system behaviors.</output>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 10) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>

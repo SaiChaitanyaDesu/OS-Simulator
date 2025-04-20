@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hashed File System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --accent-primary: #6366f1;
+      --accent-secondary: #818cf8;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #1f1f1f;
+      color: white;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .home-button-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 20px 20px;
+      z-index: 1001;
+    }
+
+    /* Keep your button style */
+    .home-button {
+      background-color: #1e293b;
+      color: var(--text-secondary);
+      font-weight: bold;
+      font-size: medium;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 255, 153, 0.3);
+    }
+
+    header {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      color: var(--accent-secondary);
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+
+    #terminal {
+      background-color: var(--bg-secondary);
+      border-radius: 12px;
+      width: 95%;
+      max-width: 850px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .terminal-header {
+      background-color: var(--bg-tertiary);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .terminal-controls {
+      display: flex;
+      gap: 8px;
+      margin-right: 15px;
+    }
+
+    .control-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .red { background-color: var(--error); }
+    .yellow { background-color: var(--warning); }
+    .green { background-color: var(--success); }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .terminal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #output {
+      font-family: 'Fira Code', monospace;
+      white-space: pre-wrap;
+      margin-bottom: 15px;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 15px;
+      min-height: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    #output::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #output::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+    }
+
+    #output::-webkit-scrollbar-thumb {
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+    }
+
+    #output::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-primary);
+    }
+
+    .command-line {
+      display: flex;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 0 15px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .prompt {
+      color: var(--accent-primary);
+      margin-right: 10px;
+      font-family: 'Fira Code', monospace;
+      font-weight: 500;
+    }
+
+    #commandInput {
+      flex: 1;
+      padding: 12px 0;
+      background-color: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-family: 'Fira Code', monospace;
+    }
+
+    #commandInput:focus {
+      outline: none;
+    }
+
+    .command-info {
+      margin-top: 20px;
+      background-color: var(--bg-tertiary);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .command-info h3 {
+      margin-bottom: 10px;
+      color: var(--accent-secondary);
+    }
+
+    .hash-table {
+      margin-top: 20px;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    .bucket {
+      display: flex;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .bucket:last-child {
+      border-bottom: none;
+    }
+
+    .bucket-index {
+      color: var(--accent-primary);
+      font-family: 'Fira Code', monospace;
+      font-weight: 500;
+      width: 40px;
+      text-align: right;
+      margin-right: 15px;
+    }
+
+    .bucket-content {
+      flex: 1;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .file-item {
+      background-color: var(--bg-tertiary);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .file-name {
+      margin-right: 5px;
+    }
+
+    .file-content {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+    }
+
+    .commands-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .command-item {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 8px 12px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .command-name {
+      color: var(--accent-secondary);
+      font-family: 'Fira Code', monospace;
+      font-weight: 500;
+    }
+
+    .command-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .bucket-placeholder {
+      color: var(--text-secondary);
+      font-style: italic;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .commands-list {
+        grid-template-columns: 1fr;
+      }
+
+      #output {
+        min-height: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="home-button-container">
+    <button onclick="window.location.href='index.html';" class="home-button">Back</button>
+  </div>
+
+  <header>
+    <h1>Hashed File Organization</h1>
+    <div class="subtitle">Interactive Hash-Based File System Simulator</div>
+  </header>
+  
+  <div id="terminal">
+    <div class="terminal-header">
+      <div class="terminal-controls">
+        <div class="control-dot red"></div>
+        <div class="control-dot yellow"></div>
+        <div class="control-dot green"></div>
+      </div>
+      <div class="terminal-title">terminal@hashfilesystem</div>
+    </div>
+    
+    <div class="terminal-body">
+      <div id="output">Welcome to the Hashed File System Simulator. Type 'help' for commands.</div>
+      
+      <div class="command-line">
+        <span class="prompt">hash$</span>
+        <input type="text" id="commandInput" placeholder="Enter command..." autofocus />
+      </div>
+      
+      <div class="hash-table" id="hashTableView">
+        <!-- Hash table buckets will be dynamically rendered here -->
+      </div>
+      
+      <div class="command-info">
+        <h3>Available Commands</h3>
+        <div class="commands-list">
+          <div class="command-item">
+            <span class="command-name">put</span>
+            <span class="command-desc">Store file</span>
+          </div>
+          <div class="command-item">
+            <span class="command-name">get</span>
+            <span class="command-desc">Retrieve file</span>
+          </div>
+          <div class="command-item">
+            <span class="command-name">delete</span>
+            <span class="command-desc">Remove file</span>
+          </div>
+          <div class="command-item">
+            <span class="command-name">list</span>
+            <span class="command-desc">List all files</span>
+          </div>
+          <div class="command-item">
+            <span class="command-name">hash</span>
+            <span class="command-desc">Show hash value</span>
+          </div>
+          <div class="command-item">
+            <span class="command-name">resize</span>
+            <span class="command-desc">Resize table</span>
+          </div>
+          <div class="command-item">
+            <span class="command-name">stats</span>
+            <span class="command-desc">System stats</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class File {
+      constructor(name, content) {
+        this.name = name;
+        this.content = content || `Content of ${name}`;
+      }
+    }
+
+    class HashFileSystem {
+      constructor(size = 10) {
+        this.tableSize = size;
+        this.buckets = Array(size).fill().map(() => []);
+        this.fileCount = 0;
+        this.collisions = 0;
+      }
+
+      hash(key) {
+        // Simple hash function - sum of character codes modulo table size
+        let hash = 0;
+        for (let i = 0; i < key.length; i++) {
+          hash += key.charCodeAt(i);
+        }
+        return hash % this.tableSize;
+      }
+
+      put(file) {
+        const index = this.hash(file.name);
+        
+        // Check if file already exists
+        const existingFileIndex = this.buckets[index].findIndex(f => f.name === file.name);
+        if (existingFileIndex >= 0) {
+          // Update existing file
+          this.buckets[index][existingFileIndex] = file;
+          return {
+            success: true,
+            message: `Updated file '${file.name}' at bucket ${index}`,
+            isNew: false
+          };
+        }
+        
+        // Add new file
+        if (this.buckets[index].length > 0) {
+          this.collisions++;
+        }
+        
+        this.buckets[index].push(file);
+        this.fileCount++;
+        
+        return {
+          success: true,
+          message: `Added file '${file.name}' to bucket ${index}`,
+          isNew: true
+        };
+      }
+
+      get(name) {
+        const index = this.hash(name);
+        const file = this.buckets[index].find(f => f.name === name);
+        
+        if (file) {
+          return {
+            success: true,
+            file: file,
+            message: `Found '${name}' in bucket ${index}`
+          };
+        } else {
+          return {
+            success: false,
+            message: `File '${name}' not found`
+          };
+        }
+      }
+
+      delete(name) {
+        const index = this.hash(name);
+        const fileIndex = this.buckets[index].findIndex(f => f.name === name);
+        
+        if (fileIndex >= 0) {
+          this.buckets[index].splice(fileIndex, 1);
+          this.fileCount--;
+          return {
+            success: true,
+            message: `Deleted file '${name}' from bucket ${index}`
+          };
+        } else {
+          return {
+            success: false,
+            message: `File '${name}' not found`
+          };
+        }
+      }
+
+      resize(newSize) {
+        if (newSize <= 0) {
+          return {
+            success: false,
+            message: `Invalid size: ${newSize}. Must be greater than 0.`
+          };
+        }
+        
+        const oldBuckets = this.buckets;
+        this.tableSize = newSize;
+        this.buckets = Array(newSize).fill().map(() => []);
+        this.collisions = 0;
+        this.fileCount = 0;
+        
+        // Rehash all files
+        for (const bucket of oldBuckets) {
+          for (const file of bucket) {
+            this.put(file);
+          }
+        }
+        
+        return {
+          success: true,
+          message: `Resized hash table to ${newSize} buckets and rehashed all files`
+        };
+      }
+
+      getAllFiles() {
+        const files = [];
+        this.buckets.forEach((bucket, index) => {
+          bucket.forEach(file => {
+            files.push({ file, bucketIndex: index });
+          });
+        });
+        return files;
+      }
+
+      getStats() {
+        const nonEmptyBuckets = this.buckets.filter(bucket => bucket.length > 0).length;
+        const loadFactor = this.fileCount / this.tableSize;
+        const maxBucketSize = Math.max(...this.buckets.map(bucket => bucket.length));
+        
+        return {
+          tableSize: this.tableSize,
+          fileCount: this.fileCount,
+          nonEmptyBuckets,
+          loadFactor: loadFactor.toFixed(2),
+          collisions: this.collisions,
+          maxBucketSize
+        };
+      }
+    }
+
+    // Initialize the file system with 10 buckets
+    const fileSystem = new HashFileSystem(10);
+
+    function appendOutput(message) {
+      const output = document.getElementById("output");
+      output.textContent += "\n" + message;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function renderHashTable() {
+      const hashTableView = document.getElementById("hashTableView");
+      hashTableView.innerHTML = "";
+      
+      fileSystem.buckets.forEach((bucket, index) => {
+        const bucketDiv = document.createElement("div");
+        bucketDiv.className = "bucket";
+        
+        const indexDiv = document.createElement("div");
+        indexDiv.className = "bucket-index";
+        indexDiv.textContent = `[${index}]`;
+        bucketDiv.appendChild(indexDiv);
+        
+        const contentDiv = document.createElement("div");
+        contentDiv.className = "bucket-content";
+        
+        if (bucket.length === 0) {
+          const placeholderDiv = document.createElement("div");
+          placeholderDiv.className = "bucket-placeholder";
+          placeholderDiv.textContent = "empty";
+          contentDiv.appendChild(placeholderDiv);
+        } else {
+          bucket.forEach(file => {
+            const fileDiv = document.createElement("div");
+            fileDiv.className = "file-item";
+            
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "file-name";
+            nameSpan.textContent = file.name;
+            fileDiv.appendChild(nameSpan);
+            
+            contentDiv.appendChild(fileDiv);
+          });
+        }
+        
+        bucketDiv.appendChild(contentDiv);
+        hashTableView.appendChild(bucketDiv);
+      });
+    }
+
+    function showHelp() {
+      const helpText = 
+`Available Commands:
+  put <name> [content] - Store a file with optional content
+  get <name> - Retrieve a file by name
+  delete <name> - Remove a file
+  list - List all files in the system
+  hash <name> - Show hash value for a name
+  resize <size> - Resize hash table and rehash files
+  stats - Display system statistics
+  exit - Quit program`;
+      appendOutput(helpText);
+    }
+
+    function handleCommand(commandLine) {
+      const args = commandLine.trim().split(" ");
+      const cmd = args[0].toLowerCase();
+      let result;
+
+      switch (cmd) {
+        case "help":
+          showHelp();
+          break;
+          
+        case "put":
+          if (!args[1]) {
+            appendOutput("Error: Missing file name. Usage: put <name> [content]");
+            break;
+          }
+          
+          const name = args[1];
+          const content = args.slice(2).join(" ") || null;
+          const file = new File(name, content);
+          
+          result = fileSystem.put(file);
+          appendOutput(result.message);
+          renderHashTable();
+          break;
+          
+        case "get":
+          if (!args[1]) {
+            appendOutput("Error: Missing file name. Usage: get <name>");
+            break;
+          }
+          
+          result = fileSystem.get(args[1]);
+          if (result.success) {
+            appendOutput(`${result.message}:\n  Content: "${result.file.content}"`);
+          } else {
+            appendOutput(result.message);
+          }
+          break;
+          
+        case "delete":
+          if (!args[1]) {
+            appendOutput("Error: Missing file name. Usage: delete <name>");
+            break;
+          }
+          
+          result = fileSystem.delete(args[1]);
+          appendOutput(result.message);
+          renderHashTable();
+          break;
+          
+        case "list":
+          const files = fileSystem.getAllFiles();
+          if (files.length === 0) {
+            appendOutput("The file system is empty.");
+          } else {
+            let listOutput = "Files in the system:";
+            files.forEach(({ file, bucketIndex }) => {
+              listOutput += `\n  [${bucketIndex}] ${file.name}: "${file.content}"`;
+            });
+            appendOutput(listOutput);
+          }
+          break;
+          
+        case "hash":
+          if (!args[1]) {
+            appendOutput("Error: Missing name. Usage: hash <name>");
+            break;
+          }
+          
+          const hashValue = fileSystem.hash(args[1]);
+          appendOutput(`Hash value for '${args[1]}' is ${hashValue}`);
+          break;
+          
+        case "resize":
+          if (!args[1] || isNaN(parseInt(args[1]))) {
+            appendOutput("Error: Invalid size. Usage: resize <number>");
+            break;
+          }
+          
+          const newSize = parseInt(args[1]);
+          result = fileSystem.resize(newSize);
+          appendOutput(result.message);
+          renderHashTable();
+          break;
+          
+        case "stats":
+          const stats = fileSystem.getStats();
+          let statsOutput = "Hash File System Statistics:";
+          statsOutput += `\n  Table Size: ${stats.tableSize} buckets`;
+          statsOutput += `\n  File Count: ${stats.fileCount} files`;
+          statsOutput += `\n  Non-Empty Buckets: ${stats.nonEmptyBuckets}`;
+          statsOutput += `\n  Load Factor: ${stats.loadFactor}`;
+          statsOutput += `\n  Collisions: ${stats.collisions}`;
+          statsOutput += `\n  Max Bucket Size: ${stats.maxBucketSize}`;
+          appendOutput(statsOutput);
+          break;
+          
+        case "exit":
+          appendOutput("Session ended.");
+          document.getElementById("commandInput").disabled = true;
+          break;
+          
+        default:
+          appendOutput("Unknown command. Type 'help' for help.");
+      }
+    }
+
+    document.getElementById("commandInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        const cmd = e.target.value;
+        appendOutput(`\nhash$ ${cmd}`);
+        handleCommand(cmd);
+        e.target.value = "";
+      }
+    });
+
+    // Initial render of the hash table
+    renderHashTable();
+  </script>
+</body>
+</html>

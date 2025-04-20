@@ -1,0 +1,268 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1f1f1f;
+    color: #e0e0e0; 
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+    overflow-x: hidden;
+}
+
+/* Container Styles */
+.container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 40px;
+    background: #1a1a1a;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+    animation: container-glow 3s infinite alternate;
+}
+
+/* Image Styles */
+.container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.container img:hover {
+    transform: scale(1.05);
+}
+
+/* Animation for Container Glow */
+@keyframes container-glow {
+    0% {
+        box-shadow: 0 0 30px rgba(0, 123, 255, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 0 30px rgba(0, 123, 255, 0.8);
+    }
+}
+
+/* Heading Styles */
+h1 {
+    text-align: center;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    animation: heading-glow 2s infinite alternate;
+}
+
+h2 {
+    text-align: center;
+    color: #007bff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    animation: heading-glow 2s infinite alternate;
+}
+
+/* Animation for Heading Glow */
+@keyframes heading-glow {
+    0% {
+        text-shadow: 2px 2px 4px rgba(0, 123, 255, 0.5);
+    }
+
+    100% {
+        text-shadow: 2px 2px 4px rgba(0, 123, 255, 0.8);
+    }
+}
+
+/* nav {
+    background-color: #333;
+    padding: 10px 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li:last-child {
+    margin-right: 0;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: #007BFF;
+    color: #fff;
+} */
+
+.navbar {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: box-shadow 0.3s ease, border-bottom 0.3s ease;
+    background-color: #1f1f1f;
+}
+
+.navbar.scrolled {
+    box-shadow: 0 2px 10px rgba(0, 188, 212, 0.3);
+    border-bottom: 2px solid #00bcd4;
+}
+
+.nav-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00bcd4;
+    cursor: pointer;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding-right: 45px;
+}
+
+.nav-item {
+    color: #f1f1f1;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+    margin-right: 5px;
+    white-space: nowrap;
+}
+
+.nav-item:last-child {
+    margin-right: 20px; /* Increase this value as needed */
+}
+
+.nav-item:hover {
+    color: #00bcd4;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background-color: #1f1f1f;
+    color: #f1f1f1;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dropbtn:hover {
+    color: #00bcd4;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #2a2a2a;
+    min-width: 250px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 6px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.dropdown-content a {
+    color: #f1f1f1;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #00bcd4;
+    color: #000;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropbttn {
+    background-color: var(--bg-color);
+    color: #f1f1f1;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Consolas', 'Courier New', monospace;
+}
+
+.navbar-divider {
+    border: none;
+    height: 2px;
+    width: 90%;
+    margin: 0 auto;
+    background: linear-gradient(to right, #00bcd4, #006064);
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+.bottom {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.bottom a button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    transition: 
+        background-color 0.3s ease,
+        box-shadow 0.3s ease,
+        text-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bottom a button:hover {
+    background-color: #0056b3;
+    text-shadow: 1px 1px 5px rgba(255, 255, 255, 0.7);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+

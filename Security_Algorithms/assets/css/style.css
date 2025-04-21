@@ -5,9 +5,6 @@ body {
   font-family: "Open Sans", sans-serif;
   color: #f1f1f1;
   background-color: #1f1f1f;
-  /* Modified SVG - increased opacity to 0.3 and changed fill color to #00bcd4 to match theme */
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2300bcd4' fill-opacity='0.25' fill-rule='evenodd'/%3E%3C/svg%3E");
-  overflow-x: hidden;
 }
 
 a {
@@ -24,6 +21,12 @@ a:hover {
 h1, h2, h3, h4, h5, h6 {
   font-family: "Roboto", sans-serif;
   color: #f1f1f1;
+}
+
+main{
+  background-color: #1f1f1f;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23333' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+  overflow-x: hidden; 
 }
 
 /*--------------------------------------------------------------
@@ -114,7 +117,6 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Keep the navbar CSS as is - not modifying it as requested */
 .navbar {
   width: 100%;
   display: flex;
@@ -226,7 +228,6 @@ section {
 }
 
 .section-bg {
-  background-color: #2a2a2a;
   color: #f1f1f1;
 }
 
@@ -297,7 +298,6 @@ section {
 }
 
 .about .content ul i {
-  background: #2a2a2a;
   box-shadow: 0px 6px 15px rgba(0, 188, 212, 0.2);
   font-size: 24px;
   padding: 20px;
@@ -353,7 +353,6 @@ button[onclick*="window.location"] a {
 --------------------------------------------------------------*/
 .faq {
   padding: 60px 0;
-  background-color: #2a2a2a;
 }
 
 .faq .faq-list {
@@ -461,4 +460,33 @@ button[onclick*="window.location"] {
   font-size: 16px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Responsive CSS to prevent content cutoff */
+@media screen and (max-width: 768px) {
+  body {
+    margin: 0;
+    padding: 10px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+  
+  /* Make content containers flexible */
+  .content-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* Adjust text size for smaller screens */
+  p, li {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Make lists display properly */
+  ul, ol {
+    padding-left: 20px;
+    margin-right: 10px;
+  }
 }

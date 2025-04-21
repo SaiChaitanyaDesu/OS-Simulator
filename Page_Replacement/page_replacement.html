@@ -113,21 +113,25 @@
       margin-top: 5px;
     }
     .card {
+      width: 100%;
       height: 100%;
       transition: all 0.3s ease;
       border: 1px solid white;
+      background-color: #2a2a2a;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       border-left: 3px solid #23EC46;
       border-radius: 8px;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
       transform: none !important;
     }
     .card-title {
       color: #f0f0f0;
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       font-weight: bold;
       text-align: center;
       width: 100%;
-      margin: auto; /* Center vertically when collapsed */
+      margin: auto;
       transition: all 0.3s ease;
     }
     .card-body {
@@ -145,14 +149,16 @@
     }
     .card-text {
       color: #f0f0f0;
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
+      font-size: 1.1rem; 
+      line-height: 1.6; 
+      margin-bottom: 1rem;
     }
     .card-text:hover {
       color: #23EC46;
     }
     .card:hover {
       background-color: #333333 !important; 
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
     }
     .card.active {
       transform: scale(1.05);
@@ -179,6 +185,24 @@
       display: block; 
       opacity: 1;
       max-height: 500px;
+    }
+    .container {
+      max-width: 1200px; 
+      padding: 2rem; 
+      margin: 0 auto;
+    }
+    .row {
+      margin-bottom: 3rem;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 2rem; 
+      margin-top: 3rem;
+    }
+    .btn-custom {
+      padding: 1rem 2.5rem;
+      font-size: 1.2rem;
     }
     body {
       background-color: #1f1f1f;
@@ -227,67 +251,131 @@
   <hr class="navbar-divider">
 
   <div class="container mt-5">
-    <div class="jumbotron" style="background-color: #222222; border: 1px solid white">
+    <div class="jumbotron" style="background-color: #222222; border: 1px solid white; padding: 2rem;">
       <h1 class="display-4 text-center" style="font-weight: 550;">Page Replacement Algorithms</h1>
       <p class="lead text-center" style="color: white;">A Page Replacement Algorithm is a technique employed by operating systems to manage memory by selecting which pages to replace in the main memory when it becomes full. The primary goal is to minimize page faults and optimize system performance.</p>
     </div>
 
     <div class="row">
-      <div class="col-md-4">
-        <div class="card" style="background-color: #222222;" onclick="toggleDescription(this)">
+      <div class="col-lg-4 col-md-6">
+        <div class="card" onclick="toggleDescription(this)">
           <div class="card-body">
             <h5 class="card-title" style="color: #f0f0f0;">FIFO</h5>
-            <p class="card-text card-description">The FIFO (First-In-First-Out) page replacement algorithm replaces the oldest page in the main memory when a page fault occurs.</p>
-            <p class="card-text card-description">It is simple to implement but may not always perform optimally compared to other algorithms.</p>
-            <p class="card-text card-description">FIFO does not consider the future usage of pages, which can lead to inefficient memory usage.</p>
-            <p class="card-text card-description">It is commonly used in scenarios where simplicity is more important than performance.</p>
+            <p class="card-text card-description">The FIFO (First-In-First-Out) page replacement algorithm is one of the simplest memory management techniques. It replaces the oldest page in memory when a page fault occurs and the memory is full.
+            </p>
+            <p class="card-text card-description">FIFO operates on the principle that the page that has been in memory the longest
+              is the least likely to be used again. It uses a queue to track the order in which pages are loaded into memory,
+              ensuring that the oldest page is replaced first.</p>
+            <p class="card-text card-description">While FIFO is easy to implement and requires minimal computational overhead, it
+              does not consider the frequency or recency of page usage. This can lead to suboptimal performance, especially in
+              scenarios where older pages are still frequently accessed.</p>
+            <p class="card-text card-description">One of the major drawbacks of FIFO is the "Belady's Anomaly," where increasing the
+              number of frames can sometimes result in more page faults. Despite its limitations, FIFO is widely used in systems
+              where simplicity and low overhead are prioritized.</p>
+            <p class="card-text card-description">In summary, FIFO is a straightforward algorithm that is best suited for systems
+              with predictable and stable access patterns, where its simplicity outweighs its potential inefficiencies.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card" style="background-color: #222222;" onclick="toggleDescription(this)">
+      <div class="col-lg-4 col-md-6">
+        <div class="card" onclick="toggleDescription(this)">
           <div class="card-body">
             <h5 class="card-title" style="color: #f0f0f0;">OPTIMAL</h5>
-            <p class="card-text card-description">The Optimal algorithm replaces the page that will not be used for the longest period of time in the future.</p>
-            <p class="card-text card-description">It is theoretically the most efficient page replacement algorithm as it minimizes the number of page faults.</p>
-            <p class="card-text card-description">However, implementing the optimal algorithm requires knowledge of future memory accesses, which is usually not feasible.</p>
-            <p class="card-text card-description">Optimal is often used as a benchmark to compare the performance of other algorithms.</p>
+            <p class="card-text card-description">The Optimal page replacement algorithm is a theoretical approach that minimizes
+              the number of page faults by replacing the page that will not be used for the longest period of time in the future.
+            </p>
+            <p class="card-text card-description">Optimal works by analyzing future memory access patterns and selecting the page
+              that is least likely to be accessed again. This ensures that the algorithm always makes the best possible decision for
+              page replacement.</p>
+            <p class="card-text card-description">While Optimal is the most efficient algorithm in terms of minimizing page faults,
+              it is not practical for real-world systems because it requires knowledge of future memory accesses, which is typically
+              unavailable.</p>
+            <p class="card-text card-description">Despite its impracticality, Optimal is often used as a benchmark to evaluate the
+              performance of other page replacement algorithms. It provides a theoretical lower bound on the number of page faults
+              that can occur for a given sequence of memory accesses.</p>
+            <p class="card-text card-description">In conclusion, the Optimal algorithm is an idealized solution that highlights the
+              potential for improvement in page replacement strategies, even though it cannot be directly implemented in most
+              systems.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card" style="background-color: #222222;" onclick="toggleDescription(this)">
+      <div class="col-lg-4 col-md-6">
+        <div class="card" onclick="toggleDescription(this)">
           <div class="card-body">
             <h5 class="card-title" style="color: #f0f0f0;">LRU</h5>
-            <p class="card-text card-description">The LRU (Least Recently Used) page replacement algorithm replaces the page that has been least recently accessed.</p>
-            <p class="card-text card-description">It is based on the idea that pages that have been accessed recently are more likely to be accessed again soon.</p>
-            <p class="card-text card-description">LRU is more complex to implement than FIFO but generally performs better by considering recent page access patterns.</p>
-            <p class="card-text card-description">However, LRU requires maintaining a list of recently used pages, which can be resource-intensive.</p>
+            <p class="card-text card-description">The LRU (Least Recently Used) page replacement algorithm replaces the page that
+              has not been accessed for the longest period of time. It is based on the assumption that pages used recently are more
+              likely to be used again soon.</p>
+            <p class="card-text card-description">LRU maintains a record of the order in which pages are accessed, either through a
+              stack or a timestamp mechanism. When a page fault occurs, the page with the oldest access time is replaced.</p>
+            <p class="card-text card-description">This algorithm generally performs better than FIFO because it considers the
+              recency of page usage. However, it is more complex to implement and requires additional memory and processing to track
+              access times.</p>
+            <p class="card-text card-description">One of the challenges of LRU is its overhead, especially in systems with a large
+              number of pages. Despite this, it is widely used in systems where access patterns are dynamic and unpredictable.</p>
+            <p class="card-text card-description">In summary, LRU is a practical and effective algorithm for minimizing page faults
+              in scenarios where recent access patterns are a good predictor of future usage.</p>
           </div>
         </div>
       </div>
     </div>
 
     <div class="row mt-4">
-      <div class="col-md-4">
-        <div class="card" style="background-color: #222222;" onclick="toggleDescription(this)">
+      <div class="col-lg-4 col-md-6">
+        <div class="card" onclick="toggleDescription(this)">
           <div class="card-body">
             <h5 class="card-title" style="color: #f0f0f0;">MRU</h5>
-            <p class="card-text card-description">The MRU (Most Recently Used) page replacement algorithm replaces the page that has been most recently accessed.</p>
-            <p class="card-text card-description">Contrary to LRU, MRU assumes that the most recently accessed page is less likely to be accessed again in the near future.</p>
-            <p class="card-text card-description">MRU is simpler to implement than LRU but may not always perform optimally, especially in scenarios where access patterns favor reusing recent pages.</p>
-            <p class="card-text card-description">It is suitable for situations like stack-based or cyclic access patterns, where the most recent page is unlikely to be reused soon.</p>
+            <p class="card-text card-description">The MRU (Most Recently Used) page replacement algorithm replaces the page that has
+              been accessed most recently. It operates on the assumption that the most recently used page is less likely to be
+              accessed again in the near future.</p>
+            <p class="card-text card-description">MRU is the opposite of LRU and is particularly effective in scenarios where access
+              patterns are cyclic or stack-based, such as in certain database queries or recursive algorithms.</p>
+            <p class="card-text card-description">While MRU is simpler to implement than LRU, it may not always perform optimally.
+              In cases where recent pages are frequently reused, MRU can lead to higher page fault rates compared to other
+              algorithms.</p>
+            <p class="card-text card-description">One of the strengths of MRU is its low computational overhead, making it suitable
+              for systems with limited resources. However, its effectiveness depends heavily on the specific access patterns of the
+              workload.</p>
+            <p class="card-text card-description">In conclusion, MRU is a specialized algorithm that works well in certain scenarios
+              but may not be the best choice for general-purpose systems with unpredictable access patterns.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card" style="background-color: #222222;" onclick="toggleDescription(this)">
+      <div class="col-lg-4 col-md-6">
+        <div class="card" onclick="toggleDescription(this)">
+          <div class="card-body">
+            <h5 class="card-title" style="color: #f0f0f0;">LFU</h5>
+            <p class="card-text card-description">The LFU (Least Frequently Used) page replacement algorithm is a memory management
+              technique that replaces the page with the lowest frequency of use when a page fault occurs and the memory is full.</p>
+            <p class="card-text card-description">LFU maintains a frequency count for each page in memory. Every time a
+              page is accessed, its frequency count is incremented. When a page needs to be replaced, the page with the smallest
+              frequency count is selected</p>
+            <p class="card-text card-description">LFU is widely used in systems where access patterns are relatively stable. It provides a good balance between 
+              simplicity and performance, making it a popular choice for many applications</p>
+            <p class="card-text card-description">However, LFU has some limitations. For example, it may not perform well in
+              scenarios where access patterns change over time. Additionally, maintaining frequency counts for all pages can introduce computational overhead.</p>
+            <p class="card-text card-description">In summary, LFU is a powerful algorithm for managing memory in scenarios where frequently accessed pages are likely to
+              be reused. Its effectiveness depends on the stability of access patterns and the system's ability to handle the overhead
+              of maintaining frequency counts.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="card" onclick="toggleDescription(this)">
           <div class="card-body">
             <h5 class="card-title" style="color: #f0f0f0;">RANDOM</h5>
-            <p class="card-text card-description">The random page replacement algorithm selects a page for replacement randomly when a page fault occurs and the main memory is full.</p>
-            <p class="card-text card-description">It does not consider any access patterns or page usage history, making it the simplest page replacement algorithm to implement.</p>
-            <p class="card-text card-description">Random replacement may lead to unpredictable performance and is generally used for comparison purposes rather than in practical implementations.</p>
-            <p class="card-text card-description">While it may not perform well in most scenarios, it can occasionally outperform other algorithms in certain edge cases.</p>
+            <p class="card-text card-description">The Random page replacement algorithm selects a page for replacement randomly when
+              a page fault occurs and the memory is full. It does not consider any access patterns or page usage history.</p>
+            <p class="card-text card-description">Random is the simplest page replacement algorithm to implement, as it requires no
+              additional data structures or tracking mechanisms. It relies entirely on chance to decide which page to replace.</p>
+            <p class="card-text card-description">While Random is easy to implement, its performance is highly unpredictable. It may
+              occasionally outperform more sophisticated algorithms in certain edge cases, but it generally leads to higher page
+              fault rates.</p>
+            <p class="card-text card-description">This algorithm is primarily used for comparison purposes rather than in practical
+              implementations. It serves as a baseline to evaluate the effectiveness of other page replacement strategies.</p>
+            <p class="card-text card-description">In summary, Random is a simple and lightweight algorithm that is best suited for
+              experimental or educational purposes, rather than real-world systems where performance and predictability are
+              critical.</p>
           </div>
         </div>
       </div>

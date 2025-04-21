@@ -141,6 +141,7 @@
                     <option value="Optimal">Optimal</option>
                     <option value="LRU">Least Recently Used</option>
                     <option value="MRU">Most Recently Used</option>
+                    <option value="LFU">Least Frequently Used</option>
                     <option value="Random">Random</option>
                 </select>
             </div>
@@ -642,6 +643,83 @@
             document.getElementById("miss_rate").innerHTML = "Page Miss Rate : " + `<b>${missRate.toFixed(2)}%</b>`;
             document.getElementById("hit_rate").innerHTML = "Page Hit Rate : " + `<b>${hitRate.toFixed(2)}%</b>`;
         }
+        else if (dropDown == "LFU") {
+    let frames = new Array(numberOfFrames).fill(-1);
+    let frequency = new Array(numberOfFrames).fill(0);
+    let counter = 0, flag1, flag2, i, j, pos, s, k;
+
+    for (i = 0; i < numberOfPages; ++i) {
+        flag1 = flag2 = 0, s = 1, k = 0;
+
+        // Check if the page is already in the frame
+        for (j = 0; j < numberOfFrames; ++j) {
+            if (frames[j] == arr[i]) {
+                pageHits++;
+                frequency[j]++;
+                flag1 = flag2 = 1;
+                s = 0;
+                break;
+            }
+        }
+
+        // If it is a page miss
+        if (flag1 == 0) {
+            for (j = 0; j < numberOfFrames; ++j) {
+                if (frames[j] == -1) {
+                    pageFaults++;
+                    frames[j] = arr[i];
+                    frequency[j] = 1;
+                    flag2 = 1;
+                    break;
+                }
+            }
+        }
+
+        // If frames are full, replace the least frequently used page
+        if (flag2 == 0) {
+            let minFreq = Math.min(...frequency);
+            pos = frequency.indexOf(minFreq);
+            frames[pos] = arr[i];
+            frequency[pos] = 1;
+            pageFaults++;
+        }
+
+        // Update the table
+        row = table.insertRow((count) + 1);
+        cell = row.insertCell((k++));
+        cell.innerHTML = arr[i];
+        count++;
+
+        for (j = 0; j < numberOfFrames; ++j) {
+            if (frames[j] == -1) {
+                cell = row.insertCell((k++));
+                cell.innerHTML = " - ";
+            } else {
+                cell = row.insertCell((k++));
+                cell.innerHTML = frames[j];
+            }
+        }
+        if (s == 0) {
+            cell = row.insertCell((k++));
+            cell.innerHTML = "Hit";
+            cell.style.backgroundColor = "rgb(0, 175, 0)";
+            cell.style.textAlign = "center";
+        } else {
+            cell = row.insertCell((k++));
+            cell.innerHTML = "Miss";
+            cell.style.backgroundColor = "rgb(175, 0, 0)";
+            cell.style.textAlign = "center";
+        }
+    }
+
+    hitRate = (pageHits / numberOfPages) * 100;
+    missRate = (pageFaults / numberOfPages) * 100;
+
+    document.getElementById("page_miss").innerHTML = "Total Number Of Page Faults : " + `<b>${pageFaults}</b>`;
+    document.getElementById("page_hits").innerHTML = "Total Number Of Page Hits : " + `<b>${pageHits}</b>`;
+    document.getElementById("miss_rate").innerHTML = "Page Miss Rate : " + `<b>${missRate.toFixed(2)}%</b>`;
+    document.getElementById("hit_rate").innerHTML = "Page Hit Rate : " + `<b>${hitRate.toFixed(2)}%</b>`;
+}
         else {
             alert("Please choose a valid algorithm!");
             reset();
